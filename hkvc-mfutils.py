@@ -22,6 +22,7 @@ def proc_days(start, end, handle_date_func):
         month_int should be from 1 to 12
         date_int should be from 1 to 31; 'd' and thus inturn date_int is optional
     """
+    print("INFO:proc_days:from {} to {}".format(start, end))
     for y in range(start['y'], end['y']+1):
         for m in range(1,13):
             startDate = None
@@ -34,8 +35,9 @@ def proc_days(start, end, handle_date_func):
             if (y == end['y']):
                 if (m > end['m']):
                     continue
-                elif (m == start['m']):
+                elif (m == end['m']):
                     endDate = end.get('d', None)
+            print("INFO:proc_days:{}{:02}:{} to {}".format(y,m,startDate, endDate))
             for d in gCal.itermonthdays(y,m):
                 if d == 0:
                     continue
