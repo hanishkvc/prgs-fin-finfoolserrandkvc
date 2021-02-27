@@ -51,10 +51,13 @@ def proc_days(start, end, handle_date_func):
 
 def fetch4date(y, m, d):
     """
-    the default handler function passed to proc_days.
+    Fetch data for the given date.
+
+    This is the default handler function passed to proc_days.
 
     One can call this directly by passing the year, month and date one is interested in.
         month should be one of 1 to 12
+        day (month day) should be one of 1 to 31, as appropriate for month specified.
     """
     print(y,m,d)
     url = gBaseURL.format(d,calendar.month_name[m][:3],y)
@@ -87,6 +90,12 @@ def proc_datestr(dateStr, fallBackMonth=1):
 
 
 def proc_datestr_startend(sStart, sEnd):
+    """
+    Convert the start and end dates given in string notation of YYYYMMDD into
+    this programs internal date dictionary representation.
+
+    The dates should follow the YYYY[MM[DD]] format, where [] means optional.
+    """
     start = proc_datestr(sStart, 1)
     end = proc_datestr(sEnd, 12)
     return start, end
@@ -96,15 +105,17 @@ def fetch4daterange(sStart, sEnd):
     """
     Fetch data for given date range.
 
-    The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD
+    The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
     """
     start, end = proc_datestr_startend(sStart, sEnd)
     proc_days(start, end, fetch4date)
 
 
-if len(sys.argv) > 1:
-    fetch4daterange(sys.argv[1], sys.argv[2])
-else:
+def do_interactive():
+    """
+    Run the interactive [REPL] logic of this program.
+    Read-Eval-Print Loop
+    """
     bQuit = False
     while not bQuit:
         try:
@@ -115,4 +126,13 @@ else:
             if excInfo[0] == SystemExit:
                 break
             print(excInfo)
+
+
+#
+# The main flow starts here
+#
+if len(sys.argv) > 1:
+    fetch4daterange(sys.argv[1], sys.argv[2])
+else:
+    do_interactive()
 
