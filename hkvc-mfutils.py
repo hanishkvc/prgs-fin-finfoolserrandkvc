@@ -86,10 +86,24 @@ def proc_datestr(dateStr, fallBackMonth=1):
     return date
 
 
-if len(sys.argv) > 1:
-    start = proc_datestr(sys.argv[1], 1)
-    end = proc_datestr(sys.argv[2], 12)
+def proc_datestr_startend(sStart, sEnd):
+    start = proc_datestr(sStart, 1)
+    end = proc_datestr(sEnd, 12)
+    return start, end
+
+
+def fetch4daterange(sStart, sEnd):
+    """
+    Fetch data for given date range.
+
+    The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD
+    """
+    start, end = proc_datestr_startend(sStart, sEnd)
     proc_days(start, end, fetch4date)
+
+
+if len(sys.argv) > 1:
+    fetch4daterange(sys.argv[1], sys.argv[2])
 else:
     bQuit = False
     while not bQuit:
