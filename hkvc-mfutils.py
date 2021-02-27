@@ -42,6 +42,9 @@ if len(sys.argv) > 1:
 else:
     bQuit = False
     while not bQuit:
-        cmd = input(":")
-        exec(cmd,globals())
+        try:
+            cmd = input(":")
+            exec(cmd,globals())
+        except:
+            print(sys.exc_info())
 
