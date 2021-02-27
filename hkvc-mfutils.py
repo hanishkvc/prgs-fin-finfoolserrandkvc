@@ -16,16 +16,13 @@ def get_days(start, end):
                 continue
             if (y == end['y']) and (m > end['m']):
                 continue
+            print()
             for d in gCal.itermonthdays(y,m):
                 if d == 0:
                     continue
-                print(d)
+                print(" %d"%(d), end="")
 
-start = {}
-start['y'] = int(sys.argv[1])
-start['m'] = 1
-end = {}
-end['y'] = int(sys.argv[2])
-end['m'] = 12
+start = { 'y': int(sys.argv[1]), 'm': 1 }
+end = { 'y': int(sys.argv[2]), 'm': 12 }
 get_days(start, end)
 
