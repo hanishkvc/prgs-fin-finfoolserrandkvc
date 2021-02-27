@@ -46,5 +46,8 @@ else:
             cmd = input(":")
             exec(cmd,globals())
         except:
-            print(sys.exc_info())
+            excInfo = sys.exc_info()
+            if excInfo[0] == SystemExit:
+                break
+            print(excInfo)
 
