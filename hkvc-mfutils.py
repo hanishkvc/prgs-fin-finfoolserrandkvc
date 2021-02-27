@@ -27,6 +27,8 @@ def proc_days(start, end, func):
 
 def handle_date(y, m, d):
     print(y,m,d)
+    url = gBaseURL.format("{}{}{}".format(d,m,y))
+    print(url)
 
 
 start = { 'y': int(sys.argv[1]), 'm': 1 }
