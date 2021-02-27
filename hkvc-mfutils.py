@@ -114,15 +114,20 @@ def fetch4daterange(sStart, sEnd):
 def parse_csv(sFile):
     tFile = open(sFile)
     for l in tFile:
+        if l.strip() == '':
+            continue
         if l[0].isalpha():
             print("WARN:parse_csv:Skipping:{}".format(l))
             continue
-        la = l.split(';')
-        code = la[0]
-        name = la[1]
-        nav  = la[4]
-        date = la[7]
-        print(code, name, nav, date)
+        try:
+            la = l.split(';')
+            code = la[0]
+            name = la[1]
+            nav  = la[4]
+            date = la[7]
+            print(code, name, nav, date)
+        except:
+            print("ERRR:parse_csv:{}".format(l))
 
 
 def do_interactive():
