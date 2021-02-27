@@ -4,6 +4,7 @@
 
 import sys
 import calendar
+import os
 
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
 #http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
@@ -30,6 +31,8 @@ def handle_date(y, m, d):
     print(y,m,d)
     url = gBaseURL.format(d,calendar.month_name[m][:3],y)
     print(url)
+    cmd = "wget {} --output-document=data/{}{:02}{:02}.csv".format(url,y,m,d)
+    os.system(cmd)
 
 
 start = { 'y': int(sys.argv[1]), 'm': 1 }
