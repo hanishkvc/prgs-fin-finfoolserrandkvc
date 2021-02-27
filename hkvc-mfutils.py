@@ -24,13 +24,18 @@ def proc_days(start, end, handle_date_func):
     """
     for y in range(start['y'], end['y']+1):
         for m in range(1,13):
-            if (y == start['y']) and (m < start['m']):
-                continue
-            if (y == end['y']) and (m > end['m']):
-                continue
-            print()
-            startDate = start.get('d', None)
-            endDate = end.get('d', None)
+            startDate = None
+            endDate = None
+            if (y == start['y']):
+                if (m < start['m']):
+                    continue
+                elif (m == start['m']):
+                    startDate = start.get('d', None)
+            if (y == end['y']):
+                if (m > end['m']):
+                    continue
+                elif (m == start['m']):
+                    endDate = end.get('d', None)
             for d in gCal.itermonthdays(y,m):
                 if d == 0:
                     continue
@@ -38,7 +43,7 @@ def proc_days(start, end, handle_date_func):
                     continue
                 if (endDate != None) and (d > endDate):
                     continue
-                print(" %d "%(d), end="")
+                print(" %d "%(d))
                 handle_date_func(y,m,d)
 
 
