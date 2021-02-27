@@ -6,7 +6,8 @@ import sys
 import calendar
 
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
-gBaseURL = "https://www.amfiindia.com/spages/NAVAll.txt?t={}"
+#http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
+gBaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
 gCal = calendar.Calendar()
 
 
@@ -27,7 +28,7 @@ def proc_days(start, end, func):
 
 def handle_date(y, m, d):
     print(y,m,d)
-    url = gBaseURL.format("{}{}{}".format(d,m,y))
+    url = gBaseURL.format(d,calendar.month_name[m][:3],y)
     print(url)
 
 
