@@ -18,8 +18,9 @@ def proc_days(start, end, handle_date_func):
         The date will be passed to the passed function as year, month, date
         as integers.
 
-    start and end need to be dictionaries {'y': year_int, 'm': month_int}
-        month_int is from 1 to 12
+    start and end need to be dictionaries {'y': year_int, 'm': month_int, 'd': date_int}
+        month_int should be from 1 to 12
+        date_int should be from 1 to 31; 'd' and thus inturn date_int is optional
     """
     for y in range(start['y'], end['y']+1):
         for m in range(1,13):
@@ -28,8 +29,14 @@ def proc_days(start, end, handle_date_func):
             if (y == end['y']) and (m > end['m']):
                 continue
             print()
+            startDate = start.get('d', None)
+            endDate = end.get('d', None)
             for d in gCal.itermonthdays(y,m):
                 if d == 0:
+                    continue
+                if (startDate != None) and (d < startDate):
+                    continue
+                if (endDate != None) and (d > endDate):
                     continue
                 print(" %d "%(d), end="")
                 handle_date_func(y,m,d)
@@ -49,9 +56,29 @@ def fetch4date(y, m, d):
     os.system(cmd)
 
 
+def proc_datestr(dateStr):
+    """
+    Convert a date specified in YYYYMMDD format into internal date dictionary format
+        MM and DD are optional.
+        If DD is used, then MM needs to be used.
+    """
+    year = dateStr[:4]
+    month = dateStr[4:6]
+    day = dateStr[6:8]
+    if (year == '') or (len(year) != 4):
+        exit()
+    date = {}
+    date['y'] = int(year)
+    if month != '':
+        date['m'] = int(month)
+    if day != '':
+        date['d'] = int(day)
+    return date
+
+
 if len(sys.argv) > 1:
-    start = { 'y': int(sys.argv[1]), 'm': 1 }
-    end = { 'y': int(sys.argv[2]), 'm': 12 }
+    start = proc_datestr(sys.argv[1])
+    end = proc_datestr(sys.argv[2])
     proc_days(start, end, fetch4date)
 else:
     bQuit = False
