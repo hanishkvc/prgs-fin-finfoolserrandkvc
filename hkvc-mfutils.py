@@ -56,11 +56,12 @@ def fetch4date(y, m, d):
     os.system(cmd)
 
 
-def proc_datestr(dateStr):
+def proc_datestr(dateStr, fallBackMonth=1):
     """
     Convert a date specified in YYYYMMDD format into internal date dictionary format
         MM and DD are optional.
-        If DD is used, then MM needs to be used.
+        MM if not specified fallsback to the value passed through fallBackMonth arg.
+        If DD is needed, then MM needs to be used.
     """
     year = dateStr[:4]
     month = dateStr[4:6]
@@ -71,14 +72,16 @@ def proc_datestr(dateStr):
     date['y'] = int(year)
     if month != '':
         date['m'] = int(month)
+    else:
+        date['m'] = fallBackMonth
     if day != '':
         date['d'] = int(day)
     return date
 
 
 if len(sys.argv) > 1:
-    start = proc_datestr(sys.argv[1])
-    end = proc_datestr(sys.argv[2])
+    start = proc_datestr(sys.argv[1], 1)
+    end = proc_datestr(sys.argv[2], 12)
     proc_days(start, end, fetch4date)
 else:
     bQuit = False
