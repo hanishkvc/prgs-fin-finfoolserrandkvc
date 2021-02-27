@@ -43,5 +43,5 @@ else:
     bQuit = False
     while not bQuit:
         cmd = input(":")
-        eval(cmd,globals())
+        exec(cmd,globals())
 
