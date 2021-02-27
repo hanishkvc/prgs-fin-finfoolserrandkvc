@@ -111,6 +111,20 @@ def fetch4daterange(sStart, sEnd):
     proc_days(start, end, fetch4date)
 
 
+def parse_csv(sFile):
+    tFile = open(sFile)
+    for l in tFile:
+        if l[0].isalpha():
+            print("WARN:parse_csv:Skipping:{}".format(l))
+            continue
+        la = l.split(';')
+        code = la[0]
+        name = la[1]
+        nav  = la[4]
+        date = la[7]
+        print(code, name, nav, date)
+
+
 def do_interactive():
     """
     Run the interactive [REPL] logic of this program.
