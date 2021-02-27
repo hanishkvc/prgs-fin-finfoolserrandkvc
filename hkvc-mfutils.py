@@ -9,7 +9,8 @@ import calendar
 gBaseURL = "https://www.amfiindia.com/spages/NAVAll.txt?t={}"
 gCal = calendar.Calendar()
 
-def get_days(start, end):
+
+def proc_days(start, end, func):
     for y in range(start['y'], end['y']+1):
         for m in range(1,13):
             if (y == start['y']) and (m < start['m']):
@@ -20,9 +21,15 @@ def get_days(start, end):
             for d in gCal.itermonthdays(y,m):
                 if d == 0:
                     continue
-                print(" %d"%(d), end="")
+                print(" %d "%(d), end="")
+                func(y,m,d)
+
+
+def handle_date(y, m, d):
+    print(y,m,d)
+
 
 start = { 'y': int(sys.argv[1]), 'm': 1 }
 end = { 'y': int(sys.argv[2]), 'm': 12 }
-get_days(start, end)
+proc_days(start, end, handle_date)
 
