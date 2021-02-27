@@ -35,7 +35,13 @@ def handle_date(y, m, d):
     os.system(cmd)
 
 
-start = { 'y': int(sys.argv[1]), 'm': 1 }
-end = { 'y': int(sys.argv[2]), 'm': 12 }
-proc_days(start, end, handle_date)
+if len(sys.argv) > 1:
+    start = { 'y': int(sys.argv[1]), 'm': 1 }
+    end = { 'y': int(sys.argv[2]), 'm': 12 }
+    proc_days(start, end, handle_date)
+else:
+    bQuit = False
+    while not bQuit:
+        cmd = input(":")
+        eval(cmd,globals())
 
