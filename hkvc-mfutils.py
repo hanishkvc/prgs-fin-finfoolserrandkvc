@@ -10,6 +10,7 @@ import os
 #http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
 gBaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
 gCal = calendar.Calendar()
+gData = {}
 
 
 def proc_days(start, end, handle_date_func):
@@ -126,6 +127,11 @@ def parse_csv(sFile):
             nav  = la[4]
             date = la[7]
             print(code, name, nav, date)
+            theMF = gData.get(code, None)
+            if theMF == None:
+                gData[code] = {'data': {}}
+            gData[code]['name'] = name
+            gData[code]['data'][date] = nav
         except:
             print("ERRR:parse_csv:{}".format(l))
 
