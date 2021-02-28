@@ -18,14 +18,21 @@ gData = {}
 
 
 def setup_paths():
+    """
+    Account for MFUTILS_BASE env variable if set
+    """
     global FNAMECSV_TMPL
     FNAMECSV_TMPL = os.path.expanduser(os.path.join(os.environ.get('MFUTILS_BASE',"~/"), FNAMECSV_TMPL))
     print("INFO:setup_paths:", FNAMECSV_TMPL)
 
 
 def setup_gdata():
-    gData['codes'] = {}
-    gData['data'] = numpy.zeros([4096*8,4096])
+    """
+    Initialise the gData dictionary
+    """
+    gData['code2index'] = {}
+    gData['index2code'] = {}
+    gData['data'] = numpy.zeros([8192*4,8192])
     gData['nextMFIndex'] = 0
     gData['dateIndex'] = -1
     gData['names'] = []
@@ -159,11 +166,12 @@ def parse_csv(sFile):
             date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
             date = date.year*10000+date.month*100+date.day
             #print(code, name, nav, date)
-            mfIndex = gData['codes'].get(code, None)
+            mfIndex = gData['code2index'].get(code, None)
             if mfIndex == None:
                 mfIndex = gData['nextMFIndex']
                 gData['nextMFIndex'] += 1
-                gData['codes'][code] = mfIndex
+                gData['code2index'][code] = mfIndex
+                gData['index2code'][mfIndex] = code
                 gData['names'].append(name)
             else:
                 if name != gData['names'][mfIndex]:
