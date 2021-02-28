@@ -61,7 +61,7 @@ def proc_days(start, end, handle_date_func):
                     continue
                 elif (m == end['m']):
                     endDate = end.get('d', None)
-            print("INFO:proc_days:{}{:02}:{} to {}".format(y,m,startDate, endDate))
+            print("INFO:proc_days:handlingmonth:{}{:02}:{} to {}".format(y,m,startDate, endDate))
             for d in gCal.itermonthdays(y,m):
                 if d == 0:
                     continue
@@ -69,7 +69,7 @@ def proc_days(start, end, handle_date_func):
                     continue
                 if (endDate != None) and (d > endDate):
                     continue
-                print(" %d "%(d))
+                print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
                 handle_date_func(y,m,d)
 
 
