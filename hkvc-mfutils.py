@@ -164,7 +164,10 @@ def parse_csv(sFile):
                 mfIndex = gData['nextMFIndex']
                 gData['nextMFIndex'] += 1
                 gData['codes'][code] = mfIndex
-            gData['names'].append(name)
+                gData['names'].append(name)
+            else:
+                if name != gData['names'][mfIndex]:
+                    input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
             gData['data'][mfIndex,gData['dateIndex']] = nav
         except:
             print("ERRR:parse_csv:{}".format(l))
