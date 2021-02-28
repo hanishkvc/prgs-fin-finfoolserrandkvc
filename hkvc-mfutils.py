@@ -15,6 +15,11 @@ gCal = calendar.Calendar()
 gData = {}
 
 
+def setup_paths():
+    global FNAMECSV_TMPL
+    FNAMECSV_TMPL = os.path.expanduser(os.path.join(os.environ.get('MFUTILS_BASE',"~/"), FNAMECSV_TMPL))
+
+
 def proc_days(start, end, handle_date_func):
     """
     call the passed function for each date with the given start and end range.
@@ -181,6 +186,7 @@ def do_interactive():
 #
 # The main flow starts here
 #
+setup_paths()
 if len(sys.argv) > 1:
     fetch4daterange(sys.argv[1], sys.argv[2])
 else:
