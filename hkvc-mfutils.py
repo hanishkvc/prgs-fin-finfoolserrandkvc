@@ -6,6 +6,7 @@ import sys
 import calendar
 import os
 import datetime
+import numpy
 
 
 FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
@@ -24,7 +25,7 @@ def setup_paths():
 
 def setup_gdata():
     gData['codes'] = {}
-    gData['data'] = numpy.zeros([4096,4096])
+    gData['data'] = numpy.zeros([4096*8,4096])
     gData['nextMFIndex'] = 0
     gData['dateIndex'] = -1
     gData['names'] = []
@@ -151,10 +152,13 @@ def parse_csv(sFile):
             la = l.split(';')
             code = int(la[0])
             name = la[1]
-            nav  = float(la[4])
+            try:
+                nav  = float(la[4])
+            except:
+                nav = -1
             date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
             date = date.year*10000+date.month*100+date.day
-            print(code, name, nav, date)
+            #print(code, name, nav, date)
             mfIndex = gData['codes'].get(code, None)
             if mfIndex == None:
                 mfIndex = gData['nextMFIndex']
