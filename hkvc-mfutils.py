@@ -5,6 +5,7 @@
 import sys
 import calendar
 import os
+import datetime
 
 
 FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
@@ -135,10 +136,11 @@ def parse_csv(sFile):
             continue
         try:
             la = l.split(';')
-            code = la[0]
+            code = int(la[0])
             name = la[1]
-            nav  = la[4]
-            date = la[7]
+            nav  = float(la[4])
+            date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
+            date = date.year*10000+date.month*100+date.day
             print(code, name, nav, date)
             theMF = gData.get(code, None)
             if theMF == None:
@@ -147,6 +149,7 @@ def parse_csv(sFile):
             gData[code]['data'].append(nav)
         except:
             print("ERRR:parse_csv:{}".format(l))
+            print(sys.exc_info())
     tFile.close()
 
 
