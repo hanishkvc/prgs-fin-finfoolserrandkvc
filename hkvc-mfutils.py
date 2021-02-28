@@ -202,7 +202,7 @@ def load4daterange(sStart, sEnd):
     proc_days(start, end, load4date)
 
 
-def findmatchingmf(mfName, fullMatch=False, partialTokens=True, ignoreCase=True):
+def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True):
     """
     Find the MFs which match the given mfName.
 
@@ -212,7 +212,9 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=True, ignoreCase=True)
 
     If partialTokens is True, then tokens in the given mfName
     could appear as part of bigger token in MFNames in its
-    dataset.
+    dataset. Else the token in given mfName and token in the
+    MFNames in the dataset should match fully at the individual
+    token level.
 
     if ignoreCase is True, then case of the given mfName,
     is ignored while trying to find a match.
@@ -228,13 +230,14 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=True, ignoreCase=True)
     mfNamePartMatch = []
     namesIndex = -1
     for curName in gData['names']:
+        curName_asis = curName
         if ignoreCase:
             curName = curName.upper()
         namesIndex += 1
         matchCnt = 0
         if fullMatch:
             if curName == mfName:
-                mfNameFullMatch.append([curName, namesIndex])
+                mfNameFullMatch.append([curName_asis, namesIndex])
             continue
         for token in mfNameTokens:
             if partialTokens:
@@ -244,9 +247,9 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=True, ignoreCase=True)
                 if token in curName.split(' '):
                     matchCnt += 1
         if matchCnt == len(mfNameTokens):
-            mfNameFullMatch.append([curName, namesIndex])
+            mfNameFullMatch.append([curName_asis, namesIndex])
         elif matchCnt > 0:
-            mfNamePartMatch.append([curName, namesIndex])
+            mfNamePartMatch.append([curName_asis, namesIndex])
     return mfNameFullMatch, mfNamePartMatch
 
 
