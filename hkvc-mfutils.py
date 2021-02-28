@@ -116,9 +116,13 @@ def fetch4daterange(sStart, sEnd):
 
 
 def parse_csv(sFile):
+    """
+    Parse the specified data csv file and load it into global data dictionary.
+    """
     tFile = open(sFile)
     for l in tFile:
-        if l.strip() == '':
+        l = l.strip()
+        if l == '':
             continue
         if l[0].isalpha():
             print("WARN:parse_csv:Skipping:{}".format(l))
