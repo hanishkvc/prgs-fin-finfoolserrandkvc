@@ -142,9 +142,9 @@ def parse_csv(sFile):
             print(code, name, nav, date)
             theMF = gData.get(code, None)
             if theMF == None:
-                gData[code] = {'name': set(), 'data': {}}
+                gData[code] = {'name': set(), 'data': []}
             gData[code]['name'].add(name)
-            gData[code]['data'][date] = nav
+            gData[code]['data'].append(nav)
         except:
             print("ERRR:parse_csv:{}".format(l))
     tFile.close()
