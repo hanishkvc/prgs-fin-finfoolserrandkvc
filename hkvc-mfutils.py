@@ -10,6 +10,7 @@ import numpy
 import matplotlib.pyplot as plt
 
 
+gbSkipWeekEnds = False
 FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
 #http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
@@ -77,7 +78,7 @@ def proc_days(start, end, handle_date_func):
                     continue
                 if (endDate != None) and (d > endDate):
                     continue
-                if calendar.weekday(y,m,d) in [5, 6]:
+                if gbSkipWeekEnds and (calendar.weekday(y,m,d) in [5, 6]):
                     continue
                 print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
                 handle_date_func(y,m,d)
