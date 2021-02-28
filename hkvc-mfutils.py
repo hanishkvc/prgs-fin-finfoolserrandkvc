@@ -22,6 +22,19 @@ def setup_paths():
     print("INFO:setup_paths:", FNAMECSV_TMPL)
 
 
+def setup_gdata():
+    gData['codes'] = {}
+    gData['data'] = numpy.zeros([4096,4096])
+    gData['nextMFIndex'] = 0
+    gData['dateIndex'] = -1
+    gData['names'] = []
+
+
+def setup():
+    setup_gdata()
+    setup_paths()
+
+
 def proc_days(start, end, handle_date_func):
     """
     call the passed function for each date with the given start and end range.
@@ -142,11 +155,13 @@ def parse_csv(sFile):
             date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
             date = date.year*10000+date.month*100+date.day
             print(code, name, nav, date)
-            theMF = gData.get(code, None)
-            if theMF == None:
-                gData[code] = {'name': set(), 'data': []}
-            gData[code]['name'].add(name)
-            gData[code]['data'].append(nav)
+            mfIndex = gData['codes'].get(code, None)
+            if mfIndex == None:
+                mfIndex = gData['nextMFIndex']
+                gData['nextMFIndex'] += 1
+                gData['codes'][code] = mfIndex
+            gData['names'].append(name)
+            gData['data'][mfIndex,gData['dateIndex']] = nav
         except:
             print("ERRR:parse_csv:{}".format(l))
             print(sys.exc_info())
@@ -157,6 +172,7 @@ def load4date(y, m, d):
     """
     Load data for the given date.
     """
+    gData['dateIndex'] += 1
     fName = FNAMECSV_TMPL.format(y,m,d)
     parse_csv(fName)
 
@@ -191,7 +207,7 @@ def do_interactive():
 #
 # The main flow starts here
 #
-setup_paths()
+setup()
 if len(sys.argv) > 1:
     fetch4daterange(sys.argv[1], sys.argv[2])
 else:
