@@ -18,6 +18,7 @@ gData = {}
 def setup_paths():
     global FNAMECSV_TMPL
     FNAMECSV_TMPL = os.path.expanduser(os.path.join(os.environ.get('MFUTILS_BASE',"~/"), FNAMECSV_TMPL))
+    print("INFO:setup_paths:", FNAMECSV_TMPL)
 
 
 def proc_days(start, end, handle_date_func):
@@ -146,6 +147,7 @@ def parse_csv(sFile):
             gData[code]['data'][date] = nav
         except:
             print("ERRR:parse_csv:{}".format(l))
+    tFile.close()
 
 
 def load4date(y, m, d):
