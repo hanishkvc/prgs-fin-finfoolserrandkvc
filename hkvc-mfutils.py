@@ -6,6 +6,8 @@ import sys
 import calendar
 import os
 
+
+FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
 #http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
 gBaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
@@ -62,8 +64,9 @@ def fetch4date(y, m, d):
     """
     print(y,m,d)
     url = gBaseURL.format(d,calendar.month_name[m][:3],y)
-    print(url)
-    cmd = "wget {} --continue --output-document=data/{}{:02}{:02}.csv".format(url,y,m,d)
+    fName = FNAMECSV_TMPL.format(y,m,d)
+    print(url, fName)
+    cmd = "wget {} --continue --output-document={}".format(url,fName)
     os.system(cmd)
 
 
@@ -129,11 +132,29 @@ def parse_csv(sFile):
             print(code, name, nav, date)
             theMF = gData.get(code, None)
             if theMF == None:
-                gData[code] = {'data': {}}
-            gData[code]['name'] = name
+                gData[code] = {'name': set(), 'data': {}}
+            gData[code]['name'].add(name)
             gData[code]['data'][date] = nav
         except:
             print("ERRR:parse_csv:{}".format(l))
+
+
+def load4date(y, m, d):
+    """
+    Load data for the given date.
+    """
+    fName = FNAMECSV_TMPL.format(y,m,d)
+    parse_csv(fName)
+
+
+def load4daterange(sStart, sEnd):
+    """
+    Load data for given date range.
+
+    The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
+    """
+    start, end = proc_datestr_startend(sStart, sEnd)
+    proc_days(start, end, load4date)
 
 
 def do_interactive():
