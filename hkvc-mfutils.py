@@ -146,7 +146,7 @@ def parse_csv(sFile):
         if l == '':
             continue
         if l[0].isalpha():
-            print("WARN:parse_csv:Skipping:{}".format(l))
+            #print("WARN:parse_csv:Skipping:{}".format(l))
             continue
         try:
             la = l.split(';')
