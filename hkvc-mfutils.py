@@ -202,6 +202,31 @@ def load4daterange(sStart, sEnd):
     proc_days(start, end, load4date)
 
 
+def findmatchingmf(mfName):
+    """
+    Find the MFs which match the tokens in the given mfName.
+
+    It returns those names which match all given tokens,
+    as well as those names which only match certain tokens.
+    """
+    mfName = mfName.strip()
+    mfNameTokens = mfName.split(' ')
+    mfNameFullMatch = []
+    mfNamePartMatch = []
+    namesIndex = -1
+    for curName in gData['names']:
+        namesIndex += 1
+        matchCnt = 0
+        for token in mfNameTokens:
+            if curName.find(token) != -1:
+                matchCnt += 1
+        if matchCnt == len(mfNameTokens):
+            mfNameFullMatch.append([curName, namesIndex])
+        elif matchCnt > 0:
+            mfNamePartMatch.append([curName, namesIndex])
+    return mfNameFullMatch, mfNamePartMatch
+
+
 def do_interactive():
     """
     Run the interactive [REPL] logic of this program.
