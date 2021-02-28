@@ -10,6 +10,21 @@ import numpy
 import matplotlib.pyplot as plt
 
 
+"""
+
+Usage scenario
+
+fetch4daterange("2015", "202102")
+load4daterange("2015", "2020")
+fillin4holidays()
+f,p = findmatchingmf("token1 token2")
+[print(x) for x in f]
+plt.plot(gData['data'][mfIndex])
+plt.show()
+
+"""
+
+
 gbSkipWeekEnds = False
 FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
