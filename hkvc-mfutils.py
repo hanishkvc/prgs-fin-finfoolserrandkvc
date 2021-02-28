@@ -206,6 +206,21 @@ def load4daterange(sStart, sEnd):
     proc_days(start, end, load4date)
 
 
+def fillin4holidays():
+    """
+    As there wont be any Nav data for holidays including weekends,
+    so fill them with the nav from the prev working day for the corresponding mf.
+    """
+    for r in range(gData['nextMFIndex']):
+        lastNav = -1
+        for c in range(gData['dateIndex']+1):
+            if gData['data'][r,c] == 0:
+                if lastNav > 0:
+                    gData['data'][r,c] = lastNav
+            else:
+                lastNav = gData['data'][r,c]
+
+
 def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True):
     """
     Find the MFs which match the given mfName.
