@@ -247,9 +247,16 @@ def load4daterange(sStart, sEnd):
 
     NOTE: This logic takes care of filling in nav values for holidays
     automatically by calling fillin4holidays.
+
+    NOTE: If we dont have csv files for all the dates specified, in the date range,
+    then ensure that we have atleast data loaded till the 1st non existant date.
     """
     start, end = proc_datestr_startend(sStart, sEnd)
-    proc_days(start, end, load4date, gbNotBeyondYesterday)
+    try:
+        proc_days(start, end, load4date, gbNotBeyondYesterday)
+    except:
+        excInfo = sys.exc_info()
+        print(excInfo)
     fillin4holidays()
 
 
