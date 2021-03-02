@@ -346,8 +346,10 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         index = gData['code2index'][code]
         mfIndexes.append(index)
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
-        aTemp = aTemp-aTemp[0]
-        plt.plot(aTemp, label=code)
+        aStart = aTemp[0]
+        aEnd = aTemp[-1]
+        aTemp = (aTemp/aStart)*100
+        plt.plot(aTemp, label="{},{},{}".format(code, aEnd, aTemp[-1]))
     plt.legend()
     plt.show()
 
