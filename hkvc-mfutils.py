@@ -296,7 +296,7 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
         matchCnt = 0
         if fullMatch:
             if curName == mfName:
-                mfNameFullMatch.append([curName_asis, namesIndex])
+                mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
             continue
         for token in mfNameTokens:
             if partialTokens:
@@ -306,10 +306,32 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
                 if token in curName.split(' '):
                     matchCnt += 1
         if matchCnt == len(mfNameTokens):
-            mfNameFullMatch.append([curName_asis, namesIndex])
+            mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
         elif matchCnt > 0:
-            mfNamePartMatch.append([curName_asis, namesIndex])
+            mfNamePartMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
     return mfNameFullMatch, mfNamePartMatch
+
+
+def lookatmfs_codes(mfCodes):
+    mfIndexes = []
+    for code in mfCodes:
+        index = gData['code2index'][code]
+        mfIndexes.append(index)
+        plt.plot(gData['data'][index])
+    plt.show()
+
+
+def lookatmfs(mfNames):
+    """
+    Given a list of MF names to look at.
+    """
+    mfNames = mfNames.split(';')
+    mfCodes = []
+    for name in mfNames:
+        f,p = findmatchingmf(name)
+        for c in f:
+            mfCodes.append(c[1])
+    lookatmfs_codes(mfCodes)
 
 
 def do_interactive():
