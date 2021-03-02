@@ -346,7 +346,10 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         index = gData['code2index'][code]
         mfIndexes.append(index)
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
-        aStart = aTemp[0]
+        for i in range(len(aTemp)):
+            aStart = aTemp[i]
+            if aStart > 0:
+                break
         aEnd = aTemp[-1]
         aTemp = ((aTemp/aStart)-1)*100
         aPercent = aTemp[-1]
