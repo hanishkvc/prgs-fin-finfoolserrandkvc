@@ -364,6 +364,7 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         print(aLabel)
         plt.plot(aTemp, label=aLabel)
     plt.legend()
+    plt.grid(True)
     plt.show()
 
 
