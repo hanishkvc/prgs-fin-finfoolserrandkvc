@@ -55,11 +55,19 @@ def setup_gdata():
     gData['nextMFIndex'] = 0
     gData['dateIndex'] = -1
     gData['names'] = []
+    gData['dates'] = []
 
 
 def setup():
     setup_gdata()
     setup_paths()
+
+
+def dateint(y, m, d):
+    """
+    Convert year, month and day into a numeric YYYYMMDD format.
+    """
+    return y*10000+m*100+d
 
 
 def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True):
@@ -199,7 +207,7 @@ def parse_csv(sFile):
             except:
                 nav = -1
             date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
-            date = date.year*10000+date.month*100+date.day
+            date = dateint(date.year,date.month,date.day)
             #print(code, name, nav, date)
             mfIndex = gData['code2index'].get(code, None)
             if mfIndex == None:
@@ -223,6 +231,7 @@ def load4date(y, m, d):
     Load data for the given date.
     """
     gData['dateIndex'] += 1
+    gData['dates'].append(dateint(y,m,d))
     fName = FNAMECSV_TMPL.format(y,m,d)
     parse_csv(fName)
 
