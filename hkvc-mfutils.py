@@ -330,6 +330,8 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
 def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
+
+    The data is plotted for the range of date given.
     """
     mfIndexes = []
     if startDate == -1:
@@ -350,12 +352,14 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     plt.show()
 
 
-def lookatmfs(mfNames):
+def lookatmfs(mfNames, startDate=-1, endDate=-1):
     """
     Given a list of MF names, look at their data.
 
     findmatchingmf logic is called wrt each given name in the list.
         All MFs returned as part of its full match list, will be looked at.
+
+    The data is plotted for the range of date given.
     """
     mfNames = mfNames.split(';')
     mfCodes = []
@@ -364,7 +368,7 @@ def lookatmfs(mfNames):
         for c in f:
             print(c)
             mfCodes.append(c[1])
-    lookatmfs_codes(mfCodes)
+    lookatmfs_codes(mfCodes, startDate, endDate)
 
 
 def do_interactive():
