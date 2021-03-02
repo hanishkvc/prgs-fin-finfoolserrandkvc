@@ -229,6 +229,9 @@ def parse_csv(sFile):
 def load4date(y, m, d):
     """
     Load data for the given date.
+
+    NOTE: This logic wont fill in prev nav for holidays,
+    you will have to call fillin4holidays explicitly.
     """
     gData['dateIndex'] += 1
     gData['dates'].append(dateint(y,m,d))
@@ -241,9 +244,27 @@ def load4daterange(sStart, sEnd):
     Load data for given date range.
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
+
+    NOTE: This logic takes care of filling in nav values for holidays
+    automatically by calling fillin4holidays.
     """
     start, end = proc_datestr_startend(sStart, sEnd)
     proc_days(start, end, load4date, gbNotBeyondYesterday)
+    fillin4holidays()
+
+
+def _fillin4holidays(mfIndex=-1):
+    """
+    As there wont be any Nav data for holidays including weekends,
+    so fill them with the nav from the prev working day for the corresponding mf.
+    """
+    lastNav = -1
+    for c in range(gData['dateIndex']+1):
+        if gData['data'][mfIndex,c] == 0:
+            if lastNav > 0:
+                gData['data'][mfIndex,c] = lastNav
+        else:
+            lastNav = gData['data'][mfIndex,c]
 
 
 def fillin4holidays():
@@ -252,13 +273,7 @@ def fillin4holidays():
     so fill them with the nav from the prev working day for the corresponding mf.
     """
     for r in range(gData['nextMFIndex']):
-        lastNav = -1
-        for c in range(gData['dateIndex']+1):
-            if gData['data'][r,c] == 0:
-                if lastNav > 0:
-                    gData['data'][r,c] = lastNav
-            else:
-                lastNav = gData['data'][r,c]
+        _fillin4holidays(r)
 
 
 def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True):
