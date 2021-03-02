@@ -62,7 +62,7 @@ def setup():
     setup_paths()
 
 
-def proc_days(start, end, handle_date_func):
+def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True):
     """
     call the passed function for each date with the given start and end range.
         The date will be passed to the passed function as year, month, date
@@ -74,7 +74,7 @@ def proc_days(start, end, handle_date_func):
     """
     print("INFO:proc_days:from {} to {}".format(start, end))
     now = time.localtime(time.time())
-    if gbNotBeyondYesterday:
+    if bNotBeyondYesterday:
         bChanged = False
         if end['y'] > now.tm_year:
             end['y'] = now.tm_year
@@ -83,10 +83,6 @@ def proc_days(start, end, handle_date_func):
             if end['m'] > now.tm_mon:
                 end['m'] = now.tm_mon
                 bChanged = True
-            elif end['m'] == now.tm_mon:
-                if end['d'] > now.tm_mday:
-                    end['d'] = now.tm_mday
-                    bChanged = True
         if bChanged:
             print("WARN:proc_days:end adjusted to be within today")
     for y in range(start['y'], end['y']+1):
@@ -113,7 +109,7 @@ def proc_days(start, end, handle_date_func):
                     continue
                 if gbSkipWeekEnds and (calendar.weekday(y,m,d) in [5, 6]):
                     continue
-                if gbNotBeyondYesterday and (y == now.tm_year) and (m == now.tm_mon) and (d >= now.tm_mday):
+                if bNotBeyondYesterday and (y == now.tm_year) and (m == now.tm_mon) and (d >= now.tm_mday):
                     continue
                 print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
                 handle_date_func(y,m,d)
@@ -179,7 +175,7 @@ def fetch4daterange(sStart, sEnd):
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
     """
     start, end = proc_datestr_startend(sStart, sEnd)
-    proc_days(start, end, fetch4date)
+    proc_days(start, end, fetch4date, gbNotBeyondYesterday)
 
 
 def parse_csv(sFile):
@@ -238,7 +234,7 @@ def load4daterange(sStart, sEnd):
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
     """
     start, end = proc_datestr_startend(sStart, sEnd)
-    proc_days(start, end, load4date)
+    proc_days(start, end, load4date, gbNotBeyondYesterday)
 
 
 def fillin4holidays():
