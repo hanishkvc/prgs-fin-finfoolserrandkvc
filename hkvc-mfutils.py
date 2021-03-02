@@ -335,7 +335,8 @@ def lookatmfs_codes(mfCodes):
     for code in mfCodes:
         index = gData['code2index'][code]
         mfIndexes.append(index)
-        plt.plot(gData['data'][index, 0:gData['dateIndex']+1])
+        plt.plot(gData['data'][index, 0:gData['dateIndex']+1], label=code)
+    plt.legend()
     plt.show()
 
 
