@@ -313,23 +313,30 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
 
 
 def lookatmfs_codes(mfCodes):
+    """
+    Given a list of MF codes (as in AMFI dataset), look at their data.
+    """
     mfIndexes = []
     for code in mfCodes:
         index = gData['code2index'][code]
         mfIndexes.append(index)
-        plt.plot(gData['data'][index])
+        plt.plot(gData['data'][index, 0:gData['dateIndex']+1])
     plt.show()
 
 
 def lookatmfs(mfNames):
     """
-    Given a list of MF names to look at.
+    Given a list of MF names, look at their data.
+
+    findmatchingmf logic is called wrt each given name in the list.
+        All MFs returned as part of its full match list, will be looked at.
     """
     mfNames = mfNames.split(';')
     mfCodes = []
     for name in mfNames:
         f,p = findmatchingmf(name)
         for c in f:
+            print(c)
             mfCodes.append(c[1])
     lookatmfs_codes(mfCodes)
 
