@@ -348,9 +348,11 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
         aStart = aTemp[0]
         aEnd = aTemp[-1]
-        aTemp = (aTemp/aStart)*100
+        aTemp = ((aTemp/aStart)-1)*100
         aPercent = aTemp[-1]
-        plt.plot(aTemp, label="{},{},{}-{}".format(code, round(aPercent,2), aStart, aEnd))
+        aLabel = "{}, {}, {} - {}".format(code, round(aPercent,2), aStart, aEnd)
+        print(aLabel)
+        plt.plot(aTemp, label=aLabel)
     plt.legend()
     plt.show()
 
