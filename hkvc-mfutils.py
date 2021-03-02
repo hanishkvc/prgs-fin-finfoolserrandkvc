@@ -8,6 +8,7 @@ import os
 import datetime
 import numpy
 import matplotlib.pyplot as plt
+import time
 
 
 """
@@ -25,6 +26,7 @@ plt.show()
 """
 
 
+gbNotBeyondYesterday = True
 gbSkipWeekEnds = False
 FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
@@ -71,6 +73,22 @@ def proc_days(start, end, handle_date_func):
         date_int should be from 1 to 31; 'd' and thus inturn date_int is optional
     """
     print("INFO:proc_days:from {} to {}".format(start, end))
+    now = time.localtime(time.time())
+    if gbNotBeyondYesterday:
+        bChanged = False
+        if end['y'] > now.tm_year:
+            end['y'] = now.tm_year
+            bChanged = True
+        elif end['y'] == now.tm_year:
+            if end['m'] > now.tm_mon:
+                end['m'] = now.tm_mon
+                bChanged = True
+            elif end['m'] == now.tm_mon:
+                if end['d'] > now.tm_mday:
+                    end['d'] = now.tm_mday
+                    bChanged = True
+        if bChanged:
+            print("WARN:proc_days:end adjusted to be within today")
     for y in range(start['y'], end['y']+1):
         for m in range(1,13):
             startDate = None
@@ -94,6 +112,8 @@ def proc_days(start, end, handle_date_func):
                 if (endDate != None) and (d > endDate):
                     continue
                 if gbSkipWeekEnds and (calendar.weekday(y,m,d) in [5, 6]):
+                    continue
+                if gbNotBeyondYesterday and (y == now.tm_year) and (m == now.tm_mon) and (d >= now.tm_mday):
                     continue
                 print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
                 handle_date_func(y,m,d)
