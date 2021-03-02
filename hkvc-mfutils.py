@@ -327,15 +327,23 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
     return mfNameFullMatch, mfNamePartMatch
 
 
-def lookatmfs_codes(mfCodes):
+def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
     """
     mfIndexes = []
+    if startDate == -1:
+        startDateIndex = 0
+    else:
+        startDateIndex = gData['dates'].index(startDate)
+    if endDate == -1:
+        endDateIndex = gData['dateIndex']
+    else:
+        endDateIndex = gData['dates'].index(endDate)
     for code in mfCodes:
         index = gData['code2index'][code]
         mfIndexes.append(index)
-        plt.plot(gData['data'][index, 0:gData['dateIndex']+1], label=code)
+        plt.plot(gData['data'][index, startDateIndex:endDateIndex+1], label=code)
     plt.legend()
     plt.show()
 
