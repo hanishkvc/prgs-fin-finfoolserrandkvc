@@ -418,19 +418,29 @@ def look4mfs(opType, startDate=-1, endDate=-1):
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
     for r in range(gData['nextMFIndex']):
-        tData[r,:], tStart, tEnd, tPercent = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+        try:
+            tData[r,:], tStart, tEnd, tPercent = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+        except:
+            traceback.print_exc()
+            print("WARN:{}:{}".format(r,gData['names'][r]))
     sortedIndex = numpy.argsort(tData[:,-1])
     mfCodes = []
     if opType == "TOP":
         topIndexThreshold = gData['nextMFIndex']-10
         for i in range(gData['nextMFIndex']):
             if sortedIndex[i] > topIndexThreshold:
-                mfCodes.append(gData['index2code'][i])
+                mfName = gData['names'][i]
+                mfCode = gData['index2code'][i]
+                mfCodes.append(mfCode)
+                print("{}:{} {}:{}".format(sortedIndex[i], i, mfCode, mfName))
     elif opType == "BOTTOM":
         bottomIndexThreshold = 10
         for i in range(gData['nextMFIndex']):
             if sortedIndex[i] < bottomIndexThreshold:
-                mfCodes.append(gData['index2code'][i])
+                mfName = gData['names'][i]
+                mfCode = gData['index2code'][i]
+                mfCodes.append(mfCode)
+                print("{}:{} {}:{}".format(sortedIndex[i], i, mfCode, mfName))
     lookatmfs_codes(mfCodes, startDate, endDate)
 
 
