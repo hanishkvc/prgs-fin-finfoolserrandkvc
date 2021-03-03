@@ -423,6 +423,7 @@ def look4mfs(opType, startDate=-1, endDate=-1):
         except:
             traceback.print_exc()
             print("WARN:{}:{}".format(r,gData['names'][r]))
+    #breakpoint()
     sortedIndex = numpy.argsort(tData[:,-1])
     mfCodes = []
     if opType == "TOP":
