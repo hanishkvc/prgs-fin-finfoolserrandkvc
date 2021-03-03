@@ -370,7 +370,7 @@ def _date2index(startDate, endDate):
     return startDateIndex, endDateIndex
 
 
-def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
+def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
 
@@ -391,7 +391,7 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     plt.show()
 
 
-def lookatmfs(mfNames, startDate=-1, endDate=-1):
+def lookupmfs(mfNames, startDate=-1, endDate=-1):
     """
     Given a list of MF names, look at their data.
 
@@ -407,15 +407,18 @@ def lookatmfs(mfNames, startDate=-1, endDate=-1):
         for c in f:
             print(c)
             mfCodes.append(c[1])
-    lookatmfs_codes(mfCodes, startDate, endDate)
+    lookupmfs_codes(mfCodes, startDate, endDate)
 
 
-def look4mfs(opType, startDate=-1, endDate=-1):
+def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
     """
     Look for MFs which are at the top or the bottom among all the MFs,
     based on their performance over the date range given.
 
     opType could be either "TOP" or "BOTTOM"
+    startDate and endDate specify the date range to consider.
+        should be numerals of the form YYYYMMDD
+    count tells how many MFs to list from the top or bottom of the performance list.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
@@ -430,11 +433,11 @@ def look4mfs(opType, startDate=-1, endDate=-1):
     mfCodes = []
     if opType == "TOP":
         startIndex = -1
-        endIndex = -11
+        endIndex = startIndex-count
         delta = -1
     elif opType == "BOTTOM":
         startIndex = 0
-        endIndex = 10
+        endIndex = startIndex+count
         delta = 1
     for si in range(startIndex, endIndex, delta):
         i = sortedIndex[si]
@@ -442,7 +445,7 @@ def look4mfs(opType, startDate=-1, endDate=-1):
         mfCode = gData['index2code'][i]
         mfCodes.append(mfCode)
         print("{}: {}:{}".format(i, mfCode, mfName))
-    lookatmfs_codes(mfCodes, startDate, endDate)
+    lookupmfs_codes(mfCodes, startDate, endDate)
 
 
 def do_interactive():
