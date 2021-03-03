@@ -31,7 +31,7 @@ look4mfs("TOP", 20150101, 20210228)
 
 # The tokens in the REMOVE_NAMETOKENS list will be matched against MFName,
 # and matching MFs will be silently ignored while loading the MF data.
-MF_REMOVE_NAMETOKENS = [ "dividend" ]
+MF_REMOVE_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
 
 gbNotBeyondYesterday = True
 gbSkipWeekEnds = False
@@ -63,6 +63,7 @@ def setup_gdata():
     gData['dateIndex'] = -1
     gData['names'] = []
     gData['dates'] = []
+    gData['removed'] = set()
 
 
 def setup():
@@ -219,6 +220,7 @@ def parse_csv(sFile):
                 if nameToken.upper() in name.upper():
                     bNameMatch = True
             if bNameMatch:
+                gData['removed'].add([code, name])
                 removedMFsCnt += 1
                 continue
             try:
@@ -243,6 +245,16 @@ def parse_csv(sFile):
             print("ERRR:parse_csv:{}".format(l))
             print(sys.exc_info())
     tFile.close()
+
+
+def print_removed():
+    """
+    Print the removed list of MFs, so that user can cross verify, things are fine.
+    """
+    print("WARN: List of REMOVED MFs")
+    for removedMF in gData['removed']:
+        print(removedMF)
+    input("WARN: The above MFs were removed when loading")
 
 
 def load4date(y, m, d):
@@ -277,6 +289,7 @@ def load4daterange(sStart, sEnd):
         excInfo = sys.exc_info()
         print(excInfo)
     fillin4holidays()
+    print_removed()
 
 
 def _fillin4holidays(mfIndex=-1):
