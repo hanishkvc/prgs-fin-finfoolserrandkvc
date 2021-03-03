@@ -9,6 +9,7 @@ import datetime
 import numpy
 import matplotlib.pyplot as plt
 import time
+import traceback
 
 
 """
@@ -415,7 +416,7 @@ def look4mfs(opType, startDate=-1, endDate=-1):
     opType could be either "TOP" or "BOTTOM"
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    tData = numpy.zeros(gData['nextMFIndex'], (endDateIndex-startDateIndex+1))
+    tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
     for r in range(gData['nextMFIndex']):
         tData[r,:], tStart, tEnd, tPercent = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
     sortedIndex = numpy.argsort(tData[:,-1])
@@ -448,7 +449,7 @@ def do_interactive():
             excInfo = sys.exc_info()
             if excInfo[0] == SystemExit:
                 break
-            print(excInfo)
+            traceback.print_exc()
 
 
 #
