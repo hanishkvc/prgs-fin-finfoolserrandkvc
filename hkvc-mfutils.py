@@ -441,7 +441,7 @@ def look4mfs(opType, startDate=-1, endDate=-1):
         mfName = gData['names'][i]
         mfCode = gData['index2code'][i]
         mfCodes.append(mfCode)
-        print("{}:{} {}:{}".format(sortedIndex[i], i, mfCode, mfName))
+        print("{}: {}:{}".format(i, mfCode, mfName))
     lookatmfs_codes(mfCodes, startDate, endDate)
 
 
