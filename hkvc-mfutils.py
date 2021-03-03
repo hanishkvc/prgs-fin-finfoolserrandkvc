@@ -202,6 +202,7 @@ def parse_csv(sFile):
     will be silently ignored and not added to the dataset.
     """
     tFile = open(sFile)
+    removedMFsCnt = 0
     for l in tFile:
         l = l.strip()
         if l == '':
@@ -213,9 +214,13 @@ def parse_csv(sFile):
             la = l.split(';')
             code = int(la[0])
             name = la[1]
+            bNameMatch = False
             for nameToken in MF_REMOVE_NAMETOKENS:
                 if nameToken.upper() in name.upper():
-                    continue
+                    bNameMatch = True
+            if bNameMatch:
+                removedMFsCnt += 1
+                continue
             try:
                 nav  = float(la[4])
             except:
