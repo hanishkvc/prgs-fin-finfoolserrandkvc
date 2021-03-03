@@ -220,7 +220,7 @@ def parse_csv(sFile):
                 if nameToken.upper() in name.upper():
                     bNameMatch = True
             if bNameMatch:
-                gData['removed'].add([code, name])
+                gData['removed'].add(str([code, name]))
                 removedMFsCnt += 1
                 continue
             try:
