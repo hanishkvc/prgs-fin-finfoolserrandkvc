@@ -18,14 +18,20 @@ Usage scenario
 
 fetch4daterange("2015", "202102")
 load4daterange("2015", "2020")
-fillin4holidays()
-f,p = findmatchingmf("token1 token2")
-[print(x) for x in f]
-plt.plot(gData['data'][mfIndex])
-plt.show()
+#fillin4holidays()
+#f,p = findmatchingmf("token1 token2")
+#[print(x) for x in f]
+#plt.plot(gData['data'][mfIndex])
+#plt.show()
+lookupmfs("token1 token2")
+look4mfs()
+look4mfs("TOP", 20150101, 20210228)
 
 """
 
+# The tokens in the REMOVE_NAMETOKENS list will be matched against MFName,
+# and matching MFs will be silently ignored while loading the MF data.
+MF_REMOVE_NAMETOKENS = [ "dividend" ]
 
 gbNotBeyondYesterday = True
 gbSkipWeekEnds = False
@@ -62,6 +68,7 @@ def setup_gdata():
 def setup():
     setup_gdata()
     setup_paths()
+    print("WARN:MF_REMOVE_NAMETOKENS:", MF_REMOVE_NAMETOKENS)
 
 
 def dateint(y, m, d):
@@ -190,6 +197,9 @@ def fetch4daterange(sStart, sEnd):
 def parse_csv(sFile):
     """
     Parse the specified data csv file and load it into global data dictionary.
+
+    NOTE: Any MFs whose name contain any of the tokens specified in MF_REMOVE_NAMETOKENS
+    will be silently ignored and not added to the dataset.
     """
     tFile = open(sFile)
     for l in tFile:
@@ -203,6 +213,9 @@ def parse_csv(sFile):
             la = l.split(';')
             code = int(la[0])
             name = la[1]
+            for nameToken in MF_REMOVE_NAMETOKENS:
+                if nameToken.upper() in name.upper():
+                    continue
             try:
                 nav  = float(la[4])
             except:
