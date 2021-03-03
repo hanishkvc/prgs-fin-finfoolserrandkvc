@@ -343,6 +343,8 @@ def procdata_relative(data):
         dStart = data[i]
         if dStart > 0:
             break
+    if dStart == 0:
+        return data, 0, 0, 0
     dEnd = data[-1]
     data = ((data/dStart)-1)*100
     dPercent = data[-1]
@@ -428,7 +430,7 @@ def look4mfs(opType, startDate=-1, endDate=-1):
     mfCodes = []
     if opType == "TOP":
         startIndex = -1
-        endIndex = -10
+        endIndex = -11
         delta = -1
     elif opType == "BOTTOM":
         startIndex = 0
