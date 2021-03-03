@@ -334,6 +334,20 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
     return mfNameFullMatch, mfNamePartMatch
 
 
+def procdata_relative(data):
+    """
+    Process the data relative to its 1st Non Zero value
+    """
+    for i in range(len(data)):
+        dStart = data[i]
+        if dStart > 0:
+            break
+    dEnd = data[-1]
+    data = ((data/dStart)-1)*100
+    dPercent = data[-1]
+    return data, dStart, dEnd, dPercent
+
+
 def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
@@ -353,13 +367,7 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         index = gData['code2index'][code]
         mfIndexes.append(index)
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
-        for i in range(len(aTemp)):
-            aStart = aTemp[i]
-            if aStart > 0:
-                break
-        aEnd = aTemp[-1]
-        aTemp = ((aTemp/aStart)-1)*100
-        aPercent = aTemp[-1]
+        aTemp, aStart, aEnd, aPercent = procdata_relative(aTemp)
         aLabel = "{}, {}, {} - {}".format(code, round(aPercent,2), aStart, aEnd)
         print(aLabel)
         plt.plot(aTemp, label=aLabel)
