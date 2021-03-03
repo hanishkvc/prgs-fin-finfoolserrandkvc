@@ -427,23 +427,20 @@ def look4mfs(opType, startDate=-1, endDate=-1):
     sortedIndex = numpy.argsort(tData[:,-1])
     mfCodes = []
     if opType == "TOP":
-        topIndexThreshold = gData['nextMFIndex']-10
-        for i in range(gData['nextMFIndex']):
-            if sortedIndex[i] > topIndexThreshold:
-                mfName = gData['names'][i]
-                mfCode = gData['index2code'][i]
-                mfCodes.append(mfCode)
-                print("{}:{} {}:{}".format(sortedIndex[i], i, mfCode, mfName))
+        startIndex = -1
+        endIndex = -10
+        delta = -1
     elif opType == "BOTTOM":
-        bottomIndexThreshold = 10
-        for i in range(gData['nextMFIndex']):
-            if sortedIndex[i] < bottomIndexThreshold:
-                mfName = gData['names'][i]
-                mfCode = gData['index2code'][i]
-                mfCodes.append(mfCode)
-                print("{}:{} {}:{}".format(sortedIndex[i], i, mfCode, mfName))
+        startIndex = 0
+        endIndex = 10
+        delta = 1
+    for si in range(startIndex, endIndex, delta):
+        i = sortedIndex[si]
+        mfName = gData['names'][i]
+        mfCode = gData['index2code'][i]
+        mfCodes.append(mfCode)
+        print("{}:{} {}:{}".format(sortedIndex[i], i, mfCode, mfName))
     lookatmfs_codes(mfCodes, startDate, endDate)
-
 
 
 def do_interactive():
