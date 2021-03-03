@@ -417,9 +417,9 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         name = gData['names'][index]
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
         aTemp, aStart, aEnd, aPercent = procdata_relative(aTemp)
-        aLabel = "{}, {}, {} - {}".format(code, round(aPercent,2), aStart, aEnd)
+        aLabel = "{}: {:6.2f}, {:8.4f} - {:8.4f}".format(code, round(aPercent,2), aStart, aEnd)
         print(aLabel, name)
-        plt.plot(aTemp, label="{}, {}".format(aLabel,name[:32]))
+        plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
     plt.legend()
     plt.grid(True)
     plt.show()
