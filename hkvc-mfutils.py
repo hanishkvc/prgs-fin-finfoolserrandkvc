@@ -348,13 +348,14 @@ def procdata_relative(data):
     return data, dStart, dEnd, dPercent
 
 
-def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
+def _date2index(startDate, endDate):
     """
-    Given a list of MF codes (as in AMFI dataset), look at their data.
+    Get the indexes corresponding to the start and end date
 
-    The data is plotted for the range of date given.
+    If either of the date is -1, then it will be mapped to
+    either the beginning or end of the current valid dataset,
+    as appropriate. i.e start maps to 0, end maps to dateIndex.
     """
-    mfIndexes = []
     if startDate == -1:
         startDateIndex = 0
     else:
@@ -363,6 +364,17 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         endDateIndex = gData['dateIndex']
     else:
         endDateIndex = gData['dates'].index(endDate)
+    return startDateIndex, endDateIndex
+
+
+def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
+    """
+    Given a list of MF codes (as in AMFI dataset), look at their data.
+
+    The data is plotted for the range of date given.
+    """
+    mfIndexes = []
+    startDateIndex, endDateIndex = _date2index(startDate, endDate)
     for code in mfCodes:
         index = gData['code2index'][code]
         mfIndexes.append(index)
@@ -393,6 +405,33 @@ def lookatmfs(mfNames, startDate=-1, endDate=-1):
             print(c)
             mfCodes.append(c[1])
     lookatmfs_codes(mfCodes, startDate, endDate)
+
+
+def look4mfs(opType, startDate=-1, endDate=-1):
+    """
+    Look for MFs which are at the top or the bottom among all the MFs,
+    based on their performance over the date range given.
+
+    opType could be either "TOP" or "BOTTOM"
+    """
+    startDateIndex, endDateIndex = _date2index(startDate, endDate)
+    tData = numpy.zeros(gData['nextMFIndex'], (endDateIndex-startDateIndex+1))
+    for r in range(gData['nextMFIndex']):
+        tData[r,:], tStart, tEnd, tPercent = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+    sortedIndex = numpy.argsort(tData[:,-1])
+    mfCodes = []
+    if opType == "TOP":
+        topIndexThreshold = gData['nextMFIndex']-10
+        for i in range(gData['nextMFIndex']):
+            if sortedIndex[i] > topIndexThreshold:
+                mfCodes.append(gData['index2code'][i])
+    elif opType == "BOTTOM":
+        bottomIndexThreshold = 10
+        for i in range(gData['nextMFIndex']):
+            if sortedIndex[i] < bottomIndexThreshold:
+                mfCodes.append(gData['index2code'][i])
+    lookatmfs_codes(mfCodes, startDate, endDate)
+
 
 
 def do_interactive():
