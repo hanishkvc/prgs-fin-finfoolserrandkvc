@@ -27,6 +27,10 @@ lookupmfs("token1 token2")
 look4mfs()
 look4mfs("TOP", 20150101, 20210228)
 
+TODO:
+    20 day, 50 day line, 10 week line, 200 day (Moving averages(simple, exponential))
+    52 week high/low,
+
 """
 
 # The tokens in the REMOVE_NAMETOKENS list will be matched against MFName,
@@ -407,16 +411,15 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
 
     The data is plotted for the range of date given.
     """
-    mfIndexes = []
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     for code in mfCodes:
         index = gData['code2index'][code]
-        mfIndexes.append(index)
+        name = gData['names'][index]
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
         aTemp, aStart, aEnd, aPercent = procdata_relative(aTemp)
         aLabel = "{}, {}, {} - {}".format(code, round(aPercent,2), aStart, aEnd)
-        print(aLabel)
-        plt.plot(aTemp, label=aLabel)
+        print(aLabel, name)
+        plt.plot(aTemp, label="{}, {}".format(aLabel,name[:32]))
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -436,7 +439,7 @@ def lookupmfs(mfNames, startDate=-1, endDate=-1):
     for name in mfNames:
         f,p = findmatchingmf(name)
         for c in f:
-            print(c)
+            #print(c)
             mfCodes.append(c[1])
     lookupmfs_codes(mfCodes, startDate, endDate)
 
@@ -475,7 +478,7 @@ def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
         mfName = gData['names'][i]
         mfCode = gData['index2code'][i]
         mfCodes.append(mfCode)
-        print("{}: {}:{}".format(i, mfCode, mfName))
+        #print("{}: {}:{}".format(i, mfCode, mfName))
     lookupmfs_codes(mfCodes, startDate, endDate)
 
 
