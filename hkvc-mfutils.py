@@ -454,9 +454,9 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         aLabel = "{}: {:6.2f}, {:8.4f} - {:8.4f}".format(code, round(aPercent,2), aStart, aEnd)
         print(aLabel, name)
         plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
-    if len(mfCodes) == 1:
-        mavg = numpy.convolve(aTemp, numpy.ones(20)/20, 'valid')
-        plt.plot(mavg, label="20DayMovingAvg")
+        if len(mfCodes) <= 3:
+            mavg = numpy.convolve(aTemp, numpy.ones(20)/20, 'valid')
+            plt.plot(mavg, label="{}, 20dMAvg".format(aLabel))
     plt.legend()
     plt.grid(True)
     plt.show()
