@@ -436,10 +436,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     dEnd = data[-1]
     dataRel = ((data/dStart)-1)*100
     dRetPercent = dataRel[-1]
-    if dataLen > 365:
-        dRetPA = dRetPercent**(1/(dataLen/365))
-    else:
-        dRetPA = dRetPercent**(1/(dataLen/365))
+    dRetPA = (((dEnd/dStart)**(1/(dataLen/365)))-1)*100
     if bMovingAvg:
         dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
     else:
