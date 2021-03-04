@@ -154,13 +154,15 @@ def fetch4date(y, m, d):
     os.system(cmd)
 
 
-def datestr2datedict(dateStr, fallBackMonth=1):
+def date2datedict(date, fallBackMonth=1):
     """
     Convert a date specified in YYYYMMDD format into internal date dictionary format
         MM and DD are optional.
         MM if not specified fallsback to the value passed through fallBackMonth arg.
         If DD is needed, then MM needs to be used.
+    NOTE: date could be either a interger or string in YYYY[MM[DD]] format.
     """
+    dateStr = str(date)
     year = dateStr[:4]
     month = dateStr[4:6]
     day = dateStr[6:8]
@@ -175,10 +177,6 @@ def datestr2datedict(dateStr, fallBackMonth=1):
     if day != '':
         date['d'] = int(day)
     return date
-
-
-def date2datedict(date, fallBackMonth=1):
-    return datestr2datedict(str(date), fallBackMonth)
 
 
 def proc_date_startend(startDate, endDate):
