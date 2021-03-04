@@ -40,6 +40,9 @@ MF_REMOVE_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "mon
 # MovingAvg related globals
 MOVAVG_WINSIZE = 20
 MOVAVG_CONVOLVETYPE = 'valid'
+# Rolling returns
+ROLLINGRET_WINSIZE = 365
+
 
 gbNotBeyondYesterday = True
 gbSkipWeekEnds = False
@@ -412,17 +415,27 @@ def procdata_relative(data):
     """
     Process the data relative to its 1st Non Zero value
     """
-    for i in range(len(data)):
+    dataLen = len(data)
+    iStart = -1
+    for i in range(dataLen):
         dStart = data[i]
         if dStart > 0:
+            iStart = i
             break
     if dStart == 0:
         return data, 0, 0, 0
     dEnd = data[-1]
-    data = ((data/dStart)-1)*100
-    dPercent = data[-1]
-    dMovAvg = numpy.convolve(data, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
-    return data, dMovAvg, dStart, dEnd, dPercent
+    dataRel = ((data/dStart)-1)*100
+    dPercent = dataRel[-1]
+    dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
+    dRollingPercent = numpy.zeros(dataLen-iStart+1)
+    for i in range(iStart, dataLen):
+        tiEnd = i + ROLLINGRET_WINSIZE
+        if tiEnd >= dataLen:
+            break
+        dRollingPercent[i-iStart] = ((data[tiEnd]/data[i]) - 1)*100
+    #return dataRel, dMovAvg, dStart, dEnd, dPercent
+    return dataRel, dRollingPercent, dStart, dEnd, dPercent
 
 
 def _date2index(startDate, endDate):
