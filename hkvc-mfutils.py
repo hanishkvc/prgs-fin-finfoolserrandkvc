@@ -154,7 +154,7 @@ def fetch4date(y, m, d):
     os.system(cmd)
 
 
-def proc_datestr(dateStr, fallBackMonth=1):
+def datestr2datedict(dateStr, fallBackMonth=1):
     """
     Convert a date specified in YYYYMMDD format into internal date dictionary format
         MM and DD are optional.
@@ -177,25 +177,29 @@ def proc_datestr(dateStr, fallBackMonth=1):
     return date
 
 
-def proc_datestr_startend(sStart, sEnd):
+def date2datedict(date, fallBackMonth=1):
+    return datestr2datedict(str(date), fallBackMonth)
+
+
+def proc_date_startend(startDate, endDate):
     """
     Convert the start and end dates given in string notation of YYYYMMDD into
     this programs internal date dictionary representation.
 
     The dates should follow the YYYY[MM[DD]] format, where [] means optional.
     """
-    start = proc_datestr(sStart, 1)
-    end = proc_datestr(sEnd, 12)
+    start = date2datedict(startDate, 1)
+    end = date2datedict(endDate, 12)
     return start, end
 
 
-def fetch4daterange(sStart, sEnd):
+def fetch4daterange(startDate, endDate):
     """
     Fetch data for given date range.
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
     """
-    start, end = proc_datestr_startend(sStart, sEnd)
+    start, end = proc_date_startend(startDate, endDate)
     proc_days(start, end, fetch4date, gbNotBeyondYesterday)
 
 
@@ -274,7 +278,7 @@ def load4date(y, m, d):
     parse_csv(fName)
 
 
-def load4daterange(sStart, sEnd):
+def load4daterange(startDate, endDate):
     """
     Load data for given date range.
 
@@ -286,7 +290,7 @@ def load4daterange(sStart, sEnd):
     NOTE: If we dont have csv files for all the dates specified, in the date range,
     then ensure that we have atleast data loaded till the 1st non existant date.
     """
-    start, end = proc_datestr_startend(sStart, sEnd)
+    start, end = proc_date_startend(startDate, endDate)
     try:
         proc_days(start, end, load4date, gbNotBeyondYesterday)
     except:
