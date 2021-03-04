@@ -436,7 +436,8 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     dEnd = data[-1]
     dataRel = ((data/dStart)-1)*100
     dRetPercent = dataRel[-1]
-    dRetPA = (((dEnd/dStart)**(1/(dataLen/365)))-1)*100
+    durationInYears = (dataLen-iStart)/365
+    dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
     if bMovingAvg:
         dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
     else:
@@ -450,7 +451,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
             dRollingRetPercents[i-iStart] = ((data[tiEnd]/data[i]) - 1)*100
     else:
         dRollingRetPercents = None
-    return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dRetPercent, dRetPA
+    return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dRetPercent, dRetPA, durationInYears
 
 
 def _date2index(startDate, endDate):
@@ -483,8 +484,8 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         index = gData['code2index'][code]
         name = gData['names'][index]
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
-        aTemp, aMovAvg, aRollingRet, aStart, aEnd, aPercent, aRetPA = procdata_relative(aTemp, gbDoMovingAvg, gbDoRollingRet)
-        aLabel = "{}: {:6.2f} {:6.2f} : {:8.4f} - {:8.4f}".format(code, round(aPercent,2), round(aRetPA,2), aStart, aEnd)
+        aTemp, aMovAvg, aRollingRet, aStart, aEnd, aPercent, aRetPA, durYrs = procdata_relative(aTemp, gbDoMovingAvg, gbDoRollingRet)
+        aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
         print(aLabel, name)
         if gbDoRelData:
             plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
@@ -532,7 +533,7 @@ def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
     tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
     for r in range(gData['nextMFIndex']):
         try:
-            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tPercent, tRetPA = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tPercent, tRetPA, tDurYrs = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
         except:
             traceback.print_exc()
             print("WARN:{}:{}".format(r,gData['names'][r]))
