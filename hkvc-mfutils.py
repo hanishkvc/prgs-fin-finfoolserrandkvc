@@ -457,7 +457,9 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
         if (type(aMovAvg) != type(None)) and (len(mfCodes) <= 3):
             plt.plot(aMovAvg, label="{}, 20dMAvg".format(aLabel))
-    plt.legend()
+    leg = plt.legend()
+    for line in leg.get_lines():
+        line.set_linewidth(4)
     plt.grid(True)
     plt.show()
 
