@@ -417,7 +417,8 @@ def procdata_relative(data):
     dEnd = data[-1]
     data = ((data/dStart)-1)*100
     dPercent = data[-1]
-    return data, dStart, dEnd, dPercent
+    dMovAvg = numpy.convolve(data, numpy.ones(20)/20, 'valid')
+    return data, dMovAvg, dStart, dEnd, dPercent
 
 
 def _date2index(startDate, endDate):
@@ -450,13 +451,12 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         index = gData['code2index'][code]
         name = gData['names'][index]
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
-        aTemp, aStart, aEnd, aPercent = procdata_relative(aTemp)
+        aTemp, aMovAvg, aStart, aEnd, aPercent = procdata_relative(aTemp)
         aLabel = "{}: {:6.2f}, {:8.4f} - {:8.4f}".format(code, round(aPercent,2), aStart, aEnd)
         print(aLabel, name)
         plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
-        if len(mfCodes) <= 3:
-            mavg = numpy.convolve(aTemp, numpy.ones(20)/20, 'valid')
-            plt.plot(mavg, label="{}, 20dMAvg".format(aLabel))
+        if (aMovAvg != None) and (len(mfCodes) <= 3):
+            plt.plot(aMovAvg, label="{}, 20dMAvg".format(aLabel))
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -495,7 +495,7 @@ def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
     tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
     for r in range(gData['nextMFIndex']):
         try:
-            tData[r,:], tStart, tEnd, tPercent = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+            tData[r,:], tMovAvg, tStart, tEnd, tPercent = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
         except:
             traceback.print_exc()
             print("WARN:{}:{}".format(r,gData['names'][r]))
