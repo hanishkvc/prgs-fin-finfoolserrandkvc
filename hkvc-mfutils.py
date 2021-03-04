@@ -201,6 +201,21 @@ def fetch4daterange(startDate, endDate):
     proc_days(start, end, fetch4date, gbNotBeyondYesterday)
 
 
+def fetch_data(startDate, endDate=None):
+    """
+    Fetch data for a given date or range of dates
+
+    If only startDate is given, then endDate is assumed to be same as startDate.
+    This is useful to fetch a full year or a full month of data, where one gives
+    only the YYYY or YYYYMM as the startDate, then the logic across the call
+    chain will ensure that starts correspond to 1 and ends correspond to 12 or
+    31, as the case may be..
+    """
+    if endDate == None:
+        endDate = startDate
+    return fetch4daterange(startDate, endDate)
+
+
 def parse_csv(sFile):
     """
     Parse the specified data csv file and load it into global data dictionary.
@@ -296,6 +311,23 @@ def load4daterange(startDate, endDate):
         print(excInfo)
     fillin4holidays()
     print_removed()
+
+
+def load_data(startDate, endDate = None):
+    """
+    Load data for given date range.
+
+    The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
+
+    NOTE: This logic takes care of filling in nav values for holidays
+    automatically by calling fillin4holidays.
+
+    NOTE: If we dont have csv files for all the dates specified, in the date range,
+    then ensure that we have atleast data loaded till the 1st non existant date.
+    """
+    if endDate == None:
+        endDate = startDate
+    load4daterange(startDate, endDate)
 
 
 def _fillin4holidays(mfIndex=-1):
