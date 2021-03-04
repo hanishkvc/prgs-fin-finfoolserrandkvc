@@ -37,10 +37,13 @@ TODO:
 # and matching MFs will be silently ignored while loading the MF data.
 MF_REMOVE_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
 
+gbDoRelData=True
 # MovingAvg related globals
+gbDoMovingAvg=False
 MOVAVG_WINSIZE = 20
 MOVAVG_CONVOLVETYPE = 'valid'
 # Rolling returns
+gbDoRollingRet=False
 ROLLINGRET_WINSIZE = 365
 
 
@@ -411,9 +414,15 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
     return mfNameFullMatch, mfNamePartMatch
 
 
-def procdata_relative(data):
+def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     """
     Process the data relative to its 1st Non Zero value
+    It calculates the
+        simple return percentage,
+        return per annum (taking compounding into account),
+            provided the duration is larger than a year.
+        MovingAverage (optional)
+        RollingReturn (optional)
     """
     dataLen = len(data)
     iStart = -1
@@ -426,16 +435,25 @@ def procdata_relative(data):
         return data, 0, 0, 0
     dEnd = data[-1]
     dataRel = ((data/dStart)-1)*100
-    dPercent = dataRel[-1]
-    dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
-    dRollingPercent = numpy.zeros(dataLen-iStart+1)
-    for i in range(iStart, dataLen):
-        tiEnd = i + ROLLINGRET_WINSIZE
-        if tiEnd >= dataLen:
-            break
-        dRollingPercent[i-iStart] = ((data[tiEnd]/data[i]) - 1)*100
-    #return dataRel, dMovAvg, dStart, dEnd, dPercent
-    return dataRel, dRollingPercent, dStart, dEnd, dPercent
+    dRetPercent = dataRel[-1]
+    if dataLen > 365:
+        dRetPA = dRetPercent**(1/(dataLen/365))
+    else:
+        dRetPA = dRetPercent**(1/(dataLen/365))
+    if bMovingAvg:
+        dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
+    else:
+        dMovAvg = None
+    if bRollingRet:
+        dRollingRetPercents = numpy.zeros(dataLen-iStart+1)
+        for i in range(iStart, dataLen):
+            tiEnd = i + ROLLINGRET_WINSIZE
+            if tiEnd >= dataLen:
+                break
+            dRollingRetPercents[i-iStart] = ((data[tiEnd]/data[i]) - 1)*100
+    else:
+        dRollingRetPercents = None
+    return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dRetPercent, dRetPA
 
 
 def _date2index(startDate, endDate):
@@ -468,12 +486,15 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         index = gData['code2index'][code]
         name = gData['names'][index]
         aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
-        aTemp, aMovAvg, aStart, aEnd, aPercent = procdata_relative(aTemp)
-        aLabel = "{}: {:6.2f}, {:8.4f} - {:8.4f}".format(code, round(aPercent,2), aStart, aEnd)
+        aTemp, aMovAvg, aRollingRet, aStart, aEnd, aPercent, aRetPA = procdata_relative(aTemp, gbDoMovingAvg, gbDoRollingRet)
+        aLabel = "{}: {:6.2f} {:6.2f} : {:8.4f} - {:8.4f}".format(code, round(aPercent,2), round(aRetPA,2), aStart, aEnd)
         print(aLabel, name)
-        plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
-        if (type(aMovAvg) != type(None)) and (len(mfCodes) <= 3):
-            plt.plot(aMovAvg, label="{}, 20dMAvg".format(aLabel))
+        if gbDoRelData:
+            plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
+        if gbDoMovingAvg:
+            plt.plot(aMovAvg, label="{}, DMAvg".format(aLabel))
+        if gbDoRollingRet:
+            plt.plot(aRollingRet, label="{}, RollRet".format(aLabel))
     leg = plt.legend()
     for line in leg.get_lines():
         line.set_linewidth(4)
@@ -514,7 +535,7 @@ def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
     tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
     for r in range(gData['nextMFIndex']):
         try:
-            tData[r,:], tMovAvg, tStart, tEnd, tPercent = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tPercent, tRetPA = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
         except:
             traceback.print_exc()
             print("WARN:{}:{}".format(r,gData['names'][r]))
