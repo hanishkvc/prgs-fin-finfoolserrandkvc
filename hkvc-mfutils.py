@@ -538,7 +538,9 @@ def do_interactive():
 #
 setup()
 if len(sys.argv) > 1:
-    fetch4daterange(sys.argv[1], sys.argv[2])
+    fetch_data(sys.argv[1], sys.argv[2])
+    load_data(sys.argv[1], sys.argv[2])
+    look4mfs("TOP")
 else:
     do_interactive()
 
