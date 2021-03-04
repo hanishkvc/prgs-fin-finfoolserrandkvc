@@ -455,7 +455,7 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         aLabel = "{}: {:6.2f}, {:8.4f} - {:8.4f}".format(code, round(aPercent,2), aStart, aEnd)
         print(aLabel, name)
         plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
-        if (aMovAvg != None) and (len(mfCodes) <= 3):
+        if (type(aMovAvg) != type(None)) and (len(mfCodes) <= 3):
             plt.plot(aMovAvg, label="{}, 20dMAvg".format(aLabel))
     plt.legend()
     plt.grid(True)
