@@ -37,6 +37,10 @@ TODO:
 # and matching MFs will be silently ignored while loading the MF data.
 MF_REMOVE_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
 
+# MovingAvg related globals
+MOVAVG_WINSIZE = 20
+MOVAVG_CONVOLVETYPE = 'valid'
+
 gbNotBeyondYesterday = True
 gbSkipWeekEnds = False
 FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
@@ -417,7 +421,7 @@ def procdata_relative(data):
     dEnd = data[-1]
     data = ((data/dStart)-1)*100
     dPercent = data[-1]
-    dMovAvg = numpy.convolve(data, numpy.ones(20)/20, 'valid')
+    dMovAvg = numpy.convolve(data, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
     return data, dMovAvg, dStart, dEnd, dPercent
 
 
