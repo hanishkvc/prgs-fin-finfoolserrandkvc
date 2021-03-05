@@ -619,7 +619,45 @@ def lookupmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
     lookupmfs_codes(mfCodes, startDate, endDate)
 
 
-def lookup_data(job, startDate=-1, endDate=-1, count=10):
+def _update_dataproccontrols(dataProcs):
+    """
+    Save current state of data proc controls, and inturn set them to
+    what is specified by the user.
+    """
+    if dataProcs == None:
+        return None
+    global gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE
+    savedDataProcControls = [ gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE ]
+    gbDoRawData, gbDoRelData, gbDoMovingAvg, gbDoRollingRet = False, False, False, False
+    for dp in dataProcs:
+        if dp.upper() == "RAW":
+            gbDoRawData = True
+        elif dp.upper() == "REL":
+            gbDoRelData = True
+        elif dp.upper().startswith("DMA"):
+            gbDoMovingAvg = True
+            days = dp.split('_')
+            if len(days) > 1:
+                MOVINGAVG_WINSIZE = int(days[1])
+        elif dp.upper().startswith("ROLL"):
+            gbDoRollingRet = True
+            days =dp.split('_')
+            if len(days) > 1:
+                ROLLINGRET_WINSIZE = int(days[1])
+    return savedDataProcControls
+
+
+def _restore_dataproccontrols(savedDataProcControls):
+    """
+    Restore data proc controls to a previously saved state.
+    """
+    if savedDataProcControls == None:
+        return
+    global gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE
+    [ gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE ] = savedDataProcControls
+
+
+def lookup_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     """
     Look up MFs from the currently loaded set.
 
@@ -639,16 +677,22 @@ def lookup_data(job, startDate=-1, endDate=-1, count=10):
     If endDate is -1, then endDate corresponding to the currently loaded data is used.
 
     count specifies how many MFs should be picked for TOP or BOTTOM operations.
+
+    dataProcs can be a list containing one or more of the following string tokens
+        "raw" | "rel" | "dma_<NumOfDays>" | "roll_<NumOfDays>"
+        This controls which aspects of the data is looked at and inturn plotted.
     """
+    savedDataProcControls = _update_dataproccontrols(dataTypes)
     if type(job) == list:
         lookupmfs_names(job, startDate, endDate)
     else:
-        if job.upper() not in [ "OP:TOP", "OP:BOTTOM" ]:
+        if job.upper() in [ "OP:TOP", "OP:BOTTOM" ]:
+            job = job[3:]
+            lookupmfs_ops(job, startDate, endDate, count)
+        else:
             print("ERRR:lookup_data: unknown operation:", job)
             print("INFO:lookup_data: If you want to look up MF names put them in a list")
-            return
-        job = job[3:]
-        lookupmfs_ops(job, startDate, endDate, count)
+    _restore_dataproccontrols(savedDataProcControls)
 
 
 def do_interactive():
