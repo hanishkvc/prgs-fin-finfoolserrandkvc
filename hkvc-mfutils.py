@@ -34,9 +34,12 @@ Old/Low level:
 Newer:
     fetch_data(2010, 202103)
     load_data(2013, 20190105)
-    lookup_data("TOP")
+    lookup_data("OP:TOP")
     lookup_data(["us direct", "hybrid direct abc"])
     show_plot()
+    lookup_data(["another mf or mfs", "related mfs"])
+    show_plot()
+    quit()
 TODO:
     20 day, 50 day line, 10 week line, 200 day (Moving averages(simple, exponential))
     52 week high/low,
@@ -47,6 +50,10 @@ TODO:
 # and matching MFs will be silently ignored while loading the MF data.
 MF_REMOVE_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
 
+#
+# Data processing and related
+#
+gbDoRawData=False
 gbDoRelData=True
 # MovingAvg related globals
 gbDoMovingAvg=False
@@ -56,13 +63,29 @@ MOVAVG_CONVOLVETYPE = 'valid'
 gbDoRollingRet=False
 ROLLINGRET_WINSIZE = 365
 
-
+#
+# proc_days related controls
+#
+# Should proc_days process beyond yesterday (i.e into today or future)
 gbNotBeyondYesterday = True
+# Should proc_days ignore weekends.
 gbSkipWeekEnds = False
+
+#
+# Fetching and Saving related
+#
 FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
 #http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
 gBaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
+
+#
+# Misc
+#
+giLabelNameChopLen = 36
+
+
+
 gCal = calendar.Calendar()
 gData = {}
 
@@ -515,13 +538,13 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
         aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
         print(aLabel, name)
         if gbDoRawData:
-            plt.plot(aRawData, label="{}, Raw:{}".format(aLabel,name[:36]))
+            plt.plot(aRawData, label="{}, Raw:{}".format(aLabel,name[:giLabelNameChopLen]))
         if gbDoRelData:
-            plt.plot(aRelData, label="{}, Rel:{}".format(aLabel,name[:36]))
+            plt.plot(aRelData, label="{}, Rel:{}".format(aLabel,name[:giLabelNameChopLen]))
         if gbDoMovingAvg:
-            plt.plot(aMovAvg, label="{}, DMA:{}".format(aLabel,name[:36]))
+            plt.plot(aMovAvg, label="{}, DMA:{}".format(aLabel,name[:giLabelNameChopLen]))
         if gbDoRollingRet:
-            plt.plot(aRollingRet, label="{}, Rol:{}".format(aLabel,name[:36]))
+            plt.plot(aRollingRet, label="{}, Rol:{}".format(aLabel,name[:giLabelNameChopLen]))
 
 
 def show_plot():
@@ -622,6 +645,7 @@ def lookup_data(job, startDate=-1, endDate=-1, count=10):
     else:
         if job.upper() not in [ "OP:TOP", "OP:BOTTOM" ]:
             print("ERRR:lookup_data: unknown operation:", job)
+            print("INFO:lookup_data: If you want to look up MF names put them in a list")
             return
         job = job[3:]
         lookupmfs_ops(job, startDate, endDate, count)
@@ -651,7 +675,7 @@ setup()
 if len(sys.argv) > 1:
     fetch_data(sys.argv[1], sys.argv[2])
     load_data(sys.argv[1], sys.argv[2])
-    lookup_data("TOP")
+    lookup_data("OP:TOP")
     show_plot()
 else:
     do_interactive()
