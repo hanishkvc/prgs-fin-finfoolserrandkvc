@@ -443,9 +443,8 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     """
     Process the data relative to its 1st Non Zero value
     It calculates the
-        simple return percentage,
-        return per annum (taking compounding into account),
-            provided the duration is larger than a year.
+        Absolute return percentage,
+        Return per annum (taking compounding into account),
         MovingAverage (optional)
         RollingReturn (optional)
     """
@@ -460,7 +459,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
         return data, 0, 0, 0
     dEnd = data[-1]
     dataRel = ((data/dStart)-1)*100
-    dRetPercent = dataRel[-1]
+    dAbsRetPercent = dataRel[-1]
     durationInYears = (dataLen-iStart)/365
     dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
     if bMovingAvg:
@@ -476,7 +475,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
             dRollingRetPercents[i-iStart] = ((data[tiEnd]/data[i]) - 1)*100
     else:
         dRollingRetPercents = None
-    return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dRetPercent, dRetPA, durationInYears
+    return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dAbsRetPercent, dRetPA, durationInYears
 
 
 def _date2index(startDate, endDate):
@@ -502,24 +501,27 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
 
-    The data is plotted for the range of date given.
+    Different representations of the data is plotted for the range of date given,
+    provided the corresponding global flags are enabled.
 
-    NOTE: The plot is not shown till user calls show_plot()
+    NOTE: The plot per se is not shown, till user calls show_plot()
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     for code in mfCodes:
         index = gData['code2index'][code]
         name = gData['names'][index]
-        aTemp = gData['data'][index, startDateIndex:endDateIndex+1]
-        aTemp, aMovAvg, aRollingRet, aStart, aEnd, aPercent, aRetPA, durYrs = procdata_relative(aTemp, gbDoMovingAvg, gbDoRollingRet)
-        aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
+        aRawData = gData['data'][index, startDateIndex:endDateIndex+1]
+        aRelData, aMovAvg, aRollingRet, aStart, aEnd, aAbsRetPercent, aRetPA, durYrs = procdata_relative(aRawData, gbDoMovingAvg, gbDoRollingRet)
+        aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
         print(aLabel, name)
+        if gbDoRawData:
+            plt.plot(aRawData, label="{}, Raw:{}".format(aLabel,name[:36]))
         if gbDoRelData:
-            plt.plot(aTemp, label="{}, {}".format(aLabel,name[:36]))
+            plt.plot(aRelData, label="{}, Rel:{}".format(aLabel,name[:36]))
         if gbDoMovingAvg:
-            plt.plot(aMovAvg, label="{}, DMAvg".format(aLabel))
+            plt.plot(aMovAvg, label="{}, DMA:{}".format(aLabel,name[:36]))
         if gbDoRollingRet:
-            plt.plot(aRollingRet, label="{}, RollRet".format(aLabel))
+            plt.plot(aRollingRet, label="{}, Rol:{}".format(aLabel,name[:36]))
 
 
 def show_plot():
@@ -570,7 +572,7 @@ def lookupmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
     tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
     for r in range(gData['nextMFIndex']):
         try:
-            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tPercent, tRetPA, tDurYrs = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tAbsRetPercent, tRetPA, tDurYrs = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
         except:
             traceback.print_exc()
             print("WARN:{}:{}".format(r,gData['names'][r]))
