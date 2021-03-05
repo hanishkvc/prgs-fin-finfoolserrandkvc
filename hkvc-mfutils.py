@@ -426,6 +426,19 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
     return mfNameFullMatch, mfNamePartMatch
 
 
+def findif(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=True):
+    """
+    Find if there are any MFs which match the given name parts.
+    """
+    f,p = findmatchingmf(findName, bFullMatch, bPartialTokens, bIgnoreCase)
+    print("INFO:findif: List of All tokens Match")
+    for n in f:
+        print(n)
+    print("INFO:findif: List of Some tokens Match")
+    for n in p:
+        print(n)
+
+
 def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     """
     Process the data relative to its 1st Non Zero value
