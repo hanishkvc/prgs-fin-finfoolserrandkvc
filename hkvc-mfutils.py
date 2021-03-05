@@ -692,7 +692,7 @@ def lookup_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
         "raw" | "rel" | "dma_<NumOfDays>" | "roll_<NumOfDays>"
         This controls which aspects of the data is looked at and inturn plotted.
     """
-    savedDataProcControls = _update_dataproccontrols(dataTypes)
+    savedDataProcControls = _update_dataproccontrols(dataProcs)
     if type(job) == list:
         lookupmfs_names(job, startDate, endDate)
     else:
