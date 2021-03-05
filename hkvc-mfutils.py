@@ -323,7 +323,7 @@ def load4daterange(startDate, endDate):
     print_removed()
 
 
-def load_data(startDate, endDate = None):
+def load_data(startDate, endDate = None, bClearData=True):
     """
     Load data for given date range.
 
@@ -337,6 +337,8 @@ def load_data(startDate, endDate = None):
     """
     if endDate == None:
         endDate = startDate
+    if bClearData:
+        setup_gdata()
     load4daterange(startDate, endDate)
 
 
