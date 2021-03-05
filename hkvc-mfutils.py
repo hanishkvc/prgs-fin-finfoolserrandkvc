@@ -480,6 +480,8 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
     Given a list of MF codes (as in AMFI dataset), look at their data.
 
     The data is plotted for the range of date given.
+
+    NOTE: The plot is not shown till user calls show_plot()
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     for code in mfCodes:
@@ -495,6 +497,12 @@ def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
             plt.plot(aMovAvg, label="{}, DMAvg".format(aLabel))
         if gbDoRollingRet:
             plt.plot(aRollingRet, label="{}, RollRet".format(aLabel))
+
+
+def show_plot():
+    """
+    Show the data plotted till now.
+    """
     leg = plt.legend()
     for line in leg.get_lines():
         line.set_linewidth(4)
