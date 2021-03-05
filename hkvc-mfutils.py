@@ -74,10 +74,15 @@ gbSkipWeekEnds = False
 #
 # Fetching and Saving related
 #
-FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
+MFS_FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
 #https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
 #http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
-gBaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
+MFS_BaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
+
+#
+# Fetching Index historic data
+#
+INDEX_BSESENSEX_URL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2011&dtToDate=05/03/2021"
 
 #
 # Misc
@@ -94,9 +99,9 @@ def setup_paths():
     """
     Account for MFUTILS_BASE env variable if set
     """
-    global FNAMECSV_TMPL
-    FNAMECSV_TMPL = os.path.expanduser(os.path.join(os.environ.get('MFUTILS_BASE',"~/"), FNAMECSV_TMPL))
-    print("INFO:setup_paths:", FNAMECSV_TMPL)
+    global MFS_FNAMECSV_TMPL
+    MFS_FNAMECSV_TMPL = os.path.expanduser(os.path.join(os.environ.get('MFUTILS_BASE',"~/"), MFS_FNAMECSV_TMPL))
+    print("INFO:setup_paths:", MFS_FNAMECSV_TMPL)
 
 
 def setup_gdata():
@@ -190,8 +195,8 @@ def fetch4date(y, m, d):
         day (month day) should be one of 1 to 31, as appropriate for month specified.
     """
     print(y,m,d)
-    url = gBaseURL.format(d,calendar.month_name[m][:3],y)
-    fName = FNAMECSV_TMPL.format(y,m,d)
+    url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
+    fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     print(url, fName)
     cmd = "wget {} --continue --output-document={}".format(url,fName)
     os.system(cmd)
@@ -330,7 +335,7 @@ def load4date(y, m, d):
     """
     gData['dateIndex'] += 1
     gData['dates'].append(dateint(y,m,d))
-    fName = FNAMECSV_TMPL.format(y,m,d)
+    fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     parse_csv(fName)
 
 
