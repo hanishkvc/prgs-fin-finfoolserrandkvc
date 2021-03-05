@@ -16,17 +16,27 @@ import traceback
 
 Usage scenario
 
-fetch4daterange("2015", "202102")
-load4daterange("2015", "2020")
-#fillin4holidays()
-#f,p = findmatchingmf("token1 token2")
-#[print(x) for x in f]
-#plt.plot(gData['data'][mfIndex])
-#plt.show()
-lookupmfs("token1 token2")
-look4mfs()
-look4mfs("TOP", 20150101, 20210228)
-
+Old/Low level:
+    fetch4daterange(2015, 202102)
+    load4daterange(2015, 2020)
+    Older:
+        #fillin4holidays()
+        f,p = findmatchingmf("token1 token2")
+        [print(x) for x in f]
+        plt.plot(gData['data'][mfIndex])
+        plt.show()
+    InBetween:
+        lookupmfs_names("mf name parts")
+        lookupmfs_names("mf name parts 1; mf name parts 2; mf name parts 3")
+        lookupmfs_names(["mf name parts 1", "mf name parts 2"])
+        look4mfs()
+        look4mfs("TOP", 20150101, 20210228)
+Newer:
+    fetch_data(2010, 202103)
+    load_data(2013, 20190105)
+    lookup_data("TOP")
+    lookup_data(["us direct", "hybrid direct abc"])
+    show_plot()
 TODO:
     20 day, 50 day line, 10 week line, 200 day (Moving averages(simple, exponential))
     52 week high/low,
@@ -191,8 +201,8 @@ def date2datedict(date, fallBackMonth=1):
 
 def proc_date_startend(startDate, endDate):
     """
-    Convert the start and end dates given in string notation of YYYYMMDD into
-    this programs internal date dictionary representation.
+    Convert the start and end dates given as integer/string notation of YYYYMMDD
+    into this programs internal date dictionary representation.
 
     The dates should follow the YYYY[MM[DD]] format, where [] means optional.
     """
@@ -510,7 +520,7 @@ def show_plot():
     plt.show()
 
 
-def lookupmfs(mfNames, startDate=-1, endDate=-1):
+def lookupmfs_names(mfNames, startDate=-1, endDate=-1):
     """
     Given a list of MF names, look at their data.
 
@@ -519,7 +529,8 @@ def lookupmfs(mfNames, startDate=-1, endDate=-1):
 
     The data is plotted for the range of date given.
     """
-    mfNames = mfNames.split(';')
+    if type(mfNames) != list:
+        mfNames = mfNames.split(';')
     mfCodes = []
     for name in mfNames:
         f,p = findmatchingmf(name)
@@ -529,7 +540,7 @@ def lookupmfs(mfNames, startDate=-1, endDate=-1):
     lookupmfs_codes(mfCodes, startDate, endDate)
 
 
-def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
+def lookupmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
     """
     Look for MFs which are at the top or the bottom among all the MFs,
     based on their performance over the date range given.
@@ -539,6 +550,9 @@ def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
         should be numerals of the form YYYYMMDD
     count tells how many MFs to list from the top or bottom of the performance list.
     """
+    if opType.upper() not in ["TOP", "BOTTOM"]:
+        print("ERRR:look4mfs: Unknown operation:", opType)
+        return
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
     for r in range(gData['nextMFIndex']):
@@ -550,11 +564,11 @@ def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
     #breakpoint()
     sortedIndex = numpy.argsort(tData[:,-1])
     mfCodes = []
-    if opType == "TOP":
+    if opType.upper() == "TOP":
         startIndex = -1
         endIndex = startIndex-count
         delta = -1
-    elif opType == "BOTTOM":
+    elif opType.upper() == "BOTTOM":
         startIndex = 0
         endIndex = startIndex+count
         delta = 1
@@ -565,6 +579,37 @@ def look4mfs(opType="TOP", startDate=-1, endDate=-1, count=10):
         mfCodes.append(mfCode)
         #print("{}: {}:{}".format(i, mfCode, mfName))
     lookupmfs_codes(mfCodes, startDate, endDate)
+
+
+def lookup_data(job, startDate=-1, endDate=-1, count=10):
+    """
+    Look up MFs from the currently loaded set.
+
+    Job could either be
+
+        a list of MF name parts like [ "mf name parts 1", "mf name parts 2", ... ]
+            a matching MF name should contain all the tokens in any one
+            of the match name parts in the list.
+
+        a string specifying a operation like
+            "OP:TOP" - will get the top 10 performing MFs by default.
+            "OP:BOTTOM" - will get the bottom 10 performing MFs by default.
+            NOTE: absolute return is used to decide the TOP or BOTTOM candidates currently.
+
+    startDate and endDate specify the range of date over which the data should be collated.
+    If startDate is -1, then startDate corresponding to the currently loaded data is used.
+    If endDate is -1, then endDate corresponding to the currently loaded data is used.
+
+    count specifies how many MFs should be picked for TOP or BOTTOM operations.
+    """
+    if type(job) == list:
+        lookupmfs_names(job, startDate, endDate)
+    else:
+        if job.upper() not in [ "OP:TOP", "OP:BOTTOM" ]:
+            print("ERRR:lookup_data: unknown operation:", job)
+            return
+        job = job[3:]
+        lookupmfs_ops(job, startDate, endDate, count)
 
 
 def do_interactive():
@@ -591,7 +636,8 @@ setup()
 if len(sys.argv) > 1:
     fetch_data(sys.argv[1], sys.argv[2])
     load_data(sys.argv[1], sys.argv[2])
-    look4mfs("TOP")
+    lookup_data("TOP")
+    show_plot()
 else:
     do_interactive()
 
