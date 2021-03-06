@@ -57,8 +57,8 @@ gbDoRawData=False
 gbDoRelData=True
 # MovingAvg related globals
 gbDoMovingAvg=False
-MOVAVG_WINSIZE = 20
-MOVAVG_CONVOLVETYPE = 'valid'
+MOVINGAVG_WINSIZE = 20
+MOVINGAVG_CONVOLVEMODE = 'valid'
 # Rolling returns
 gbDoRollingRet=False
 ROLLINGRET_WINSIZE = 365
@@ -496,7 +496,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     durationInYears = (dataLen-iStart)/365
     dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
     if bMovingAvg:
-        dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVAVG_WINSIZE)/MOVAVG_WINSIZE, MOVAVG_CONVOLVETYPE)
+        dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVINGAVG_WINSIZE)/MOVINGAVG_WINSIZE, MOVINGAVG_CONVOLVEMODE)
     else:
         dMovAvg = None
     if bRollingRet:
