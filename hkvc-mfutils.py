@@ -37,7 +37,7 @@ Newer:
     lookat_data("OP:TOP")
     lookat_data(["us direct", "hybrid direct abc"])
     show_plot()
-    lookat_data(["another mf or mfs", "related mfs"])
+    lookat_data(["another mf or mfs", "related mfs"], dataProcs=[ "raw", "rel", "dma"])
     show_plot()
     quit()
 TODO:
@@ -70,6 +70,8 @@ ROLLINGRET_WINSIZE = 365
 gbNotBeyondYesterday = True
 # Should proc_days ignore weekends.
 gbSkipWeekEnds = False
+# Should relative data calc ignore non data at begining of dataset
+gbDataRelIgnoreBeginingNonData = True
 
 #
 # Fetching and Saving related
@@ -492,6 +494,8 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
         return data, 0, 0, 0
     dEnd = data[-1]
     dataRel = ((data/dStart)-1)*100
+    if gbDataRelIgnoreBeginingNonData and (iStart != -1):
+        dataRel[:iStart] = 0
     dAbsRetPercent = dataRel[-1]
     durationInYears = (dataLen-iStart)/365
     dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
