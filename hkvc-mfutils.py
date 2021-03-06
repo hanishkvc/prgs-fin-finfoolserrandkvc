@@ -26,18 +26,18 @@ Old/Low level:
         plt.plot(gData['data'][mfIndex])
         plt.show()
     InBetween:
-        lookupmfs_names("mf name parts")
-        lookupmfs_names("mf name parts 1; mf name parts 2; mf name parts 3")
-        lookupmfs_names(["mf name parts 1", "mf name parts 2"])
+        lookatmfs_names("mf name parts")
+        lookatmfs_names("mf name parts 1; mf name parts 2; mf name parts 3")
+        lookatmfs_names(["mf name parts 1", "mf name parts 2"])
         look4mfs()
         look4mfs("TOP", 20150101, 20210228)
 Newer:
     fetch_data(2010, 202103)
     load_data(2013, 20190105)
-    lookup_data("OP:TOP")
-    lookup_data(["us direct", "hybrid direct abc"])
+    lookat_data("OP:TOP")
+    lookat_data(["us direct", "hybrid direct abc"])
     show_plot()
-    lookup_data(["another mf or mfs", "related mfs"])
+    lookat_data(["another mf or mfs", "related mfs"])
     show_plot()
     quit()
 TODO:
@@ -530,7 +530,7 @@ def _date2index(startDate, endDate):
     return startDateIndex, endDateIndex
 
 
-def lookupmfs_codes(mfCodes, startDate=-1, endDate=-1):
+def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
 
@@ -568,7 +568,7 @@ def show_plot():
     plt.show()
 
 
-def lookupmfs_names(mfNames, startDate=-1, endDate=-1):
+def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
     """
     Given a list of MF names, look at their data.
 
@@ -585,10 +585,10 @@ def lookupmfs_names(mfNames, startDate=-1, endDate=-1):
         for c in f:
             #print(c)
             mfCodes.append(c[1])
-    lookupmfs_codes(mfCodes, startDate, endDate)
+    lookatmfs_codes(mfCodes, startDate, endDate)
 
 
-def lookupmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
+def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
     """
     Look for MFs which are at the top or the bottom among all the MFs,
     based on their performance over the date range given.
@@ -626,7 +626,7 @@ def lookupmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
         mfCode = gData['index2code'][i]
         mfCodes.append(mfCode)
         #print("{}: {}:{}".format(i, mfCode, mfName))
-    lookupmfs_codes(mfCodes, startDate, endDate)
+    lookatmfs_codes(mfCodes, startDate, endDate)
 
 
 def _update_dataproccontrols(dataProcs):
@@ -667,9 +667,9 @@ def _restore_dataproccontrols(savedDataProcControls):
     [ gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE ] = savedDataProcControls
 
 
-def lookup_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
+def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     """
-    Look up MFs from the currently loaded set.
+    Look at data of MFs from the currently loaded set.
 
     Job could either be
 
@@ -694,14 +694,14 @@ def lookup_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     """
     savedDataProcControls = _update_dataproccontrols(dataProcs)
     if type(job) == list:
-        lookupmfs_names(job, startDate, endDate)
+        lookatmfs_names(job, startDate, endDate)
     else:
         if job.upper() in [ "OP:TOP", "OP:BOTTOM" ]:
             job = job[3:]
-            lookupmfs_ops(job, startDate, endDate, count)
+            lookatmfs_ops(job, startDate, endDate, count)
         else:
-            print("ERRR:lookup_data: unknown operation:", job)
-            print("INFO:lookup_data: If you want to look up MF names put them in a list")
+            print("ERRR:lookat_data: unknown operation:", job)
+            print("INFO:lookat_data: If you want to look up MF names put them in a list")
     _restore_dataproccontrols(savedDataProcControls)
 
 
@@ -729,7 +729,7 @@ setup()
 if len(sys.argv) > 1:
     fetch_data(sys.argv[1], sys.argv[2])
     load_data(sys.argv[1], sys.argv[2])
-    lookup_data("OP:TOP")
+    lookat_data("OP:TOP")
     show_plot()
 else:
     do_interactive()
