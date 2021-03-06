@@ -454,20 +454,20 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
     return mfNameFullMatch, mfNamePartMatch
 
 
-def findif(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=True, bPrintAllTokenMatch=True, bPrintSomeTokenMatch=False):
+def search_data(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=True, bPrintAllTokenMatch=True, bPrintSomeTokenMatch=False):
     """
-    Find if there are any MFs which match the given name parts in findName.
+    Search/Find if there are any MFs which match the given name parts in findName.
 
     bPrintAllTokenMatch: If enabled prints MFs which match all the tokens in the specified findName.
     bPrintSomeTokenMatch: If enabled prints MFs even if they match only some of the tokens in the specified findName.
     """
     f,p = findmatchingmf(findName, bFullMatch, bPartialTokens, bIgnoreCase)
     if bPrintAllTokenMatch:
-        print("INFO:findif: List of All tokens Match")
+        print("INFO:search_data: List of All tokens Match")
         for n in f:
             print(n)
     if bPrintSomeTokenMatch:
-        print("INFO:findif: List of Some tokens Match")
+        print("INFO:search_data: List of Some tokens Match")
         for n in p:
             print(n)
 
