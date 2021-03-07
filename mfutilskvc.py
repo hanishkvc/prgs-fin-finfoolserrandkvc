@@ -556,17 +556,17 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
         print(aLabel, name)
         if gbDoRawData:
-            plt.plot(aRawData, label="{}, Raw:{}".format(aLabel,name[:giLabelNameChopLen]))
+            plt.plot(aRawData, label="{}, {}:Raw".format(aLabel,name[:giLabelNameChopLen]))
         if gbDoRelData:
-            plt.plot(aRelData, label="{}, Rel:{}".format(aLabel,name[:giLabelNameChopLen]))
+            plt.plot(aRelData, label="{}, {}:Rel".format(aLabel,name[:giLabelNameChopLen]))
         if gbDoMovingAvg:
             if MOVINGAVG_CONVOLVEMODE == 'valid':
                 tStartPos = int(MOVINGAVG_WINSIZE/2)
             else:
                 tStartPos = 0
-            plt.plot(list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, DMA{}:{}".format(aLabel,MOVINGAVG_WINSIZE,name[:giLabelNameChopLen]))
+            plt.plot(list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, {}:DMA{}".format(aLabel,MOVINGAVG_WINSIZE,name[:giLabelNameChopLen]))
         if gbDoRollingRet:
-            plt.plot(aRollingRet, label="{}, Rol:{}".format(aLabel,name[:giLabelNameChopLen]))
+            plt.plot(aRollingRet, label="{}, {}:Rol{}".format(aLabel,name[:giLabelNameChopLen],ROLLINGRET_WINSIZE))
 
 
 def show_plot():

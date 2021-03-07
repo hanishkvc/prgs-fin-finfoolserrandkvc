@@ -1,4 +1,5 @@
 print("A sample script for the mfutilskvc, plotting indian sensex and s&p 500 indirectly using index fund data...")
+input("Dont forget to fetch the data for the date range you are interested in, before using this script")
 #
 # Load the data
 #
