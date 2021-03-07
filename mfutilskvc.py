@@ -120,6 +120,7 @@ def setup_gdata():
     gData['names'] = []
     gData['dates'] = []
     gData['removed'] = set()
+    gData['dateRange'] = [-1, -1]
 
 
 def setup():
@@ -579,8 +580,23 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     provided the corresponding global flags are enabled.
 
     NOTE: The plot per se is not shown, till user calls show_plot()
+    NOTE: DateRange used should match that used in previous calls.
+          However load_data and or show_plot will reset dateRange to a clean slate,
+          and user will be free again to look at a new date range of their choosing.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
+    if gData['dateRange'][0] == -1:
+        gData['dateRange'][0] = startDateIndex
+    if gData['dateRange'][1] == -1:
+        gData['dateRange'][1] = endDateIndex
+    savedStartDateIndex = gData['dateRange'][0]
+    savedEndDateIndex = gData['dateRange'][1]
+    if (savedStartDateIndex != startDateIndex) or (savedEndDateIndex != endDateIndex):
+        print("WARN:lookatmfs_codes:previously used dateRange:{} - {}".format(gData['dates'][savedStartDateIndex], gData['dates'][savedEndDateIndex]))
+        print("WARN:lookatmfs_codes:passed dateRange:{} - {}".format(gData['dates'][startDateIndex], gData['dates'][endDateIndex]))
+        print("INFO:lookatmfs_codes:call again with matching dateRange OR")
+        input("INFO:lookatmfs_codes:load_data|show_plot will clear saved dateRange, so that you can lookat a new dateRange that you want to")
+        return
     for code in mfCodes:
         index = gData['code2index'][code]
         name = gData['names'][index]
@@ -610,13 +626,13 @@ def show_plot():
     for line in leg.get_lines():
         line.set_linewidth(4)
     plt.grid(True)
-    #plt.xticks(list(range(len(gData['dates']))), gData['dates'], rotation='vertical')
-    numX = len(gData['dates'])
-    #xTicks = (numpy.linspace(0,1,5)*numX).astype(int)
+    curDates = gData['dates'][startDateIndex:endDateIndex+1]
+    numX = len(curDates)
     xTicks = (numpy.arange(0,1,0.2)*numX).astype(int)
-    xTickLabels = numpy.array(gData['dates'])[xTicks]
+    xTickLabels = numpy.array(curDates)[xTicks]
     plt.xticks(xTicks, xTickLabels)
     plt.show()
+    gData['dateRange'] = [-1, -1]
 
 
 def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
