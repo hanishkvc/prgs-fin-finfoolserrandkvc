@@ -606,24 +606,25 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
         print(aLabel, name)
         if gbDoRawData:
-            _plot_data(code, None, aRawData, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Raw")
+            _plot_data(code, None, aRawData, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Raw")
         if gbDoRelData:
-            _plot_data(code, None, aRelData, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Rel")
+            _plot_data(code, None, aRelData, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Rel")
         if gbDoMovingAvg:
             if MOVINGAVG_CONVOLVEMODE == 'valid':
                 tStartPos = int(MOVINGAVG_WINSIZE/2)
             else:
                 tStartPos = 0
             typeTag = "DMA{}".format(MOVINGAVG_WINSIZE)
-            _plot_data(code, list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
+            _plot_data(code, list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
         if gbDoRollingRet:
             typeTag = "Rol{}".format(ROLLINGRET_WINSIZE)
-            _plot_data(code, None, aRollingRet, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
+            _plot_data(code, None, aRollingRet, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
 
 
 def _plot_data(mfCode, xData, yData, label, typeTag):
     theTag = str([mfCode, typeTag])
     if theTag in gData['plots']:
+        print("WARN:_plot_data: Skipping", mfCode)
         return
     gData['plots'].add(theTag)
     label = "{}:{}".format(label, typeTag)
