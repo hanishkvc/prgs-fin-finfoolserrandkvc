@@ -556,7 +556,11 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         if gbDoRelData:
             plt.plot(aRelData, label="{}, Rel:{}".format(aLabel,name[:giLabelNameChopLen]))
         if gbDoMovingAvg:
-            plt.plot(aMovAvg, label="{}, DMA{}:{}".format(aLabel,MOVINGAVG_WINSIZE,name[:giLabelNameChopLen]))
+            if MOVINGAVG_CONVOLVEMODE == 'valid':
+                tStartPos = int(MOVINGAVG_WINSIZE/2)
+            else:
+                tStartPos = 0
+            plt.plot(list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, DMA{}:{}".format(aLabel,MOVINGAVG_WINSIZE,name[:giLabelNameChopLen]))
         if gbDoRollingRet:
             plt.plot(aRollingRet, label="{}, Rol:{}".format(aLabel,name[:giLabelNameChopLen]))
 
@@ -759,5 +763,5 @@ setup()
 if len(sys.argv) > 1:
     handle_args()
 else:
-    do_interactive()
+    do_run()
 
