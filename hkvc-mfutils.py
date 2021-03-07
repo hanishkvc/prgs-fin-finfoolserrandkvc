@@ -709,15 +709,26 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     _restore_dataproccontrols(savedDataProcControls)
 
 
-def do_interactive():
+def do_run(theFile=None):
     """
-    Run the interactive [REPL] logic of this program.
+    Run the REPL logic of this program.
     Read-Eval-Print Loop
+
+    NOTE: If a script file is passed to the logic, it will fall back to
+    interactive mode, once there are no more commands in the script file.
+        Script file can use quit() to exit the program automatically
+        if required.
     """
     bQuit = False
     while not bQuit:
         try:
-            cmd = input(":")
+            if theFile == None:
+                cmd = input(":")
+            else:
+                cmd = theFile.readline()
+                if cmd == '':
+                    theFile=None
+                    continue
             exec(cmd,globals())
         except:
             excInfo = sys.exc_info()
@@ -726,15 +737,27 @@ def do_interactive():
             traceback.print_exc()
 
 
+def handle_args():
+    """
+    Logic to handle the commandline arguments
+    """
+    if sys.argv[1].endswith(".mf"):
+        print("INFO:Running ", sys.argv[1])
+        f = open(sys.argv[1])
+        do_run(f)
+    else:
+        fetch_data(sys.argv[1], sys.argv[2])
+        load_data(sys.argv[1], sys.argv[2])
+        lookat_data("OP:TOP")
+        show_plot()
+
+
 #
 # The main flow starts here
 #
 setup()
 if len(sys.argv) > 1:
-    fetch_data(sys.argv[1], sys.argv[2])
-    load_data(sys.argv[1], sys.argv[2])
-    lookat_data("OP:TOP")
-    show_plot()
+    handle_args()
 else:
     do_interactive()
 
