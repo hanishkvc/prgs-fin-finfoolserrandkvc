@@ -187,6 +187,17 @@ def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True):
                 handle_date_func(y,m,d)
 
 
+def wget_better(url, localFName):
+    #cmd = "curl {} --remote-time --time-cond {} --output {}".format(url,fName,fName)
+    mtimePrev = os.stat(localFName).st_mtime
+    cmd = "wget {} --continue --output-document={}".format(url,localFName)
+    os.system(cmd)
+    mtimeNow = os.stat(localFName).st_mtime
+    if mtimeNow != mtimePrev:
+        os.remove(localFName)
+        os.system(cmd)
+
+
 def fetch4date(y, m, d):
     """
     Fetch data for the given date.
@@ -201,9 +212,7 @@ def fetch4date(y, m, d):
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     print(url, fName)
-    #cmd = "curl {} --remote-time --time-cond {} --output {}".format(url,fName,fName)
-    cmd = "wget {} --continue --output-document={}".format(url,fName)
-    os.system(cmd)
+    wget_better(url, fName)
 
 
 def date2datedict(date, fallBackMonth=1):
