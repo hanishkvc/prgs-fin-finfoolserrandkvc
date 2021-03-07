@@ -325,7 +325,7 @@ def print_removed():
     print("WARN: List of REMOVED MFs")
     for removedMF in gData['removed']:
         print(removedMF)
-    input("WARN: The above MFs were removed when loading")
+    print("WARN: The above MFs were removed when loading")
 
 
 def load4date(y, m, d):
