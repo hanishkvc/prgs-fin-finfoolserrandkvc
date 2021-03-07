@@ -610,6 +610,12 @@ def show_plot():
     for line in leg.get_lines():
         line.set_linewidth(4)
     plt.grid(True)
+    #plt.xticks(list(range(len(gData['dates']))), gData['dates'], rotation='vertical')
+    numX = len(gData['dates'])
+    #xTicks = (numpy.linspace(0,1,5)*numX).astype(int)
+    xTicks = (numpy.arange(0,1,0.2)*numX).astype(int)
+    xTickLabels = numpy.array(gData['dates'])[xTicks]
+    plt.xticks(xTicks, xTickLabels)
     plt.show()
 
 
