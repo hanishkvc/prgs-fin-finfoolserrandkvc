@@ -484,10 +484,12 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
                 mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
             continue
         bSkip = False
+        noTokenCnt = 0
         for token in mfNameTokens:
             if token.startswith("-NO-"):
                 token = token[4:]
                 bSkipFlag=True
+                noTokenCnt += 1
             else:
                 bSkipFlag=False
             if partialTokens:
@@ -504,7 +506,7 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
                         matchCnt += 1
         if bSkip:
             continue
-        if matchCnt == len(mfNameTokens):
+        if matchCnt == (len(mfNameTokens) - noTokenCnt):
             mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
         elif matchCnt > 0:
             mfNamePartMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
