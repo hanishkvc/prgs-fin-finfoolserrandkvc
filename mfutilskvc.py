@@ -227,6 +227,12 @@ def fetch4date(y, m, d):
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     print(url, fName)
     wget_better(url, fName)
+    f = open(fName)
+    l = f.readline()
+    if not l.startswith("Scheme Code"):
+        print("ERRR:fetch4date:Not a valid nav file, removing it")
+        os.remove(fName)
+    f.close()
 
 
 def date2datedict(date, fallBackMonth=1):
