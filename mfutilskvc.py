@@ -121,6 +121,7 @@ def setup_gdata():
     gData['dates'] = []
     gData['removed'] = set()
     gData['dateRange'] = [-1, -1]
+    gData['plots'] = set()
 
 
 def setup():
@@ -605,17 +606,31 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
         aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
         print(aLabel, name)
         if gbDoRawData:
-            plt.plot(aRawData, label="{}, {}:Raw".format(aLabel,name[:giLabelNameChopLen]))
+            _plot_data(code, None, aRawData, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Raw")
         if gbDoRelData:
-            plt.plot(aRelData, label="{}, {}:Rel".format(aLabel,name[:giLabelNameChopLen]))
+            _plot_data(code, None, aRelData, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Rel")
         if gbDoMovingAvg:
             if MOVINGAVG_CONVOLVEMODE == 'valid':
                 tStartPos = int(MOVINGAVG_WINSIZE/2)
             else:
                 tStartPos = 0
-            plt.plot(list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, {}:DMA{}".format(aLabel,MOVINGAVG_WINSIZE,name[:giLabelNameChopLen]))
+            typeTag = "DMA{}".format(MOVINGAVG_WINSIZE)
+            _plot_data(code, list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
         if gbDoRollingRet:
-            plt.plot(aRollingRet, label="{}, {}:Rol{}".format(aLabel,name[:giLabelNameChopLen],ROLLINGRET_WINSIZE))
+            typeTag = "Rol{}".format(ROLLINGRET_WINSIZE)
+            _plot_data(code, None, aRollingRet, label="{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
+
+
+def _plot_data(mfCode, xData, yData, label, typeTag):
+    theTag = str([mfCode, typeTag])
+    if theTag in gData['plots']:
+        return
+    gData['plots'].add(theTag)
+    label = "{}:{}".format(label, typeTag)
+    if xData == None:
+        plt.plot(yData, label=label)
+    else:
+        plt.plot(xData, yData, label=label)
 
 
 def show_plot():
@@ -635,6 +650,7 @@ def show_plot():
     plt.xticks(xTicks, xTickLabels)
     plt.show()
     gData['dateRange'] = [-1, -1]
+    gData['plots'] = set()
 
 
 def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
