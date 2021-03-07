@@ -44,7 +44,8 @@ Newer:
 TODO:
     20 day, 50 day line, 10 week line, 200 day (Moving averages(simple, exponential))
     52 week high/low,
-
+    Extract fund type from Nav data file
+    Negative tokens while matching
 """
 
 gbDEBUG=False
@@ -461,6 +462,9 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
 
     It returns those names which match all given tokens,
     as well as those names which only match certain tokens.
+
+    NOTE: One can prefix any token with -NO-, in which case
+    if such a token is found to be present in the MFName, then that MF is skipped.
     """
     if ignoreCase:
         mfName = mfName.upper()
@@ -479,13 +483,27 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
             if curName == mfName:
                 mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
             continue
+        bSkip = False
         for token in mfNameTokens:
+            if token.startswith("-NO-"):
+                token = token[4:]
+                bSkipFlag=True
+            else:
+                bSkipFlag=False
             if partialTokens:
                 if curName.find(token) != -1:
-                    matchCnt += 1
+                    if bSkipFlag:
+                        bSkip = True
+                    else:
+                        matchCnt += 1
             else:
                 if token in curName.split(' '):
-                    matchCnt += 1
+                    if bSkipFlag:
+                        bSkip = True
+                    else:
+                        matchCnt += 1
+        if bSkip:
+            continue
         if matchCnt == len(mfNameTokens):
             mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
         elif matchCnt > 0:
@@ -762,6 +780,9 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
         a list of MF name parts like [ "mf name parts 1", "mf name parts 2", ... ]
             a matching MF name should contain all the tokens in any one
             of the match name parts in the list.
+
+            NOTE: if one prefixes -NO- to a token, then the MFName shouldnt contain
+            that token as part of its name.
 
         a string specifying a operation like
             "OP:TOP" - will get the top 10 performing MFs by default.
