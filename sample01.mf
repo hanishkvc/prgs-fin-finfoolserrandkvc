@@ -1,5 +1,9 @@
 print("A sample script for the mfutilskvc, plotting indian sensex and s&p 500 indirectly using index fund data...")
-input("Dont forget to fetch the data for the date range you are interested in, before using this script")
+#
+# Fetch data if required, commented out by default
+#
+input("Dont forget to fetch data for the date range you are interested in, if required, before using this script")
+#fetch_data(2020, 2021)
 #
 # Load the data
 #
