@@ -47,6 +47,7 @@ TODO:
 
 """
 
+gbDEBUG=False
 # The tokens in the REMOVE_NAMETOKENS list will be matched against MFName,
 # and matching MFs will be silently ignored while loading the MF data.
 MF_REMOVE_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
@@ -346,10 +347,14 @@ def print_removed():
     """
     Print the removed list of MFs, so that user can cross verify, things are fine.
     """
-    print("WARN: List of REMOVED MFs")
+    msg = "WARN: About to print the list of REMOVED/Filtered out MFs"
+    if gbDEBUG:
+        input("{}, press any key...".format(msg))
+    else:
+        print(msg)
     for removedMF in gData['removed']:
         print(removedMF)
-    print("WARN: The above MFs were removed when loading")
+    print("WARN: The above MFs were removed/filtered out when loading")
 
 
 def load4date(y, m, d):
