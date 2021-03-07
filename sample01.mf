@@ -1,0 +1,22 @@
+print("A sample script for the mfutilskvc, plotting indian sensex and s&p 500 indirectly using index fund data...")
+#
+# Load the data
+#
+load_data(2020, 2021)
+#
+# Look at loaded data from different angles
+#
+lookat_data(["sensex index direct tata", "s&p 500 index direct"], dataProcs=["rel", "dma_7"])
+show_plot()
+lookat_data(["sensex index direct tata", "s&p 500 index direct"], dataProcs=["rel", "dma_20"])
+show_plot()
+lookat_data(["sensex index direct tata", "s&p 500 index direct"], dataProcs=["rel", "dma_50"])
+show_plot()
+lookat_data(["sensex index direct tata", "s&p 500 index direct"], dataProcs=["rel", "dma_20"])
+lookat_data(["sensex index direct tata", "s&p 500 index direct"], dataProcs=["dma_50"])
+show_plot()
+#
+# Quit if you dont want to further look at the data.
+#
+#quit()
+
