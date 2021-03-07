@@ -184,7 +184,10 @@ def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True):
                 if bNotBeyondYesterday and (y == now.tm_year) and (m == now.tm_mon) and (d >= now.tm_mday):
                     continue
                 print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
-                handle_date_func(y,m,d)
+                try:
+                    handle_date_func(y,m,d)
+                except:
+                    traceback.print_exc()
 
 
 def wget_better(url, localFName):
