@@ -10,6 +10,7 @@ import numpy
 import matplotlib.pyplot as plt
 import time
 import traceback
+import readline
 
 
 """
@@ -200,6 +201,7 @@ def fetch4date(y, m, d):
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     print(url, fName)
+    #cmd = "curl {} --remote-time --time-cond {} --output {}".format(url,fName,fName)
     cmd = "wget {} --continue --output-document={}".format(url,fName)
     os.system(cmd)
 
