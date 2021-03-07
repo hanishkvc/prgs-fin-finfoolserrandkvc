@@ -506,12 +506,14 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     else:
         dMovAvg = None
     if bRollingRet:
-        dRollingRetPercents = numpy.zeros(dataLen-iStart+1)
-        for i in range(iStart, dataLen):
+        dRollingRetPercents = numpy.zeros(dataLen)
+        tStart = iStart
+        tStart = 0
+        for i in range(tStart, dataLen):
             tiEnd = i + ROLLINGRET_WINSIZE
             if tiEnd >= dataLen:
                 break
-            dRollingRetPercents[i-iStart] = ((data[tiEnd]/data[i]) - 1)*100
+            dRollingRetPercents[tiEnd] = ((data[tiEnd]/data[i]) - 1)*100
     else:
         dRollingRetPercents = None
     return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dAbsRetPercent, dRetPA, durationInYears
@@ -564,8 +566,7 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
                 tStartPos = 0
             plt.plot(list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, DMA{}:{}".format(aLabel,MOVINGAVG_WINSIZE,name[:giLabelNameChopLen]))
         if gbDoRollingRet:
-            tStartPos = ROLLINGRET_WINSIZE
-            plt.plot(list(range(tStartPos,len(aRollingRet)+tStartPos)), aRollingRet, label="{}, Rol:{}".format(aLabel,name[:giLabelNameChopLen]))
+            plt.plot(aRollingRet, label="{}, Rol:{}".format(aLabel,name[:giLabelNameChopLen]))
 
 
 def show_plot():
