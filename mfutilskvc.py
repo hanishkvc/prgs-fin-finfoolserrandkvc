@@ -564,7 +564,8 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
                 tStartPos = 0
             plt.plot(list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, label="{}, DMA{}:{}".format(aLabel,MOVINGAVG_WINSIZE,name[:giLabelNameChopLen]))
         if gbDoRollingRet:
-            plt.plot(aRollingRet, label="{}, Rol:{}".format(aLabel,name[:giLabelNameChopLen]))
+            tStartPos = ROLLINGRET_WINSIZE
+            plt.plot(list(range(tStartPos,len(aRollingRet)+tStartPos)), aRollingRet, label="{}, Rol:{}".format(aLabel,name[:giLabelNameChopLen]))
 
 
 def show_plot():
