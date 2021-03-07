@@ -626,6 +626,8 @@ def show_plot():
     for line in leg.get_lines():
         line.set_linewidth(4)
     plt.grid(True)
+    startDateIndex = gData['dateRange'][0]
+    endDateIndex = gData['dateRange'][1]
     curDates = gData['dates'][startDateIndex:endDateIndex+1]
     numX = len(curDates)
     xTicks = (numpy.arange(0,1,0.2)*numX).astype(int)
