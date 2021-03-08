@@ -52,9 +52,9 @@ TODO:
 """
 
 gbDEBUG=False
-# The tokens in the REMOVE_NAMETOKENS list will be matched against MFName,
+# The tokens in the SKIP_NAMETOKENS list will be matched against MFName,
 # and matching MFs will be silently ignored while loading the MF data.
-MF_REMOVE_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
+MF_SKIP_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
 
 #
 # Data processing and related
@@ -123,7 +123,7 @@ def setup_gdata():
     gData['dateIndex'] = -1
     gData['names'] = []
     gData['dates'] = []
-    gData['removed'] = set()
+    gData['skipped'] = set()
     gData['dateRange'] = [-1, -1]
     gData['plots'] = set()
     gData['mfTypes'] = {}
@@ -133,7 +133,7 @@ def setup():
     tc.gData = gData
     setup_gdata()
     setup_paths()
-    print("WARN:MF_REMOVE_NAMETOKENS:", MF_REMOVE_NAMETOKENS)
+    print("WARN:MF_SKIP_NAMETOKENS:", MF_SKIP_NAMETOKENS)
 
 
 def dateint(y, m, d):
@@ -309,11 +309,11 @@ def parse_csv(sFile):
     """
     Parse the specified data csv file and load it into global data dictionary.
 
-    NOTE: Any MFs whose name contain any of the tokens specified in MF_REMOVE_NAMETOKENS
+    NOTE: Any MFs whose name contain any of the tokens specified in MF_SKIP_NAMETOKENS
     will be silently ignored and not added to the dataset.
     """
     tFile = open(sFile)
-    removedMFsCnt = 0
+    skippedMFsCnt = 0
     curMFType = ""
     for l in tFile:
         l = l.strip()
@@ -331,12 +331,12 @@ def parse_csv(sFile):
             code = int(la[0])
             name = la[1]
             bNameMatch = False
-            for nameToken in MF_REMOVE_NAMETOKENS:
+            for nameToken in MF_SKIP_NAMETOKENS:
                 if nameToken.upper() in name.upper():
                     bNameMatch = True
             if bNameMatch:
-                gData['removed'].add(str([code, name]))
-                removedMFsCnt += 1
+                gData['skipped'].add(str([code, name]))
+                skippedMFsCnt += 1
                 continue
             try:
                 nav  = float(la[4])
@@ -363,18 +363,18 @@ def parse_csv(sFile):
     tFile.close()
 
 
-def print_removed():
+def print_skipped():
     """
-    Print the removed list of MFs, so that user can cross verify, things are fine.
+    Print the skipped list of MFs, so that user can cross verify, things are fine.
     """
-    msg = "WARN: About to print the list of REMOVED/Filtered out MFs"
+    msg = "WARN: About to print the list of SKIPPED/Filtered out MFs"
     if gbDEBUG:
         input("{}, press any key...".format(msg))
     else:
         print(msg)
-    for removedMF in gData['removed']:
-        print(removedMF)
-    print("WARN: The above MFs were removed/filtered out when loading")
+    for skippedMF in gData['skipped']:
+        print(skippedMF)
+    print("WARN: The above MFs were skipped/filtered out when loading")
 
 
 def load4date(y, m, d):
@@ -409,7 +409,8 @@ def load4daterange(startDate, endDate):
         excInfo = sys.exc_info()
         print(excInfo)
     fillin4holidays()
-    print_removed()
+    if gbDEBUG:
+        print_skipped()
 
 
 def load_data(startDate, endDate = None, bClearData=True):
@@ -890,7 +891,7 @@ def handle_args():
 #
 print("MFUtilsKVC: A stupid exploration of MF NAV data")
 print("License: GPL")
-print("DONT USE THIS PROGRAM TO MAKE ANY DECISIONS OR INFERENCES OR ...")
+print("PLEASE DONT USE THIS PROGRAM TO MAKE ANY DECISIONS OR INFERENCES OR ...")
 
 setup()
 if len(sys.argv) > 1:
