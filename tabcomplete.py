@@ -13,6 +13,14 @@ L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         ]
 
 
+def matching_list(curPart):
+    match = []
+    for x in gData['mfTypes']:
+        if x.startswith(curPart):
+            match.append(x[len(curPart):])
+    return match
+
+
 def complete(text, state):
     """
     Handle the tab completion
@@ -25,10 +33,9 @@ def complete(text, state):
         return match[state]
     if curLine.startswith("mftypes_members("):
         data = curLine[16:].lstrip()
-        print("DBUG:tc:", data)
         if data[0] == '"':
             data = data[1:]
-        match = [x for x in gData['mftypes'] if x.startswith(data)]
+        match = matching_list(data)
         return match[state]
     return None
 
