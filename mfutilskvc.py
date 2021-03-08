@@ -844,7 +844,17 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     _restore_dataproccontrols(savedDataProcControls)
 
 
-def input_multiline(prompt, theFile=None):
+def input_multi(prompt=">>>", altPrompt="...", theFile=None):
+    """
+    Allow reading a single line or multiline of python block
+    either from console or from the file specified.
+
+    If user is entering a multiline python block, the program
+    will show a different prompt to make it easy for the user
+    to identify the same.
+
+    NOTE: By default it follows the same prompts as python.
+    """
     lines = ""
     bMulti = False
     lineCnt = 0
@@ -856,8 +866,8 @@ def input_multiline(prompt, theFile=None):
             if line == '':
                 theFile=None
                 continue
-        if prompt != "":
-            prompt = ""
+        if prompt != altPrompt:
+            prompt = altPrompt
         lineCnt += 1
         lineStripped = line.strip()
         if (lineCnt == 1):
@@ -887,7 +897,7 @@ def do_run(theFile=None):
     bQuit = False
     while not bQuit:
         try:
-            cmd = input_multiline(":", theFile)
+            cmd = input_multi(theFile=theFile)
             exec(cmd,globals())
         except:
             excInfo = sys.exc_info()
