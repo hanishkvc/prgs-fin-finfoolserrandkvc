@@ -415,7 +415,7 @@ def load4daterange(startDate, endDate):
         print_skipped()
 
 
-def load_data(startDate, endDate = None, bClearData=True):
+def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None):
     """
     Load data for given date range.
 
@@ -431,6 +431,7 @@ def load_data(startDate, endDate = None, bClearData=True):
         endDate = startDate
     if bClearData:
         setup_gdata(startDate, endDate)
+    gData['whiteListMFTypes'] = whiteListMFTypes
     load4daterange(startDate, endDate)
 
 
@@ -474,57 +475,57 @@ def fillin4holidays():
         _fillin4holidays(r)
 
 
-def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True):
+def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ignoreCase=True):
     """
-    Find the MFs which match the given mfName.
+    Find strings from dataSet, which match the given searchTemplate.
 
     If fullMatch is True, then checks for a full match, else
-    it tries to find MFNames in its dataset, which contain
-    some or all of the tokens in the given mfName,.
+    it tries to find strings in its dataset, which contain
+    some or all of the tokens in the given searchTmpl.
 
-    If partialTokens is True, then tokens in the given mfName
-    could appear as part of bigger token in MFNames in its
-    dataset. Else the token in given mfName and token in the
-    MFNames in the dataset should match fully at the individual
+    If partialTokens is True, then tokens in the given searchTmpl
+    could appear as part of bigger token in strings in its
+    dataset. Else the token in given searchTmpl and token in the
+    strings in the dataset should match fully at the individual
     token level.
 
-    if ignoreCase is True, then case of the given mfName,
+    if ignoreCase is True, then case of the given searchTmpl,
     is ignored while trying to find a match.
 
-    It returns those names which match all given tokens,
-    as well as those names which only match certain tokens.
+    It returns those strings which match all given tokens,
+    as well as those strings which only match certain tokens.
 
     NOTE: One can prefix any token with -NO-, in which case
-    if such a token is found to be present in the MFName,
-    then that MF is skipped.
+    if such a token is found to be present in a string from
+    the dataSet, then that string is skipped.
 
     NOTE: One can prefix any token with ~PART~, in which case
     such a token can occur either independently or as part of
-    a bigger word in the MF name.
+    a bigger word in the matched string(s) from the dataSet.
 
     NOTE: If you want to mix NO and PART, do it in that order
     i.e -NO-~PART~TheToken.
     """
     if ignoreCase:
-        mfName = mfName.upper()
-    mfName = mfName.strip()
-    mfNameTokens = mfName.split(' ')
-    mfNameFullMatch = []
-    mfNamePartMatch = []
+        searchTmpl = searchTmpl.upper()
+    searchTmpl = searchTmpl.strip()
+    searchTmplTokens = searchTmpl.split(' ')
+    searchTmplFullMatch = []
+    searchTmplPartMatch = []
     namesIndex = -1
-    for curName in gData['names']:
+    for curName in dataSet:
         curName_asis = curName
         if ignoreCase:
             curName = curName.upper()
         namesIndex += 1
         matchCnt = 0
         if fullMatch:
-            if curName == mfName:
-                mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
+            if curName == searchTmpl:
+                searchTmplFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
             continue
         bSkip = False
         noTokenCnt = 0
-        for token in mfNameTokens:
+        for token in searchTmplTokens:
             if token.startswith("-NO-"):
                 token = token[4:]
                 bSkipFlag=True
@@ -552,11 +553,20 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
                         matchCnt += 1
         if bSkip:
             continue
-        if matchCnt == (len(mfNameTokens) - noTokenCnt):
-            mfNameFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
+        if matchCnt == (len(searchTmplTokens) - noTokenCnt):
+            searchTmplFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
         elif matchCnt > 0:
-            mfNamePartMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
-    return mfNameFullMatch, mfNamePartMatch
+            searchTmplPartMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
+    return searchTmplFullMatch, searchTmplPartMatch
+
+
+def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True):
+    """
+    Find MFs from the MF dataSet, which match the given mfName Template.
+
+    NOTE: look at help of _findmatching for the search/matching behaviour.
+    """
+    return _findmatching(mfName, gData['names'], fullMatch, partialTokens, ignoreCase)
 
 
 def search_data(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=True, bPrintAllTokenMatch=True, bPrintSomeTokenMatch=False):
