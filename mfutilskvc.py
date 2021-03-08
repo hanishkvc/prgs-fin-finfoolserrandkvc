@@ -112,14 +112,15 @@ def setup_paths():
     print("INFO:setup_paths:", MFS_FNAMECSV_TMPL)
 
 
-def setup_gdata():
+def setup_gdata(startDate=-1, endDate=-1):
     """
     Initialise the gData dictionary
     """
+    numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
     gData.clear()
     gData['code2index'] = {}
     gData['index2code'] = {}
-    gData['data'] = numpy.zeros([8192*4,8192])
+    gData['data'] = numpy.zeros([8192*4, numDates])
     gData['nextMFIndex'] = 0
     gData['dateIndex'] = -1
     gData['names'] = []
@@ -429,7 +430,7 @@ def load_data(startDate, endDate = None, bClearData=True):
     if endDate == None:
         endDate = startDate
     if bClearData:
-        setup_gdata()
+        setup_gdata(startDate, endDate)
     load4daterange(startDate, endDate)
 
 
