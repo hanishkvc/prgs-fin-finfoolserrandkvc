@@ -844,12 +844,18 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     _restore_dataproccontrols(savedDataProcControls)
 
 
-def input_multiline(prompt):
+def input_multiline(prompt, theFile=None):
     lines = ""
     bMulti = False
     lineCnt = 0
     while True:
-        line = input(prompt)
+        if theFile == None:
+            line = input(prompt)
+        else:
+            line = theFile.readline()
+            if line == '':
+                theFile=None
+                continue
         if prompt != "":
             prompt = ""
         lineCnt += 1
@@ -881,13 +887,7 @@ def do_run(theFile=None):
     bQuit = False
     while not bQuit:
         try:
-            if theFile == None:
-                cmd = input_multiline(":")
-            else:
-                cmd = theFile.readline()
-                if cmd == '':
-                    theFile=None
-                    continue
+            cmd = input_multiline(":", theFile)
             exec(cmd,globals())
         except:
             excInfo = sys.exc_info()
