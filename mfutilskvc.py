@@ -493,7 +493,15 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
     as well as those names which only match certain tokens.
 
     NOTE: One can prefix any token with -NO-, in which case
-    if such a token is found to be present in the MFName, then that MF is skipped.
+    if such a token is found to be present in the MFName,
+    then that MF is skipped.
+
+    NOTE: One can prefix any token with ~PART~, in which case
+    such a token can occur either independently or as part of
+    a bigger word in the MF name.
+
+    NOTE: If you want to mix NO and PART, do it in that order
+    i.e -NO-~PART~TheToken.
     """
     if ignoreCase:
         mfName = mfName.upper()
@@ -521,7 +529,12 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
                 noTokenCnt += 1
             else:
                 bSkipFlag=False
-            if partialTokens:
+            if token.startswith("~PART~"):
+                token = token[6:]
+                bPartialTokenMatch = True
+            else:
+                bPartialTokenMatch = False
+            if bPartialTokenMatch:
                 if curName.find(token) != -1:
                     if bSkipFlag:
                         bSkip = True
