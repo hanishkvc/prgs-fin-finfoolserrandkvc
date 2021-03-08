@@ -669,7 +669,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
                 inv = int(days/2)
                 tResult[r,:inv] = numpy.nan
-                tResult[r,-inv:] = numpy.nan
+                tResult[r,gData['dateIndex']-inv:] = numpy.nan
             elif op.startswith("roll"):
                 days = int(op[4:])
                 tResult[r,days:] = gData[dataSrc][r,days:]/gData[dataSrc][r,:-days]
@@ -693,7 +693,7 @@ def plot_data(dataSrc, mfCodes, startDate=-1, endDate=-1):
     for mfCode in mfCodes:
         index = gData['code2index'][mfCode]
         print("DBUG:plot_data:{}:{}:{}".format(dataSrc, mfCode, index))
-        plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1])
+        plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label="{}:{}".format(dataSrc, mfCode))
 
 
 def _date2index(startDate, endDate):
