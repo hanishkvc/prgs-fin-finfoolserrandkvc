@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # Get and work with MF nav data
 # HanishKVC, 2021
+# GPL
+#
 
 import sys
 import calendar
@@ -886,6 +888,10 @@ def handle_args():
 #
 # The main flow starts here
 #
+print("MFUtilsKVC: A stupid exploration of MF NAV data")
+print("License: GPL")
+print("DONT USE THIS PROGRAM TO MAKE ANY DECISIONS OR INFERENCES OR ...")
+
 setup()
 if len(sys.argv) > 1:
     handle_args()
