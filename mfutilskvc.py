@@ -534,6 +534,8 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
                 bPartialTokenMatch = True
             else:
                 bPartialTokenMatch = False
+            if partialTokens:
+                bPartialTokenMatch = True
             if bPartialTokenMatch:
                 if curName.find(token) != -1:
                     if bSkipFlag:
