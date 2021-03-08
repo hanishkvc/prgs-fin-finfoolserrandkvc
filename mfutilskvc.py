@@ -844,7 +844,7 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     _restore_dataproccontrols(savedDataProcControls)
 
 
-def input_multi(prompt=">>>", altPrompt="...", theFile=None):
+def input_multi(prompt="<>>", altPrompt="...", theFile=None):
     """
     Allow reading a single line or multiline of python block
     either from console or from the file specified.
