@@ -123,6 +123,7 @@ def setup_gdata():
     gData['removed'] = set()
     gData['dateRange'] = [-1, -1]
     gData['plots'] = set()
+    gData['mfTypes'] = {}
 
 
 def setup():
@@ -309,12 +310,16 @@ def parse_csv(sFile):
     """
     tFile = open(sFile)
     removedMFsCnt = 0
+    curMFType = ""
     for l in tFile:
         l = l.strip()
         if l == '':
             continue
         if l[0].isalpha():
             #print("WARN:parse_csv:Skipping:{}".format(l))
+            if l[-1] == ')':
+                curMFType = l
+                gData['mfTypes'][curMFType] = []
             continue
         try:
             la = l.split(';')
@@ -342,6 +347,7 @@ def parse_csv(sFile):
                 gData['code2index'][code] = mfIndex
                 gData['index2code'][mfIndex] = code
                 gData['names'].append(name)
+                gData['mfTypes'][curMFType].append(code)
             else:
                 if name != gData['names'][mfIndex]:
                     input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
@@ -418,6 +424,14 @@ def load_data(startDate, endDate = None, bClearData=True):
     if bClearData:
         setup_gdata()
     load4daterange(startDate, endDate)
+
+
+def mftypes_list():
+    """
+    List MFTypes found in currently loaded data.
+    """
+    for k in gData['mfTypes']:
+        print(k)
 
 
 def _fillin4holidays(mfIndex=-1):
