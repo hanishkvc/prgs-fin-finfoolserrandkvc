@@ -618,6 +618,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dAbsRetPercent, dRetPA, durationInYears
 
 
+gbRelDataPlusFloat = False
 def procdata_ex(opsList, startDate=-1, endDate=-1):
     """
     Allow data from any valid data key in gData to be operated on and the results to be saved
@@ -665,7 +666,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     dStart = gData[dataSrc][r, iStart]
                 dEnd = gData[dataSrc][r, endDateIndex]
                 if dStart != 0:
-                    tResult[r,:] = (gData[dataSrc][r,:]/dStart)
+                    if gbRelDataPlusFloat:
+                        tResult[r,:] = (gData[dataSrc][r,:]/dStart)
+                    else:
+                        tResult[r,:] = ((gData[dataSrc][r,:]/dStart)-1)*100
             elif op.startswith("dma"):
                 days = int(op[3:])
                 tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
@@ -674,7 +678,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 tResult[r,gData['dateIndex']-inv:] = numpy.nan
             elif op.startswith("roll"):
                 days = int(op[4:])
-                tResult[r,days:] = gData[dataSrc][r,days:]/gData[dataSrc][r,:-days]
+                if gbRelDataPlusFloat:
+                    tResult[r,days:] = gData[dataSrc][r,days:]/gData[dataSrc][r,:-days]
+                else:
+                    tResult[r,days:] = ((gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])-1)*100
                 tResult[r,:days] = numpy.nan
         gData[dataDst] = tResult
 
