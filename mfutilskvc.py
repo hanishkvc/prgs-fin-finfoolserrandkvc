@@ -844,6 +844,29 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     _restore_dataproccontrols(savedDataProcControls)
 
 
+def input_multiline(prompt):
+    lines = ""
+    bMulti = False
+    lineCnt = 0
+    while True:
+        line = input(prompt)
+        if prompt != "":
+            prompt = ""
+        lineCnt += 1
+        if (lineCnt == 1):
+            lines = line
+            if (line.strip()[-1] == ':'):
+                bMulti = True
+                continue
+            else:
+                break
+        else:
+            if line.strip() == "":
+                break
+            lines = "{}\n{}".format(lines,line)
+    return lines
+
+
 def do_run(theFile=None):
     """
     Run the REPL logic of this program.
@@ -858,7 +881,7 @@ def do_run(theFile=None):
     while not bQuit:
         try:
             if theFile == None:
-                cmd = input(":")
+                cmd = input_multiline(":")
             else:
                 cmd = theFile.readline()
                 if cmd == '':
