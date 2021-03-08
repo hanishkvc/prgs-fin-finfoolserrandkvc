@@ -695,9 +695,10 @@ def show_plot():
     endDateIndex = gData['dateRange'][1]
     curDates = gData['dates'][startDateIndex:endDateIndex+1]
     numX = len(curDates)
-    xTicks = (numpy.arange(0,1,0.2)*numX).astype(int)
+    xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
+    xTicks[-1] -= 1
     xTickLabels = numpy.array(curDates)[xTicks]
-    plt.xticks(xTicks, xTickLabels)
+    plt.xticks(xTicks, xTickLabels, rotation='vertical')
     plt.show()
     gData['dateRange'] = [-1, -1]
     gData['plots'] = set()
