@@ -321,7 +321,8 @@ def parse_csv(sFile):
             #print("WARN:parse_csv:Skipping:{}".format(l))
             if l[-1] == ')':
                 curMFType = l
-                gData['mfTypes'][curMFType] = []
+                if curMFType not in gData['mfTypes']:
+                    gData['mfTypes'][curMFType] = []
             continue
         try:
             la = l.split(';')
@@ -350,7 +351,6 @@ def parse_csv(sFile):
                 gData['index2code'][mfIndex] = code
                 gData['names'].append(name)
                 gData['mfTypes'][curMFType].append(code)
-                print(gData['mfTypes'][curMFType])
             else:
                 if name != gData['names'][mfIndex]:
                     input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
@@ -359,8 +359,6 @@ def parse_csv(sFile):
             print("ERRR:parse_csv:{}".format(l))
             print(sys.exc_info())
     tFile.close()
-    print("DBUG:parseCSV:", curMFType)
-    input(gData['mfTypes'][curMFType])
 
 
 def print_removed():
