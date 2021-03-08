@@ -128,6 +128,7 @@ def setup_gdata():
 
 
 def setup():
+    tc.gData = gData
     setup_gdata()
     setup_paths()
     print("WARN:MF_REMOVE_NAMETOKENS:", MF_REMOVE_NAMETOKENS)

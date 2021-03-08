@@ -5,8 +5,10 @@
 import readline
 
 
+gData = None
 L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
-        "show_plot", "mftypes_list",
+        "show_plot",
+        "mftypes_list", "mftypes_members",
         "quit"
         ]
 
@@ -15,11 +17,19 @@ def complete(text, state):
     """
     Handle the tab completion
     """
-    curTokens = readline.get_line_buffer().split()
-    if (len(curTokens) < 1) or ((len(curTokens) == 1) and (text != "")):
+    curLine = readline.get_line_buffer()
+    curTokens = curLine.split()
+    numTokens = len(curTokens)
+    if (numTokens < 1) or ((numTokens == 1) and (text != "")):
         match = [x for x in L1 if x.startswith(text)]
         return match[state]
-
+    if curLine.startswith("mftypes_members("):
+        data = curLine[16:].lstrip()
+        print("DBUG:tc:", data)
+        if data[0] == '"':
+            data = data[1:]
+        match = [x for x in gData['mftypes'] if x.startswith(data)]
+        return match[state]
     return None
 
 
