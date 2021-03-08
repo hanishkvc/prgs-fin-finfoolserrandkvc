@@ -625,6 +625,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         dataSrc = parts[0]
         op = parts[1]
         dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
+        print("DBUG:procdata_ex:generating", dataDst)
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = gData[dataSrc].copy()
         for r in range(gData['nextMFIndex']):
@@ -640,11 +641,23 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     tResult[r,:] = (gData[dataSrc][r,:]/dStart)
             elif op.startswith("dma"):
                 days = int(op[3:])
-                tResult[r,:] = numpy.convolve(gData[dataSrc], numpy.ones(days)/days, 'same')
+                tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                inv = int(days/2)
+                tResult[r,:inv] = numpy.nan
+                tResult[r,-inv:] = numpy.nan
             elif op.startswith("roll"):
                 days = int(op[4:])
-                tResult[r,:] = gData[dataSrc][r,days:]/gData[dataSrc][r,:-days]
+                tResult[r,days:] = gData[dataSrc][r,days:]/gData[dataSrc][r,:-days]
+                tResult[r,:days] = numpy.nan
         gData[dataDst] = tResult
+
+
+def plot_data(dataSrc, mfCodes, startDate=-1, endDate=-1):
+    startDateIndex, endDateIndex = _date2index(startDate, endDate)
+    for mfCode in mfCodes:
+        index = gData['code2index'][mfCode]
+        print("DBUG:plot_data:{}:{}:{}".format(dataSrc, mfCode, index))
+        plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1])
 
 
 def _date2index(startDate, endDate):
