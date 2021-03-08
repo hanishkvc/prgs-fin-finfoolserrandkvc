@@ -443,7 +443,7 @@ def mftypes_members(mfType):
     """
     print("INFO:mfTypesMembers:", mfType)
     for m in gData['mfTypes'][mfType]:
-        print(m)
+        print(m, gData['names'][gData['code2index'][m]])
 
 
 def _fillin4holidays(mfIndex=-1):
