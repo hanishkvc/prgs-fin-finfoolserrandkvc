@@ -13,11 +13,11 @@ L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         ]
 
 
-def matching_list(curPart):
+def matching_list(curPart, text):
     match = []
     for x in gData['mfTypes']:
         if x.startswith(curPart):
-            match.append(x[len(curPart):])
+            match.append(text+x[len(curPart):])
     return match
 
 
@@ -35,7 +35,7 @@ def complete(text, state):
         data = curLine[16:].lstrip()
         if data[0] == '"':
             data = data[1:]
-        match = matching_list(data)
+        match = matching_list(data, text)
         return match[state]
     return None
 
