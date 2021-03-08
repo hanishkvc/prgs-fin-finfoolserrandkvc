@@ -645,6 +645,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         '<OP>(<DataSrc>[<startDate>:<endDate>])'
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
+    if not _daterange_checkfine(startDateIndex, endDateIndex, "procdata_ex"):
+        return
     for curOp in opsList:
         parts = curOp.split('>')
         dataSrc = parts[0]
@@ -715,6 +717,26 @@ def _date2index(startDate, endDate):
     return startDateIndex, endDateIndex
 
 
+def _daterange_checkfine(startDateIndex, endDateIndex, caller):
+    """
+    Check the DateRange specified matches previously saved DateRange.
+    Else alert user.
+    """
+    if gData['dateRange'][0] == -1:
+        gData['dateRange'][0] = startDateIndex
+    if gData['dateRange'][1] == -1:
+        gData['dateRange'][1] = endDateIndex
+    savedStartDateIndex = gData['dateRange'][0]
+    savedEndDateIndex = gData['dateRange'][1]
+    if (savedStartDateIndex != startDateIndex) or (savedEndDateIndex != endDateIndex):
+        print("WARN:{}:previously used dateRange:{} - {}".format(caller, gData['dates'][savedStartDateIndex], gData['dates'][savedEndDateIndex]))
+        print("WARN:{}:passed dateRange:{} - {}".format(caller, gData['dates'][startDateIndex], gData['dates'][endDateIndex]))
+        print("INFO:{}:call again with matching dateRange OR".format(caller))
+        input("INFO:{}:load_data|show_plot will clear saved dateRange, so that you can lookat a new dateRange that you want to".format(caller))
+        return False
+    return True
+
+
 def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
@@ -728,17 +750,7 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
           and user will be free again to look at a new date range of their choosing.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    if gData['dateRange'][0] == -1:
-        gData['dateRange'][0] = startDateIndex
-    if gData['dateRange'][1] == -1:
-        gData['dateRange'][1] = endDateIndex
-    savedStartDateIndex = gData['dateRange'][0]
-    savedEndDateIndex = gData['dateRange'][1]
-    if (savedStartDateIndex != startDateIndex) or (savedEndDateIndex != endDateIndex):
-        print("WARN:lookatmfs_codes:previously used dateRange:{} - {}".format(gData['dates'][savedStartDateIndex], gData['dates'][savedEndDateIndex]))
-        print("WARN:lookatmfs_codes:passed dateRange:{} - {}".format(gData['dates'][startDateIndex], gData['dates'][endDateIndex]))
-        print("INFO:lookatmfs_codes:call again with matching dateRange OR")
-        input("INFO:lookatmfs_codes:load_data|show_plot will clear saved dateRange, so that you can lookat a new dateRange that you want to")
+    if not _daterange_checkfine(startDateIndex, endDateIndex, "lookatmfs_codes"):
         return
     for code in mfCodes:
         index = gData['code2index'][code]
