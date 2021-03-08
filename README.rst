@@ -88,22 +88,29 @@ Search
 
 Search through the loaded data set to see if it contains MFs with matching names.
 
-The user should give a list of strings. THe program will try to see if the MFs in the
-dataset contain all the tokens in any of the given strings. If so, the corresponding
-MF name will be printed.
+The user is required to specify a string containing tokens (a token is a alphanumeric
+with spaces around it, so each word in a string is a token). THe program will try to
+see if any of the MFs in the dataset contain all the tokens in the given string. If so,
+the corresponding MF name will be printed.
 
 The user can prefix -NO- to the tokens if required, in which case, if a MF name contains
 the corresponding token, the MF name will be skipped.
 
-search_data(["match tokens set 1", "match tokens set 2 -NO-SkipIfThisFound -NO-SkipEvenIfThisFound", ...])
+search_data("match tokens -NO-SkipIfThisFound -NO-SkipEvenIfThisFound")
 
 
 LookAt
 =======
 
+Basic use
+----------
+
 One can look at the data belonging to the specified list of MFs.
 
-THe list of MFs to look at is specified in the same way as in search_data above.
+THe list of MFs to look at is specified as a list of strings. The program will
+try to see if any of the MFs in the dataset contain all the tokens in any of the
+given strings. If so, the corresponding MF name will be selected, and its data
+can be looked at.
 
 One can either look at
 
@@ -117,13 +124,11 @@ One can either look at
 
 It will also print the absolute and per annum return.
 
-
 lookat_data(<ListOfMFNameMatchTokens>, dataProcs=<ListOfDataProcs>)
 
 ONe specifies the type of data to look at by setting the dataProcs, suitably into either
 
    "raw" and or "rel" and or "dma_N" and or "roll_N"; where N specifies the number of days.
-
 
 One can call lookat_data multiple times, to build up the set of MFs and their data one
 is interested in looking at and then at the end call show_plot, to get a plot all the
@@ -136,9 +141,9 @@ work with a new date range.
 
 
 DateRange
-============
+----------
 
-Both lookat and search can optionally take startDate and endDate as arguments.
+User can optionally specify startDate and endDate as arguments.
 
 If startDate is not specified, it will be mapped to the startDate specified during load_data.
 
