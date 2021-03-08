@@ -350,6 +350,7 @@ def parse_csv(sFile):
                 gData['index2code'][mfIndex] = code
                 gData['names'].append(name)
                 gData['mfTypes'][curMFType].append(code)
+                print(gData['mfTypes'][curMFType])
             else:
                 if name != gData['names'][mfIndex]:
                     input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
@@ -358,6 +359,8 @@ def parse_csv(sFile):
             print("ERRR:parse_csv:{}".format(l))
             print(sys.exc_info())
     tFile.close()
+    print("DBUG:parseCSV:", curMFType)
+    input(gData['mfTypes'][curMFType])
 
 
 def print_removed():
@@ -434,6 +437,15 @@ def mftypes_list():
     """
     for k in gData['mfTypes']:
         print(k)
+
+
+def mftypes_members(mfType):
+    """
+    List the members of the specified MFType
+    """
+    print("INFO:mfTypesMembers:", mfType)
+    for m in gData['mfTypes'][mfType]:
+        print(m)
 
 
 def _fillin4holidays(mfIndex=-1):
