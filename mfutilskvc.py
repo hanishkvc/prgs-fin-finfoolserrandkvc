@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import time
 import traceback
 import readline
+import tabcomplete as tc
 
 
 """
