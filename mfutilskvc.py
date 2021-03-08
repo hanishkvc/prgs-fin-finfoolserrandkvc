@@ -116,6 +116,7 @@ def setup_gdata():
     """
     Initialise the gData dictionary
     """
+    gData.clear()
     gData['code2index'] = {}
     gData['index2code'] = {}
     gData['data'] = numpy.zeros([8192*4,8192])
