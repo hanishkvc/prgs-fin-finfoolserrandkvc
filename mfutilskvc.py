@@ -618,6 +618,35 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dAbsRetPercent, dRetPA, durationInYears
 
 
+def procdata_ex(opsList, startDate=-1, endDate=-1):
+    startDateIndex, endDateIndex = _date2index(startDate, endDate)
+    for curOp in opsList:
+        parts = curOp.split('>')
+        dataSrc = parts[0]
+        op = parts[1]
+        dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
+        #dataLen = endDateIndex - startDateIndex + 1
+        tResult = gData[dataSrc].copy()
+        for r in range(gData['nextMFIndex']):
+            if op == "srel":
+                iStart = -1
+                dStart = 0
+                nonZeros = numpy.nonzero(gData[dataSrc][r, startDateIndex:endDateIndex+1])
+                if (len(nonZeros) > 0):
+                    iStart = nonZeros[0] + startDateIndex
+                    dStart = gData[dataSrc][r, iStart]
+                dEnd = gData[dataSrc][r, endDateIndex]
+                if dStart != 0:
+                    tResult[r,:] = (gData[dataSrc][r,:]/dStart)
+            elif op.startswith("dma"):
+                days = int(op[3:])
+                tResult[r,:] = numpy.convolve(gData[dataSrc], numpy.ones(days)/days, 'same')
+            elif op.startswith("roll"):
+                days = int(op[4:])
+                tResult[r,:] = gData[dataSrc][r,days:]/gData[dataSrc][r,:-days]
+        gData[dataDst] = tResult
+
+
 def _date2index(startDate, endDate):
     """
     Get the indexes corresponding to the start and end date
