@@ -853,15 +853,16 @@ def input_multiline(prompt):
         if prompt != "":
             prompt = ""
         lineCnt += 1
+        lineStripped = line.strip()
         if (lineCnt == 1):
             lines = line
-            if (line.strip()[-1] == ':'):
+            if (lineStripped != "") and (lineStripped[-1] == ':'):
                 bMulti = True
                 continue
             else:
                 break
         else:
-            if line.strip() == "":
+            if lineStripped == "":
                 break
             lines = "{}\n{}".format(lines,line)
     return lines
