@@ -619,6 +619,31 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
 
 
 def procdata_ex(opsList, startDate=-1, endDate=-1):
+    """
+    Allow data from any valid data key in gData to be operated on and the results to be saved
+    into a destination data key in gData.
+
+    opsList is a list of operations, which could be one of
+
+        "srel": calculate absolute return ratio across the full date range wrt given start date.
+                if the startDate contains a 0 value, then it tries to find a valid non zero value
+                and then use that.
+        "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
+                of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
+                of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
+                in these locations, so the result wont be proper, so force it to NaN).
+        "roll<DAYSInINT>": Calculate a rolling return rate across the full date range, with a
+                windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
+                cant satisfy the windowsize to calculate the rolling return rate, will be set to
+                NaN.
+
+    NOTE: NaN is used, because plot will ignore those data points and keep the corresponding
+    verticals blank.
+
+    Destination data key is constructed using the template
+
+        '<OP>(<DataSrc>[<startDate>:<endDate>])'
+    """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     for curOp in opsList:
         parts = curOp.split('>')
@@ -653,6 +678,17 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
 
 
 def plot_data(dataSrc, mfCodes, startDate=-1, endDate=-1):
+    """
+    Plot specified data for the specified MFs, over the specified date range.
+
+    dataSrc: Is the key used to retreive the data from gData.
+    mfCodes: Is a list of mfCodes'
+    startDate and endDate: specify the date range over which the data should be
+        retreived and plotted.
+
+    Remember to call plt.plot or show_plot, when you want to see the plots,
+    accumulated till that time.
+    """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     for mfCode in mfCodes:
         index = gData['code2index'][mfCode]
