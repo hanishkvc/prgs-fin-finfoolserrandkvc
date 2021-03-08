@@ -853,11 +853,16 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
     will show a different prompt to make it easy for the user
     to identify the same.
 
+    Entering a empty line or a line with a smaller indentation
+    than that used when multiline block entry started, will
+    lead to the logic getting out of the multiline input mode.
+
     NOTE: By default it follows the same prompts as python.
     """
     lines = ""
     bMulti = False
     lineCnt = 0
+    refStartWS = 0
     while True:
         if theFile == None:
             line = input(prompt)
@@ -880,7 +885,12 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
         else:
             if lineStripped == "":
                 break
+            curStartWS = len(line) - len(line.lstrip())
+            if (lineCnt == 2):
+                refStartWS = curStartWS
             lines = "{}\n{}".format(lines,line)
+            if (refStartWS != curStartWS):
+                break
     return lines
 
 
