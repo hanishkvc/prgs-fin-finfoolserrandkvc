@@ -788,9 +788,11 @@ def _plot_data(mfCode, xData, yData, label, typeTag):
         plt.plot(xData, yData, label=label)
 
 
-def show_plot():
+def show_plot(clearGDataDateRangePlus=True):
     """
     Show the data plotted till now.
+
+    clearGDataDateRangePlus if True, will clear gData dateRange and plots.
     """
     leg = plt.legend()
     for line in leg.get_lines():
@@ -805,8 +807,9 @@ def show_plot():
     xTickLabels = numpy.array(curDates)[xTicks]
     plt.xticks(xTicks, xTickLabels, rotation='vertical')
     plt.show()
-    gData['dateRange'] = [-1, -1]
-    gData['plots'] = set()
+    if clearGDataDateRangePlus:
+        gData['dateRange'] = [-1, -1]
+        gData['plots'] = set()
 
 
 def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
