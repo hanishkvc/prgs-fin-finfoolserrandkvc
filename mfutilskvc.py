@@ -14,6 +14,7 @@ import time
 import traceback
 import readline
 import tabcomplete as tc
+import hlpr
 
 
 """
@@ -88,8 +89,9 @@ MFS_FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
 MFS_BaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
 
 #
-# Fetching Index historic data
+# DATA URLs TOCHECK
 #
+## Index historic data
 INDEX_BSESENSEX_URL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2011&dtToDate=05/03/2021"
 
 #
@@ -201,27 +203,6 @@ def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True):
                     traceback.print_exc()
 
 
-def wget_better(url, localFName):
-    """
-    If the file on the server is bigger than the local file,
-    then redownload the file freshly, rather than appending to it,
-    as chances are the local file was not a partial download, but
-    rather a older version of the file with different data.
-    """
-    #cmd = "curl {} --remote-time --time-cond {} --output {}".format(url,fName,fName)
-    if os.path.exists(localFName):
-        mtimePrev = os.stat(localFName).st_mtime
-    else:
-        mtimePrev = -1
-    cmd = "wget {} --continue --output-document={}".format(url,localFName)
-    os.system(cmd)
-    if os.path.exists(localFName):
-        mtimeNow = os.stat(localFName).st_mtime
-        if (mtimePrev != -1) and (mtimeNow != mtimePrev):
-            os.remove(localFName)
-            os.system(cmd)
-
-
 def fetch4date(y, m, d):
     """
     Fetch data for the given date.
@@ -236,7 +217,7 @@ def fetch4date(y, m, d):
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     print(url, fName)
-    wget_better(url, fName)
+    hlpr.wget_better(url, fName)
     f = open(fName)
     l = f.readline()
     if not l.startswith("Scheme Code"):
