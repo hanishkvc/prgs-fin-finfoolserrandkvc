@@ -296,7 +296,6 @@ def parse_csv(sFile):
     will be silently ignored and not added to the dataset.
     """
     tFile = open(sFile)
-    skippedMFsCnt = 0
     curMFType = ""
     bSkipCurMFType = False
     for l in tFile:
@@ -322,14 +321,16 @@ def parse_csv(sFile):
             la = l.split(';')
             code = int(la[0])
             name = la[1]
-            bNameMatch = False
-            for nameToken in MF_SKIP_NAMETOKENS:
-                if nameToken.upper() in name.upper():
-                    bNameMatch = True
-            if bNameMatch:
-                gData['skipped'].add(str([code, name]))
-                skippedMFsCnt += 1
-                continue
+            if (gData['whiteListMFNames'] != None):
+                fm, pm = _findmatching(name, gData['whiteListMFNames'])
+                if len(fm) == 0:
+                    gData['skipped'].add(str([code, name]))
+                    continue
+            if (gData['blackListMFNames'] != None):
+                fm, pm = _findmatching(name, gData['blackListMFNames'])
+                if len(fm) > 0:
+                    gData['skipped'].add(str([code, name]))
+                    continue
             try:
                 nav  = float(la[4])
             except:
