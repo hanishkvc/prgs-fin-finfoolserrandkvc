@@ -311,7 +311,7 @@ def parse_csv(sFile):
                 if gData['whiteListMFTypes'] == None:
                     bSkipCurMFType = False
                 else:
-                    fm,pm = _findmatching(curMFType, gData['whiteListMFTypes'])
+                    fm,pm = matches_templates(curMFType, gData['whiteListMFTypes'])
                     if len(fm) == 0:
                         bSkipCurMFType = True
             continue
@@ -322,12 +322,12 @@ def parse_csv(sFile):
             code = int(la[0])
             name = la[1]
             if (gData['whiteListMFNames'] != None):
-                fm, pm = _findmatching(name, gData['whiteListMFNames'])
+                fm, pm = matches_templates(name, gData['whiteListMFNames'])
                 if len(fm) == 0:
                     gData['skipped'].add(str([code, name]))
                     continue
             if (gData['blackListMFNames'] != None):
-                fm, pm = _findmatching(name, gData['blackListMFNames'])
+                fm, pm = matches_templates(name, gData['blackListMFNames'])
                 if len(fm) > 0:
                     gData['skipped'].add(str([code, name]))
                     continue
