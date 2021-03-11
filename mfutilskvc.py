@@ -55,7 +55,8 @@ TODO:
 gbDEBUG=False
 # The tokens in the SKIP_NAMETOKENS list will be matched against MFName,
 # and matching MFs will be silently ignored while loading the MF data.
-MF_SKIP_NAMETOKENS = [ "dividend", "low duration", "liquid", "overnight", "money market" ]
+MF_ADD_MFTYPETOKENS = [ "equity" ]
+MF_SKIP_MFNAMETOKENS = [ "dividend" ]
 
 #
 # Data processing and related
@@ -137,7 +138,6 @@ def setup():
     tc.gData = gData
     setup_gdata()
     setup_paths()
-    print("WARN:MF_SKIP_NAMETOKENS:", MF_SKIP_NAMETOKENS)
 
 
 def dateint(y, m, d):
@@ -292,8 +292,11 @@ def parse_csv(sFile):
     """
     Parse the specified data csv file and load it into global data dictionary.
 
-    NOTE: Any MFs whose name contain any of the tokens specified in MF_SKIP_NAMETOKENS
-    will be silently ignored and not added to the dataset.
+    NOTE: It uses the white and black lists wrt MFTypes and MFNames, if any
+    specified in gData, to decide whether a given MF should be added to the
+    dataset or not. User can control this in the normal usage flow by either
+    passing these lists explicitly to load_data and or by setting related
+    global variables before calling load_data.
     """
     tFile = open(sFile)
     curMFType = ""
@@ -311,9 +314,12 @@ def parse_csv(sFile):
                 if gData['whiteListMFTypes'] == None:
                     bSkipCurMFType = False
                 else:
+                    #breakpoint()
                     fm,pm = matches_templates(curMFType, gData['whiteListMFTypes'])
                     if len(fm) == 0:
                         bSkipCurMFType = True
+                    else:
+                        bSkipCurMFType = False
             continue
         if bSkipCurMFType:
             continue
