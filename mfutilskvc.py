@@ -560,7 +560,7 @@ def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ign
         matchCnt = 0
         if fullMatch:
             if curName == searchTmpl:
-                searchTmplFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
+                searchTmplFullMatch.append([curName_asis, namesIndex])
             continue
         bSkip = False
         noTokenCnt = 0
@@ -593,9 +593,9 @@ def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ign
         if bSkip:
             continue
         if matchCnt == (len(searchTmplTokens) - noTokenCnt):
-            searchTmplFullMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
+            searchTmplFullMatch.append([curName_asis, namesIndex])
         elif matchCnt > 0:
-            searchTmplPartMatch.append([curName_asis, gData['index2code'][namesIndex], namesIndex])
+            searchTmplPartMatch.append([curName_asis, namesIndex])
     return searchTmplFullMatch, searchTmplPartMatch
 
 
@@ -605,7 +605,14 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
 
     NOTE: look at help of _findmatching for the search/matching behaviour.
     """
-    return _findmatching(mfName, gData['names'], fullMatch, partialTokens, ignoreCase)
+    fm, pm = _findmatching(mfName, gData['names'], fullMatch, partialTokens, ignoreCase)
+    fmNew = []
+    for curName, curIndex in fm:
+        fm.append([curName, gData['index2code'][curIndex], curIndex])
+    pmNew = []
+    for curName, curIndex in pm:
+        pm.append([curName, gData['index2code'][curIndex], curIndex])
+    return fmNew, pmNew
 
 
 def search_data(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=True, bPrintAllTokenMatch=True, bPrintSomeTokenMatch=False):
