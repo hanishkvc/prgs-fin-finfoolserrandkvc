@@ -606,7 +606,6 @@ def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ign
     for curName in dataSet:
         namesIndex += 1
         fm, pm = matches_templates(curName, [searchTmpl], fullMatch, partialTokens, ignoreCase)
-        print(curName, fm, pm)
         if (len(fm) > 0):
             searchTmplFullMatch.append([curName, namesIndex])
         if (len(pm) > 0):
@@ -621,14 +620,13 @@ def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True
     NOTE: look at help of _findmatching for the search/matching behaviour.
     """
     fm, pm = _findmatching(mfName, gData['names'], fullMatch, partialTokens, ignoreCase)
-    print("DBUG:fmmf:1:",mfName, fm)
+    #breakpoint()
     fmNew = []
     for curName, curIndex in fm:
-        fm.append([curName, gData['index2code'][curIndex], curIndex])
-    print("DBUG:fmmf:2:",mfName, pm)
+        fmNew.append([curName, gData['index2code'][curIndex], curIndex])
     pmNew = []
     for curName, curIndex in pm:
-        pm.append([curName, gData['index2code'][curIndex], curIndex])
+        pmNew.append([curName, gData['index2code'][curIndex], curIndex])
     return fmNew, pmNew
 
 
