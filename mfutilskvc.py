@@ -514,6 +514,58 @@ def fillin4holidays():
         _fillin4holidays(r)
 
 
+def matches_templates(theString, matchTemplates, fullMatch=False, partialTokens=False, ignoreCase=True):
+    theString_asis = theString
+    if ignoreCase:
+        theString = theString.upper()
+    matchTmplFullMatch = []
+    matchTmplPartMatch = []
+    tmplIndex = -1
+    for matchTmpl in matchTemplates:
+        tmplIndex += 1
+        if fullMatch:
+            if theString == matchTmpl:
+                matchTmplFullMatch.append([theString_asis, tmplIndex])
+            continue
+        matchTmplTokens = matchTmpl.split()
+        bSkip = False
+        noTokenCnt = 0
+        matchCnt = 0
+        for token in matchTmplTokens:
+            if token.startswith("-NO-"):
+                token = token[4:]
+                bNoFlag=True
+                noTokenCnt += 1
+            else:
+                bNoFlag=False
+            if token.startswith("~PART~"):
+                token = token[6:]
+                bPartialTokenMatch = True
+            else:
+                bPartialTokenMatch = False
+            if partialTokens:
+                bPartialTokenMatch = True
+            if bPartialTokenMatch:
+                if theString.find(token) != -1:
+                    if bNoFlag:
+                        bSkip = True
+                    else:
+                        matchCnt += 1
+            else:
+                if token in theString.split():
+                    if bNoFlag:
+                        bSkip = True
+                    else:
+                        matchCnt += 1
+        if bSkip:
+            continue
+        if matchCnt == (len(matchTmplTokens) - noTokenCnt):
+            matchTmplFullMatch.append([theString_asis, tmplIndex])
+        elif matchCnt > 0:
+            matchTmplPartMatch.append([theString_asis, tmplIndex])
+    return matchTmplFullMatch, matchTmplPartMatch
+
+
 def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ignoreCase=True):
     """
     Find strings from dataSet, which match the given searchTemplate.
@@ -545,57 +597,16 @@ def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ign
     NOTE: If you want to mix NO and PART, do it in that order
     i.e -NO-~PART~TheToken.
     """
-    if ignoreCase:
-        searchTmpl = searchTmpl.upper()
-    searchTmpl = searchTmpl.strip()
-    searchTmplTokens = searchTmpl.split(' ')
     searchTmplFullMatch = []
     searchTmplPartMatch = []
     namesIndex = -1
     for curName in dataSet:
-        curName_asis = curName
-        if ignoreCase:
-            curName = curName.upper()
         namesIndex += 1
-        matchCnt = 0
-        if fullMatch:
-            if curName == searchTmpl:
-                searchTmplFullMatch.append([curName_asis, namesIndex])
-            continue
-        bSkip = False
-        noTokenCnt = 0
-        for token in searchTmplTokens:
-            if token.startswith("-NO-"):
-                token = token[4:]
-                bSkipFlag=True
-                noTokenCnt += 1
-            else:
-                bSkipFlag=False
-            if token.startswith("~PART~"):
-                token = token[6:]
-                bPartialTokenMatch = True
-            else:
-                bPartialTokenMatch = False
-            if partialTokens:
-                bPartialTokenMatch = True
-            if bPartialTokenMatch:
-                if curName.find(token) != -1:
-                    if bSkipFlag:
-                        bSkip = True
-                    else:
-                        matchCnt += 1
-            else:
-                if token in curName.split(' '):
-                    if bSkipFlag:
-                        bSkip = True
-                    else:
-                        matchCnt += 1
-        if bSkip:
-            continue
-        if matchCnt == (len(searchTmplTokens) - noTokenCnt):
-            searchTmplFullMatch.append([curName_asis, namesIndex])
-        elif matchCnt > 0:
-            searchTmplPartMatch.append([curName_asis, namesIndex])
+        fm, pm = matches_templates(curName, [searchTmpl], fullMatch, partialTokens, ignoreCase)
+        if (len(fm) > 0):
+            searchTmplFullMatch.append([curName, namesIndex])
+        if (len(pm) > 0):
+            searchTmplPartMatch.append([curName, namesIndex])
     return searchTmplFullMatch, searchTmplPartMatch
 
 
