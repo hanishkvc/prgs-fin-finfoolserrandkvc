@@ -298,6 +298,7 @@ def parse_csv(sFile):
     tFile = open(sFile)
     skippedMFsCnt = 0
     curMFType = ""
+    bSkipCurMFType = False
     for l in tFile:
         l = l.strip()
         if l == '':
@@ -308,6 +309,14 @@ def parse_csv(sFile):
                 curMFType = l
                 if curMFType not in gData['mfTypes']:
                     gData['mfTypes'][curMFType] = []
+                if gData['whiteListMFTypes'] == None:
+                    bSkipCurMFType = False
+                else:
+                    fm,pm = _findmatching(curMFType, gData['whiteListMFTypes'])
+                    if len(fm) == 0:
+                        bSkipCurMFType = True
+            continue
+        if bSkipCurMFType:
             continue
         try:
             la = l.split(';')
@@ -383,7 +392,8 @@ def load4daterange(startDate, endDate):
     automatically by calling fillin4holidays.
 
     NOTE: If we dont have csv files for all the dates specified, in the date range,
-    then ensure that we have atleast data loaded till the 1st non existant date.
+    then ensure that we have atleast data loaded till the 1st non existant date. Rather
+    the logic ensures that data is loaded for all the dates for which data csv exists.
     """
     start, end = proc_date_startend(startDate, endDate)
     try:
@@ -396,23 +406,70 @@ def load4daterange(startDate, endDate):
         print_skipped()
 
 
-def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None):
+gWhiteListMFTypes = None
+gWhiteListMFNames = None
+gBlackListMFNames = None
+def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None, whiteListMFNames=None, blackListMFNames=None):
     """
     Load data for given date range.
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
 
+    bClearData if set, resets the gData by calling setup_gdata.
+
+    User can optionally specify whiteListMFTypes/whiteListMFNames/blackListMFNames.
+
+        if any of them is set to a list, the same will be written into gData.
+        if any of them is set to None, then the logic will check to see, if
+            there is a corresponding global list available or not.
+            If available, the same will be written into gData.
+                gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames.
+            Else the corresponding key in gData will point to None.
+
+    These are used by the underlying parse and load logic, as follows.
+
+        if gData['whiteListMFTypes'] is a valid list (i.e not None), then the logic will load
+        only MFs, which belong to a MFType which has matching tokens corresponding to all the
+        tokens in one of the strings in the passed list. Else MFs are not filtered based on
+        MFType.
+
+        if gData['whiteListMFNames'] is a valid list (i.e not None), then the logic will load
+        only MFs, whose name contain matching tokens corresponding to all the tokens in one of
+        the strings in the passed list.
+
+        if gData['blackListMFNames'] is a valid list (i.e not None), then the logic will load
+        only MFs, whose name dont contain matching tokens corresponding to all the tokens in
+        any of the strings in the passed list.
+
+        NONE-NONE-NONE : All MFs will be loaded.
+        LIST-NONE-NONE : All MFs which belong to any of the MFTypes specified, will be loaded.
+        NONE-LIST-NONE : MFs whose name match with a template in MFNames whitelist, will be loaded.
+        NONE-NONE-LIST : MFs whose name match with a template in MFNames blacklist, will be skipped.
+        NONE-LIST-LIST : MFs whose name match a template in MFNames whitelist, and doesnt match any
+                         of the templates in the MFNames blacklist, will be loaded.
+        ....
+
+        NOTE: The _findmatching logic will be used for matching templates.
+
     NOTE: This logic takes care of filling in nav values for holidays
     automatically by calling fillin4holidays.
 
-    NOTE: If we dont have csv files for all the dates specified, in the date range,
-    then ensure that we have atleast data loaded till the 1st non existant date.
+    NOTE: If we dont have csv files for some of the dates specified, in the date range,
+    the load4daterange logic ensures that data for dates for which csv exists will be loaded.
     """
     if endDate == None:
         endDate = startDate
     if bClearData:
         setup_gdata(startDate, endDate)
+    if whiteListMFTypes == None:
+        whiteListMFTypes = gWhiteListMFTypes
+    if whiteListMFNames == None:
+        whiteListMFNames = gWhiteListMFNames
+    if blackListMFNames == None:
+        blackListMFNames = gBlackListMFNames
     gData['whiteListMFTypes'] = whiteListMFTypes
+    gData['whiteListMFNames'] = whiteListMFNames
+    gData['blackListMFNames'] = blackListMFNames
     load4daterange(startDate, endDate)
 
 
