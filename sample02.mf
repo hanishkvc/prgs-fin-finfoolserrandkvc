@@ -29,9 +29,11 @@ show_plot()
 # Notice below I am reusing dma20, so use it as I want its old values, before its overwritten
 procdata_ex([ "roll31Data=roll31(dma20)", "dma20=dma20(srel)", "dma50=dma50(srel)"])
 datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31Data' ]
-for data in datas:
-	plot_data(data, mfCodes)
-show_plot()
+
+for mfCode in mfCodes:
+	for data in datas:
+		plot_data(data, [mfCode])
+	show_plot()
 
 #
 # Quit if you dont want to further look at the data.

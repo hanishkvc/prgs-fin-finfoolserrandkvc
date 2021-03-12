@@ -1199,10 +1199,11 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
             if lineStripped == "":
                 break
             curStartWS = len(line) - len(line.lstrip())
+            #print(curStartWS)
             if (lineCnt == 2):
                 refStartWS = curStartWS
             lines = "{}\n{}".format(lines,line)
-            if (refStartWS != curStartWS):
+            if (refStartWS > curStartWS):
                 break
     return lines
 
@@ -1223,6 +1224,7 @@ def do_run(theFile=None):
     bQuit = False
     while not bQuit:
         try:
+            #breakpoint()
             cmd = input_multi(theFile=theFile)
             if gbREPLPrint:
                 if '\n' not in cmd:
