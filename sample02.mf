@@ -12,7 +12,7 @@ load_data(2020, 2021)
 # Look at loaded data from different angles
 #
 
-procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll365=roll365(data)", "dma50=dma50(data)", "roll31Data=roll31(data)"])
+procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll365=roll365(data)", "dma50=dma50(data)", "roll31=roll31(data)"])
 
 indexes = [ "sensex index direct tata", "s&p 500 index direct motilal", "direct nasdaq 100 motilal" ]
 mfCodes = []
@@ -27,8 +27,8 @@ for data in datas:
 show_plot()
 
 # Notice below I am reusing dma20, so use it as I want its old values, before its overwritten
-procdata_ex([ "roll31Data=roll31(dma20)", "dma20=dma20(srel)", "dma50=dma50(srel)"])
-datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31Data' ]
+procdata_ex([ "roll31Dma20=roll31(dma20)", "dma20=dma20(srel)", "dma50=dma50(srel)", "dma20Roll31=dma20(roll31)"])
+datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'roll31Dma20', 'dma20Roll31' ]
 
 for mfCode in mfCodes:
 	for data in datas:
