@@ -140,6 +140,22 @@ def setup():
     setup_gdata()
     setup_paths()
     loadfilters_set(MF_ALLOW_MFTYPETOKENS, MF_ALLOW_MFNAMETOKENS, MF_SKIP_MFNAMETOKENS)
+    print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
+
+
+gNameCleanupMap = [
+        ['-', ' '],
+        ['Divided', 'Dividend'],
+        ['Diviend', 'Dividend'],
+        ['Divdend', 'Dividend'],
+        ]
+def string_cleanup(theString, cleanupMap):
+    """
+    Use the given cleanup map to replace elements of the passed string.
+    """
+    for cm in cleanupMap:
+        theString = theString.replace(cm[0], cm[1])
+    return theString
 
 
 def dateint(y, m, d):
@@ -328,7 +344,7 @@ def parse_csv(sFile):
         try:
             la = l.split(';')
             code = int(la[0])
-            name = la[1]
+            name = string_cleanup(la[1], gNameCleanupMap)
             if (gData['whiteListMFNames'] != None):
                 fm, pm = matches_templates(name, gData['whiteListMFNames'])
                 if len(fm) == 0:
