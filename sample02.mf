@@ -23,7 +23,7 @@ datas = [ 'data', 'dma20', 'dma50', 'srel(data[-1:-1])', 'roll365', 'roll31Data'
 
 for data in datas:
 	plot_data(data, mfCodes)
-	show_plot(False)
+	_show_plot()
 
 for data in datas:
 	plot_data(data, mfCodes)
