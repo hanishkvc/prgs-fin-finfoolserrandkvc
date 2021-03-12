@@ -55,7 +55,8 @@ TODO:
 gbDEBUG=False
 # The tokens in the SKIP_NAMETOKENS list will be matched against MFName,
 # and matching MFs will be silently ignored while loading the MF data.
-MF_ADD_MFTYPETOKENS = [ "equity" ]
+MF_ALLOW_MFTYPETOKENS = [ "equity" ]
+MF_ALLOW_MFNAMETOKENS = None
 MF_SKIP_MFNAMETOKENS = [ "dividend" ]
 
 #
@@ -138,6 +139,7 @@ def setup():
     tc.gData = gData
     setup_gdata()
     setup_paths()
+    loadfilters_set(MF_ALLOW_MFTYPETOKENS, MF_ALLOW_MFNAMETOKENS, MF_SKIP_MFNAMETOKENS)
 
 
 def dateint(y, m, d):
@@ -416,6 +418,39 @@ def load4daterange(startDate, endDate):
 gWhiteListMFTypes = None
 gWhiteListMFNames = None
 gBlackListMFNames = None
+
+
+def loadfilters_set(whiteListMFTypes=None, whiteListMFNames=None, blackListMFNames=None):
+    """
+    Setup global filters used by load logic.
+
+    If whiteListMFTypes is set, loads only MFs which belong to the given MFType.
+    If whiteListMFNames is set, loads only MFs whose name matches any one of the given match templates.
+    If blackListMFNames is set, loads only MFs whose names dont match any of the corresponding match templates.
+
+    NOTE: Call load_filter with required filters, before calling load_data.
+    """
+    global gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames
+    if whiteListMFTypes != None:
+        gWhiteListMFTypes = whiteListMFTypes
+    if whiteListMFNames != None:
+        gWhiteListMFNames = whiteListMFNames
+    if blackListMFNames != None:
+        gBlackListMFNames = blackListMFNames
+    print("LoadFiltersSet:Global Filters:\n\tgWhiteListMFTypes {}\n\tgWhiteListMFNames {}\n\tgBlackListMFNames {}".format(gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames))
+
+
+def loadfilters_clear():
+    """
+    Clear any global white/blacklist filters setup wrt load operation.
+    """
+    global gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames
+    gWhiteListMFTypes = None
+    gWhiteListMFNames = None
+    gBlackListMFTypes = None
+    print("LoadFiltersClear:Global Filters Cleared:\n\tgWhiteListMFTypes {}\n\tgWhiteListMFNames {}\n\tgBlackListMFNames {}".format(gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames))
+
+
 def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None, whiteListMFNames=None, blackListMFNames=None):
     """
     Load data for given date range.
