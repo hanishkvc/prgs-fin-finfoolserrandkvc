@@ -55,9 +55,9 @@ TODO:
 gbDEBUG=False
 # The tokens in the SKIP_NAMETOKENS list will be matched against MFName,
 # and matching MFs will be silently ignored while loading the MF data.
-MF_ALLOW_MFTYPETOKENS = [ "equity" ]
+MF_ALLOW_MFTYPETOKENS = [ "equity", "other", "hybrid", "solution" ]
 MF_ALLOW_MFNAMETOKENS = None
-MF_SKIP_MFNAMETOKENS = [ "dividend" ]
+MF_SKIP_MFNAMETOKENS = [ "~PART~dividend" ]
 
 #
 # Data processing and related
