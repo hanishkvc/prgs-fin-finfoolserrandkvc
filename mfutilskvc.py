@@ -868,8 +868,10 @@ def plot_data(dataSrc, mfCodes, startDate=-1, endDate=-1):
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     for mfCode in mfCodes:
         index = gData['code2index'][mfCode]
-        print("DBUG:plot_data:{}:{}:{}".format(dataSrc, mfCode, index))
-        plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label="{}:{}".format(dataSrc, mfCode))
+        name = gData['names'][index][:giLabelNameChopLen]
+        label = "{}:{}:{}".format(mfCode, name, dataSrc)
+        print("DBUG:plot_data:{}:{}".format(label, index))
+        plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
 def _date2index(startDate, endDate):
