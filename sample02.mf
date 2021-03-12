@@ -37,6 +37,7 @@ procdata_ex([ "dma20=dma20(srel)", "dma50=dma50(srel)", "dma20Roll31=dma20(roll3
 procdata_ex([ "roll90=roll90(data)", "dma20Roll90=dma20(roll90)"])
 procdata_ex([ "roll180=roll180(data)", "dma20Roll180=dma20(roll180)"])
 procdata_ex([ "roll365=roll365(data)", "dma20Roll365=dma20(roll365)"])
+procdata_ex([ "roll999=roll999(data)", "dma20Roll999=dma20(roll999)", "dma51Roll999=dma51(roll999)"])
 datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'dma20Roll31' ]
 
 for mfCode in mfCodes:
@@ -52,6 +53,10 @@ show_plot()
 
 #plot_data('dma20Roll180', mfCodes)
 plot_data('dma20Roll365', mfCodes)
+show_plot()
+plot_data('dma20Roll999', mfCodes)
+show_plot()
+plot_data('dma51Roll999', mfCodes)
 show_plot()
 
 #
