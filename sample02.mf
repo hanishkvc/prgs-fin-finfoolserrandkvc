@@ -27,8 +27,11 @@ for data in datas:
 show_plot()
 
 # Notice below I am reusing dma20, so use it as I want its old values, before its overwritten
-procdata_ex([ "roll31Dma20=roll31(dma20)", "dma20=dma20(srel)", "dma50=dma50(srel)", "dma20Roll31=dma20(roll31)"])
-datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'roll31Dma20', 'dma20Roll31' ]
+# roll31 of dma20 of the raw data will have artifacts, if the actual data starts, somewhere in between
+# So avoiding plotting of the same. However DMA20 on Roll31 data should be fine.
+procdata_ex([ "roll31Dma20=roll31(dma20)" ])
+procdata_ex([ "dma20=dma20(srel)", "dma50=dma50(srel)", "dma20Roll31=dma20(roll31)"])
+datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'dma20Roll31' ]
 
 for mfCode in mfCodes:
 	for data in datas:
