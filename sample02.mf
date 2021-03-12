@@ -7,7 +7,7 @@ input("Dont forget to fetch data for the date range you are interested in, if re
 #
 # Load the data
 #
-load_data(2018, 2021)
+load_data(2012, 2021)
 #
 # Look at loaded data from different angles
 #
@@ -18,7 +18,7 @@ def plot_multiple(datas, mfCodes):
 
 procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll365=roll365(data)", "dma50=dma50(data)", "roll31=roll31(data)"])
 
-indexes = [ "sensex index direct tata", "s&p 500 index direct motilal", "direct nasdaq 100 motilal" ]
+indexes = [ "sensex index direct tata", "s&p 500 index direct motilal", "direct nasdaq 100 motilal", "etf nasdaq 100 motilal" ]
 mfCodes = []
 for index in indexes:
 	fm, pm = findmatchingmf(index)
@@ -36,6 +36,7 @@ procdata_ex([ "roll31Dma20=roll31(dma20)" ])
 procdata_ex([ "dma20=dma20(srel)", "dma50=dma50(srel)", "dma20Roll31=dma20(roll31)"])
 procdata_ex([ "roll90=roll90(data)", "dma20Roll90=dma20(roll90)"])
 procdata_ex([ "roll180=roll180(data)", "dma20Roll180=dma20(roll180)"])
+procdata_ex([ "roll365=roll365(data)", "dma7Roll365=dma7(roll365)"])
 datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'dma20Roll31' ]
 
 for mfCode in mfCodes:
@@ -49,7 +50,8 @@ show_plot()
 plot_data('dma20Roll90', mfCodes)
 show_plot()
 
-plot_data('dma20Roll180', mfCodes)
+#plot_data('dma20Roll180', mfCodes)
+plot_data('dma7Roll365', mfCodes)
 show_plot()
 
 #
