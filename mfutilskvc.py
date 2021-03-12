@@ -535,7 +535,7 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None,
     gData['blackListMFNames'] = blackListMFNames
     load4daterange(startDate, endDate)
     if bOptimizeSize:
-        gData['data'] = gData['data'][:gData['nextMFIndex'],:]
+        gData['data'] = gData['data'][:gData['nextMFIndex'],:gData['dateIndex']+1]
 
 
 def mftypes_list():
