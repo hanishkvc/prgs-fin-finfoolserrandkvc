@@ -773,10 +773,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
     Allow data from any valid data key in gData to be operated on and the results to be saved
     into a destination data key in gData.
 
-    opsList is a list of operations, which specifies the data to work with and operation to do.
-    Each operation is specified using the format
+    opsList is a list of operations, which specifies the key of the data source to work with,
+    as well as the operation to do. It may also optionally specify the dataDst key to use to
+    store the result. Each operation is specified using the format
 
-        dataSrc>operationCode
+        dataDst=opCode(dataSrc)
 
     The operationCode could be one of
 
@@ -798,7 +799,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
     NOTE: NaN is used, because plot will ignore those data points and keep the corresponding
     verticals blank.
 
-    Destination data key is constructed using the template
+    NOTE: If no Destination data key is specified, then it is constructed using the template
 
         '<OP>(<DataSrc>[<startDate>:<endDate>])'
     """
@@ -806,11 +807,16 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
     if not _daterange_checkfine(startDateIndex, endDateIndex, "procdata_ex"):
         return
     for curOp in opsList:
-        parts = curOp.split('>')
-        dataSrc = parts[0]
-        op = parts[1]
-        dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
-        print("DBUG:procdata_ex:generating", dataDst)
+        curOpFull = curOp
+        if '=' in curOp:
+            dataDst, curOp = curOp.split('=')
+        else:
+            dataDst = ''
+        op, dataSrc = curOp.split('(', 1)
+        dataSrc = dataSrc[:-1]
+        if dataDst == '':
+            dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
+        print("DBUG:procdata_ex:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = gData[dataSrc].copy()
         for r in range(gData['nextMFIndex']):

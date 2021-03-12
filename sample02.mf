@@ -11,7 +11,7 @@ load_data(2020, 2021)
 #
 # Look at loaded data from different angles
 #
-procdata_ex(["data>srel", "data>dma20", "data>roll365", "data>dma50", "data>roll31"])
+procdata_ex(["srel(data)", "dma20=dma20(data)", "roll365(data)", "dma50(data)", "roll31(data)"])
 indexes = [ "sensex index direct tata", "s&p 500 index direct motilal" ]
 mfCodes = []
 for index in indexes:
@@ -19,7 +19,7 @@ for index in indexes:
 	if len(fm) > 0:
 		mfCodes.append(fm[0][1])
 
-datas = [ 'data', 'dma20(data[-1:-1])', 'dma50(data[-1:-1])', 'srel(data[-1:-1])', 'roll365(data[-1:-1])', 'roll31(data[-1:-1])' ]
+datas = [ 'data', 'dma20', 'dma50(data[-1:-1])', 'srel(data[-1:-1])', 'roll365(data[-1:-1])', 'roll31(data[-1:-1])' ]
 
 for data in datas:
 	plot_data(data, mfCodes)
