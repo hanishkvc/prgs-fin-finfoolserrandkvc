@@ -1191,6 +1191,7 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
     return lines
 
 
+gbREPLPrint = True
 def do_run(theFile=None):
     """
     Run the REPL logic of this program.
@@ -1200,11 +1201,18 @@ def do_run(theFile=None):
     interactive mode, once there are no more commands in the script file.
         Script file can use quit() to exit the program automatically
         if required.
+
+    NOTE: One can control printing of REPL, by controlling gbREPLPrint.
     """
     bQuit = False
     while not bQuit:
         try:
             cmd = input_multi(theFile=theFile)
+            if gbREPLPrint:
+                if '\n' not in cmd:
+                    if '=' not in cmd:
+                        if not cmd.startswith("print"):
+                            cmd = "print({})".format(cmd)
             exec(cmd,globals())
         except:
             excInfo = sys.exc_info()
