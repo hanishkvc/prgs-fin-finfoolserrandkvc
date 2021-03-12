@@ -7,10 +7,14 @@ input("Dont forget to fetch data for the date range you are interested in, if re
 #
 # Load the data
 #
-load_data(2020, 2021)
+load_data(2018, 2021)
 #
 # Look at loaded data from different angles
 #
+
+def plot_multiple(datas, mfCodes):
+	for data in datas:
+		plot_data(data, mfCodes)
 
 procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll365=roll365(data)", "dma50=dma50(data)", "roll31=roll31(data)"])
 
@@ -22,8 +26,7 @@ for index in indexes:
 		mfCodes.append(fm[0][1])
 
 datas = [ 'data', 'dma20', 'dma50' ]
-for data in datas:
-	plot_data(data, mfCodes)
+plot_multiple(datas, mfCodes)
 show_plot()
 
 # Notice below I am reusing dma20, so use it as I want its old values, before its overwritten
@@ -31,12 +34,23 @@ show_plot()
 # So avoiding plotting of the same. However DMA20 on Roll31 data should be fine.
 procdata_ex([ "roll31Dma20=roll31(dma20)" ])
 procdata_ex([ "dma20=dma20(srel)", "dma50=dma50(srel)", "dma20Roll31=dma20(roll31)"])
+procdata_ex([ "roll90=roll90(data)", "dma20Roll90=dma20(roll90)"])
+procdata_ex([ "roll180=roll180(data)", "dma20Roll180=dma20(roll180)"])
 datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'dma20Roll31' ]
 
 for mfCode in mfCodes:
-	for data in datas:
-		plot_data(data, [mfCode])
+	plot_multiple(datas, [mfCode])
 	show_plot()
+
+datas = [ 'dma20', 'dma20Roll90' ]
+plot_multiple(datas, mfCodes)
+show_plot()
+
+plot_data('dma20Roll90', mfCodes)
+show_plot()
+
+plot_data('dma20Roll180', mfCodes)
+show_plot()
 
 #
 # Quit if you dont want to further look at the data.
