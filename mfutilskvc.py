@@ -834,6 +834,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                         tResult[r,:] = (gData[dataSrc][r,:]/dStart)
                     else:
                         tResult[r,:] = ((gData[dataSrc][r,:]/dStart)-1)*100
+                    tResult[r,:iStart] = numpy.nan
             elif op.startswith("rel"):
                 baseDate = op[3:]
                 if baseDate != '':
