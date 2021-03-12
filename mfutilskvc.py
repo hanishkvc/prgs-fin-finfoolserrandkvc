@@ -521,6 +521,38 @@ def fillin4holidays():
 
 
 def matches_templates(theString, matchTemplates, fullMatch=False, partialTokens=False, ignoreCase=True):
+    """
+    Find match templates which are satisfied by the given string.
+
+    If fullMatch is True, then checks for a full match, else
+    it tries to find strings in its dataset, which contain
+    some or all of the tokens in the given searchTmpl.
+
+    If partialTokens is True, then tokens in the given searchTmpl
+    could appear as part of bigger token in strings in its
+    dataset. Else the token in given searchTmpl and token in the
+    strings in the dataset should match fully at the individual
+    token level.
+
+    if ignoreCase is True, then case of the given searchTmpl,
+    is ignored while trying to find a match.
+
+    It returns fullMatch index list which contains index of all templates,
+    which match the given string wrt all the tokens in it, as well as a
+    partialMatch index list which contains the index of all templates,
+    which only match some of the tokens given in it wrt the given string.
+
+    NOTE: One can prefix any token in a matchTemplate with -NO-, if such
+    a token is found to be present in the given string, the string wont
+    match wrt the corresponding matchTemplate.
+
+    NOTE: One can prefix any token in the matchTemplate with ~PART~,
+    in which case such a token can occur either independently or as
+    part of a bigger word in the given string, to trigger a match.
+
+    NOTE: If you want to mix NO and PART, do it in that order
+    i.e -NO-~PART~TheToken.
+    """
     theString_asis = theString
     if ignoreCase:
         theString = theString.upper()
@@ -579,32 +611,12 @@ def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ign
     """
     Find strings from dataSet, which match the given searchTemplate.
 
-    If fullMatch is True, then checks for a full match, else
-    it tries to find strings in its dataset, which contain
-    some or all of the tokens in the given searchTmpl.
-
-    If partialTokens is True, then tokens in the given searchTmpl
-    could appear as part of bigger token in strings in its
-    dataset. Else the token in given searchTmpl and token in the
-    strings in the dataset should match fully at the individual
-    token level.
-
-    if ignoreCase is True, then case of the given searchTmpl,
-    is ignored while trying to find a match.
+    Look at matches_templates function to understand how the matching
+    works, and the impact of the options to control the same. It also
+    gives details about the template specification.
 
     It returns those strings which match all given tokens,
     as well as those strings which only match certain tokens.
-
-    NOTE: One can prefix any token with -NO-, in which case
-    if such a token is found to be present in a string from
-    the dataSet, then that string is skipped.
-
-    NOTE: One can prefix any token with ~PART~, in which case
-    such a token can occur either independently or as part of
-    a bigger word in the matched string(s) from the dataSet.
-
-    NOTE: If you want to mix NO and PART, do it in that order
-    i.e -NO-~PART~TheToken.
     """
     searchTmplFullMatch = []
     searchTmplPartMatch = []
