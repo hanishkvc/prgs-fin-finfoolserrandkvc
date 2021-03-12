@@ -715,11 +715,19 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
     Allow data from any valid data key in gData to be operated on and the results to be saved
     into a destination data key in gData.
 
-    opsList is a list of operations, which could be one of
+    opsList is a list of operations, which specifies the data to work with and operation to do.
+    Each operation is specified using the format
+
+        dataSrc>operationCode
+
+    The operationCode could be one of
 
         "srel": calculate absolute return ratio across the full date range wrt given start date.
                 if the startDate contains a 0 value, then it tries to find a valid non zero value
                 and then use that.
+        "rel[<BaseDate>]": calculate absolute return ration across the full date range wrt the
+                val corresponding to the given baseDate.
+                If BaseDate is not given, then startDate will be used as the baseDate.
         "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
                 of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
@@ -761,6 +769,15 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                         tResult[r,:] = (gData[dataSrc][r,:]/dStart)
                     else:
                         tResult[r,:] = ((gData[dataSrc][r,:]/dStart)-1)*100
+            elif op.startswith("rel"):
+                baseDate = op[3:]
+                if baseDate != '':
+                    baseDate = int(baseDate)
+                    baseDateIndex = gData['dates'].index(baseDate)
+                    baseData = gData[dataSrc][r, baseDateIndex]
+                else:
+                    baseData = gData[dataSrc][r, startDateIndex]
+                tResult[r,:] = (((gData[dataSrc][r,:])/baseData)-1)*100
             elif op.startswith("dma"):
                 days = int(op[3:])
                 tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
