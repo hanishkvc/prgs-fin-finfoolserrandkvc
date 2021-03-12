@@ -119,6 +119,9 @@ def setup_paths():
 def setup_gdata(startDate=-1, endDate=-1):
     """
     Initialise the gData dictionary
+
+    NumOfRows (corresponding to MFs) is set to a fixed value.
+    NumOfCols (corresponding to Dates) is set based on date range.
     """
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
     gData.clear()
@@ -467,7 +470,7 @@ def loadfilters_clear():
     print("LoadFiltersClear:Global Filters Cleared:\n\tgWhiteListMFTypes {}\n\tgWhiteListMFNames {}\n\tgBlackListMFNames {}".format(gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames))
 
 
-def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None, whiteListMFNames=None, blackListMFNames=None):
+def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None, whiteListMFNames=None, blackListMFNames=None, bOptimizeSize=True):
     """
     Load data for given date range.
 
@@ -509,6 +512,8 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None,
 
         NOTE: The _findmatching logic will be used for matching templates.
 
+    bOptimizeSize if set, resizes the data array to be only as big as actual loaded data.
+
     NOTE: This logic takes care of filling in nav values for holidays
     automatically by calling fillin4holidays.
 
@@ -529,6 +534,8 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None,
     gData['whiteListMFNames'] = whiteListMFNames
     gData['blackListMFNames'] = blackListMFNames
     load4daterange(startDate, endDate)
+    if bOptimizeSize:
+        gData['data'] = gData['data'][:gData['nextMFIndex'],:]
 
 
 def mftypes_list():
