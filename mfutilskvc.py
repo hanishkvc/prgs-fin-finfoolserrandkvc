@@ -815,9 +815,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         tResult = gData[dataSrc].copy()
         for r in range(gData['nextMFIndex']):
             if op == "srel":
+                #breakpoint()
                 iStart = -1
                 dStart = 0
-                nonZeros = numpy.nonzero(gData[dataSrc][r, startDateIndex:endDateIndex+1])
+                nonZeros = numpy.nonzero(gData[dataSrc][r, startDateIndex:endDateIndex+1])[0]
                 if (len(nonZeros) > 0):
                     iStart = nonZeros[0] + startDateIndex
                     dStart = gData[dataSrc][r, iStart]
