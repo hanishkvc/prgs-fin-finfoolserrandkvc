@@ -971,6 +971,22 @@ def _plot_data(mfCode, xData, yData, label, typeTag):
         plt.plot(xData, yData, label=label)
 
 
+def _get_daterange_indexes():
+    """
+    Get the dateRange related indexes stored in gData.
+
+    If there is no valid dateRange info stored in gData, then return
+    indexes related to the date range of the currently loaded data.
+    """
+    iSDate = gData['dateRange'][0]
+    if iSDate == -1:
+        iSDate = 0
+    iEDate = gData['dateRange'][1]
+    if iEDate == -1:
+        iEDate = gData['dateIndex']
+    return iSDate, iEDate
+
+
 def _show_plot():
     """
     Show the data plotted till now.
@@ -979,8 +995,7 @@ def _show_plot():
     for line in leg.get_lines():
         line.set_linewidth(4)
     plt.grid(True)
-    startDateIndex = gData['dateRange'][0]
-    endDateIndex = gData['dateRange'][1]
+    startDateIndex, endDateIndex = _get_daterange_indexes()
     curDates = gData['dates'][startDateIndex:endDateIndex+1]
     numX = len(curDates)
     xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
