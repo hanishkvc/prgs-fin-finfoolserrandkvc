@@ -689,13 +689,13 @@ def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ign
     return searchTmplFullMatch, searchTmplPartMatch
 
 
-def findmatchingmf(mfName, fullMatch=False, partialTokens=False, ignoreCase=True):
+def findmatchingmf(mfNameTmpl, fullMatch=False, partialTokens=False, ignoreCase=True):
     """
     Find MFs from the MF dataSet, which match the given mfName Template.
 
     NOTE: look at help of _findmatching for the search/matching behaviour.
     """
-    fm, pm = _findmatching(mfName, gData['names'], fullMatch, partialTokens, ignoreCase)
+    fm, pm = _findmatching(mfNameTmpl, gData['names'], fullMatch, partialTokens, ignoreCase)
     #breakpoint()
     fmNew = []
     for curName, curIndex in fm:
