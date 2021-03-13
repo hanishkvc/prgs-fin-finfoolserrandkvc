@@ -1,34 +1,52 @@
+#
+# A Sample script to show how mfutilskvc can be used with a script
+# HanishKVC
+#
+
 print("A sample script for the mfutilskvc, plotting indian sensex and s&p 500 indirectly using index fund data...")
+
+
 #
 # Fetch data if required, commented out by default
 #
 input("Dont forget to fetch data for the date range you are interested in, if required, before using this script")
 #fetch_data(2020, 2021)
+
+
 #
 # Load the data
 #
 load_data(2013, 2021)
+
+
 #
-# Look at loaded data from different angles
+# Process and Look at loaded data from different angles
 #
 
 def plot_show(datas, mfCodes):
 	plot_data(datas, mfCodes)
 	show_plot()
 
+
+def get_mfcodes(mfNameTemplates):
+	mfCodes = []
+	for mfTmpl in mfNameTemplates:
+		fullMatch, partMatch = findmatchingmf(mfTmpl)
+		for mf in fullMatch:
+			mfCodes.append(mf)
+	return mfCodes
+
+
 procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "dma50=dma50(data)", "roll31=roll31(data)"])
 
 indexes = [ "sensex index direct tata", "s&p 500 index direct motilal", "direct nasdaq 100 motilal", "etf nasdaq 100 motilal" ]
-mfCodes = []
-for index in indexes:
-	fm, pm = findmatchingmf(index)
-	if len(fm) > 0:
-		mfCodes.append(fm[0][1])
+mfCodes = get_mfcodes(indexes)
+
 
 datas = [ 'data', 'dma20', 'dma50' ]
 plot_show(datas, mfCodes)
 
-# Notice below I am reusing dma20, so use it as I want its old values, before its overwritten
+# Notice below I want to reuse dma20, so first use it with its old values, before overwriting
 # roll31 of dma20 of the raw data will have artifacts, if the actual data starts, somewhere in between
 # So avoiding plotting of the same. However DMA20 on Roll31 data should be fine.
 procdata_ex([ "roll31Dma20=roll31(dma20)" ])
@@ -45,11 +63,14 @@ for mfCode in mfCodes:
 datas = [ 'dma20', 'dma20Roll90' ]
 plot_show(datas, mfCodes)
 
-plot_show('dma20Roll90', mfCodes)
-plot_data('dma20Roll180', mfCodes)
-plot_show('dma20Roll365', mfCodes)
-plot_show('dma20Roll999', mfCodes)
-plot_show('dma51Roll999', mfCodes)
+if False:
+	plot_show('dma20Roll90', mfCodes)
+	plot_data('dma20Roll180', mfCodes)
+	plot_show('dma20Roll365', mfCodes)
+	plot_show('dma20Roll999', mfCodes)
+	plot_show('dma51Roll999', mfCodes)
+
+plot_show(['dma20Roll365', 'dma20Roll999', 'dma50Roll999'])
 
 #
 # Quit if you dont want to further look at the data.
