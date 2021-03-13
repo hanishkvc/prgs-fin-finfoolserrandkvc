@@ -928,7 +928,9 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
                 metaKey = gData['metas'].get(srelMetaLabel, None)
                 if metaKey != None:
                     dataLabel = gData[metaKey][index]
-            label = "{}:{}:{}:{}".format(mfCode, name, dataSrc, dataLabel)
+                else:
+                    dataLabel = ""
+            label = "{}:{}: {:16} : {}".format(mfCode, name, dataSrc, dataLabel)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
