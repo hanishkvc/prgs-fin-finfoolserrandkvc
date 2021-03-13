@@ -942,6 +942,22 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
+def analdata_ex(dataSrc, op, theDate=-1, numEntries=10):
+    startDateIndex, dateIndex = _date2index(theDate, theDate)
+    theArray = gData[dataSrc][:,dateIndex].copy()
+    if op == 'top':
+        theArray[numpy.isinf(theArray)] = 0
+        theArray[numpy.isnan(theArray)] = 0
+        theRows=numpy.argsort(theArray)[-numEntries:]
+        theWinners = []
+        for i in range(-1,-(numEntries+1),-1):
+            index = theRows[i]
+            curEntry = [gData['index2code'][index], gData['names'][index], theArray[index]]
+            theWinners.append(curEntry)
+            print("INFO:analdata_ex:{}:{}".format(op, curEntry))
+        return theWinners
+
+
 def _date2index(startDate, endDate):
     """
     Get the indexes corresponding to the start and end date
