@@ -12,9 +12,9 @@ load_data(2013, 2021)
 # Look at loaded data from different angles
 #
 
-def plot_multiple(datas, mfCodes):
-	for data in datas:
-		plot_data(data, mfCodes)
+def plot_show(datas, mfCodes):
+	plot_data(datas, mfCodes)
+	show_plot()
 
 procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "dma50=dma50(data)", "roll31=roll31(data)"])
 
@@ -26,8 +26,7 @@ for index in indexes:
 		mfCodes.append(fm[0][1])
 
 datas = [ 'data', 'dma20', 'dma50' ]
-plot_multiple(datas, mfCodes)
-show_plot()
+plot_show(datas, mfCodes)
 
 # Notice below I am reusing dma20, so use it as I want its old values, before its overwritten
 # roll31 of dma20 of the raw data will have artifacts, if the actual data starts, somewhere in between
@@ -38,26 +37,19 @@ procdata_ex([ "roll90=roll90(data)", "dma20Roll90=dma20(roll90)"])
 procdata_ex([ "roll180=roll180(data)", "dma20Roll180=dma20(roll180)"])
 procdata_ex([ "roll365=roll365(data)", "dma20Roll365=dma20(roll365)"])
 procdata_ex([ "roll999=roll999(data)", "dma20Roll999=dma20(roll999)", "dma51Roll999=dma51(roll999)"])
-datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'dma20Roll31' ]
 
+datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'dma20Roll31' ]
 for mfCode in mfCodes:
-	plot_multiple(datas, [mfCode])
-	show_plot()
+	plot_show(datas, [mfCode])
 
 datas = [ 'dma20', 'dma20Roll90' ]
-plot_multiple(datas, mfCodes)
-show_plot()
+plot_show(datas, mfCodes)
 
-plot_data('dma20Roll90', mfCodes)
-show_plot()
-
-#plot_data('dma20Roll180', mfCodes)
-plot_data('dma20Roll365', mfCodes)
-show_plot()
-plot_data('dma20Roll999', mfCodes)
-show_plot()
-plot_data('dma51Roll999', mfCodes)
-show_plot()
+plot_show('dma20Roll90', mfCodes)
+plot_data('dma20Roll180', mfCodes)
+plot_show('dma20Roll365', mfCodes)
+plot_show('dma20Roll999', mfCodes)
+plot_show('dma51Roll999', mfCodes)
 
 #
 # Quit if you dont want to further look at the data.

@@ -860,12 +860,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         gData[dataDst] = tResult
 
 
-def plot_data(dataSrc, mfCodes, startDate=-1, endDate=-1):
+def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
     """
-    Plot specified data for the specified MFs, over the specified date range.
+    Plot specified datas for the specified MFs, over the specified date range.
 
-    dataSrc: Is the key used to retreive the data from gData.
-    mfCodes: Is a list of mfCodes'
+    dataSrcs: Is a key or a list of keys used to retreive the data from gData.
+    mfCodes: Is a mfCode or a list of mfCodes.
     startDate and endDate: specify the date range over which the data should be
         retreived and plotted.
 
@@ -873,12 +873,17 @@ def plot_data(dataSrc, mfCodes, startDate=-1, endDate=-1):
     accumulated till that time.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    for mfCode in mfCodes:
-        index = gData['code2index'][mfCode]
-        name = gData['names'][index][:giLabelNameChopLen]
-        label = "{}:{}:{}".format(mfCode, name, dataSrc)
-        print("DBUG:plot_data:{}:{}".format(label, index))
-        plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
+    if type(dataSrc) == str:
+        dataSrcs = [ dataSrc ]
+    if type(mfCodes) == int:
+        mfCodes = [ mfCodes]
+    for dataSrc in dataSrcs:
+        for mfCode in mfCodes:
+            index = gData['code2index'][mfCode]
+            name = gData['names'][index][:giLabelNameChopLen]
+            label = "{}:{}:{}".format(mfCode, name, dataSrc)
+            print("DBUG:plot_data:{}:{}".format(label, index))
+            plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
 def _date2index(startDate, endDate):
