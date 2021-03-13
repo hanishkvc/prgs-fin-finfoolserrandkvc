@@ -873,8 +873,8 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
     accumulated till that time.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    if type(dataSrc) == str:
-        dataSrcs = [ dataSrc ]
+    if type(dataSrcs) == str:
+        dataSrcs = [ dataSrcs ]
     if type(mfCodes) == int:
         mfCodes = [ mfCodes]
     for dataSrc in dataSrcs:
