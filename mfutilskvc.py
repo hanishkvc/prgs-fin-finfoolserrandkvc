@@ -725,13 +725,15 @@ def search_data(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=Tr
             print(n)
 
 
-def datadst_metakey(dataDst):
-    return "{}Meta".format(dataDst)
+def datadst_metakeys(dataDst):
+    dataKey="{}MetaData".format(dataDst)
+    labelKey="{}MetaLabel".format(dataDst)
+    return dataKey, labelKey
 
 
 def update_metas(op, dataSrc, dataDst):
     if op == "srel":
-        gData['metas']['srel'] = datadst_metakey(dataDst)
+        gData['metas']['srelMetaData'], gData['metas']['srelMetaLabel'] = datadst_metakeys(dataDst)
 
 
 def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
@@ -829,8 +831,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         print("DBUG:procdata_ex:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = gData[dataSrc].copy()
-        dataDstMeta = datadst_metakey(dataDst)
-        gData[dataDstMeta] = []
+        dataDstMetaData, dataDstMetaLabel = datadst_metakeys(dataDst)
+        gData[dataDstMetaLabel] = []
+        if op == 'srel':
+            gData[dataDstMetaData] = numpy.array([gData['nextMFIndex'],3])
         update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
             if op == "srel":
@@ -852,10 +856,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
                     dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
                     label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
-                    gData[dataDstMeta].append([label, dAbsRet, dRetPA, durationInYears])
+                    gData[dataDstMetaLabel].append(label)
+                    gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 else:
                     durationInYears = (endDateIndex-startDateIndex+1)/365
-                    gData[dataDstMeta].append(["", 0, 0, durationInYears])
+                    gData[dataDstMetaLabel].append("")
+                    gData[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
             elif op.startswith("rel"):
                 baseDate = op[3:]
                 if baseDate != '':
@@ -899,16 +905,16 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
     if type(mfCodes) == int:
         mfCodes = [ mfCodes]
     for dataSrc in dataSrcs:
-        dataSrcMeta = datadst_metakey(dataSrc)
+        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         for mfCode in mfCodes:
             index = gData['code2index'][mfCode]
             name = gData['names'][index][:giLabelNameChopLen]
             try:
-                dataLabel = gData[dataSrcMeta][index][0]
+                dataLabel = gData[dataSrcMetaLabel][index]
             except:
-                metaKey = gData['metas'].get('srel', None)
+                metaKey = gData['metas'].get('srelMetaLabel', None)
                 if metaKey != None:
-                    dataLabel = gData[metaKey][index][0]
+                    dataLabel = gData[metaKey][index]
             label = "{}:{}:{}:{}".format(mfCode, name, dataSrc, dataLabel)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
