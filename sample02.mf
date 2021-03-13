@@ -33,7 +33,7 @@ def get_mfcodes(mfNameTemplates):
 	for mfTmpl in mfNameTemplates:
 		fullMatch, partMatch = findmatchingmf(mfTmpl)
 		for mf in fullMatch:
-			mfCodes.append(mf)
+			mfCodes.append(mf[1])
 	return mfCodes
 
 
@@ -46,21 +46,20 @@ mfCodes = get_mfcodes(indexes)
 datas = [ 'data', 'dma20', 'dma50' ]
 plot_show(datas, mfCodes)
 
-# Notice below I want to reuse dma20, so first use it with its old values, before overwriting
 # roll31 of dma20 of the raw data will have artifacts, if the actual data starts, somewhere in between
 # So avoiding plotting of the same. However DMA20 on Roll31 data should be fine.
 procdata_ex([ "roll31Dma20=roll31(dma20)" ])
-procdata_ex([ "dma20=dma20(srel)", "dma50=dma50(srel)", "dma20Roll31=dma20(roll31)"])
+procdata_ex([ "dma20SRel=dma20(srel)", "dma50SRel=dma50(srel)", "dma20Roll31=dma20(roll31)"])
 procdata_ex([ "roll90=roll90(data)", "dma20Roll90=dma20(roll90)"])
 procdata_ex([ "roll180=roll180(data)", "dma20Roll180=dma20(roll180)"])
 procdata_ex([ "roll365=roll365(data)", "dma20Roll365=dma20(roll365)"])
-procdata_ex([ "roll999=roll999(data)", "dma20Roll999=dma20(roll999)", "dma51Roll999=dma51(roll999)"])
+procdata_ex([ "roll999=roll999(data)", "dma20Roll999=dma20(roll999)", "dma50Roll999=dma50(roll999)"])
 
-datas = [ 'srel', 'dma20', 'dma50', 'roll365', 'roll31', 'dma20Roll31' ]
+datas = [ 'srel', 'dma20SRel', 'dma50SRel', 'roll31', 'dma20Roll31' ]
 for mfCode in mfCodes:
 	plot_show(datas, [mfCode])
 
-datas = [ 'dma20', 'dma20Roll90' ]
+datas = [ 'dma20SRel', 'dma20Roll90' ]
 plot_show(datas, mfCodes)
 
 if False:
@@ -68,9 +67,9 @@ if False:
 	plot_data('dma20Roll180', mfCodes)
 	plot_show('dma20Roll365', mfCodes)
 	plot_show('dma20Roll999', mfCodes)
-	plot_show('dma51Roll999', mfCodes)
+	plot_show('dma50Roll999', mfCodes)
 
-plot_show(['dma20Roll365', 'dma20Roll999', 'dma50Roll999'])
+plot_show(['dma20Roll365', 'dma20Roll999', 'dma50Roll999'], mfCodes)
 
 #
 # Quit if you dont want to further look at the data.
