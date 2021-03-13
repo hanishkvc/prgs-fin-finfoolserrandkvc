@@ -819,6 +819,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         print("DBUG:procdata_ex:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = gData[dataSrc].copy()
+        dataDstMeta = "{}Meta".format(dataDst)
+        gData[dataDstMeta] = []
         for r in range(gData['nextMFIndex']):
             if op == "srel":
                 #breakpoint()
@@ -835,6 +837,13 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     else:
                         tResult[r,:] = ((gData[dataSrc][r,:]/dStart)-1)*100
                     tResult[r,:iStart] = numpy.nan
+                    dAbsRet = tResult[r, -1]
+                    durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
+                    dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
+                    gData[dataDstMeta].append([dAbsRet, dRetPA, durationInYears])
+                else:
+                    durationInYears = (endDateIndex-startDateIndex+1)/365
+                    gData[dataDstMeta].append([0, 0, durationInYears])
             elif op.startswith("rel"):
                 baseDate = op[3:]
                 if baseDate != '':
