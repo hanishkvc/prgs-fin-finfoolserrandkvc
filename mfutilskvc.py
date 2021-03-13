@@ -840,10 +840,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     dAbsRet = tResult[r, -1]
                     durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
                     dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
-                    gData[dataDstMeta].append([dAbsRet, dRetPA, durationInYears])
+                    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
+                    gData[dataDstMeta].append([label, dAbsRet, dRetPA, durationInYears])
                 else:
                     durationInYears = (endDateIndex-startDateIndex+1)/365
-                    gData[dataDstMeta].append([0, 0, durationInYears])
+                    gData[dataDstMeta].append(["", 0, 0, durationInYears])
             elif op.startswith("rel"):
                 baseDate = op[3:]
                 if baseDate != '':
@@ -887,10 +888,15 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
     if type(mfCodes) == int:
         mfCodes = [ mfCodes]
     for dataSrc in dataSrcs:
+        dataSrcMeta = "{}Meta".format(dataSrc)
         for mfCode in mfCodes:
             index = gData['code2index'][mfCode]
             name = gData['names'][index][:giLabelNameChopLen]
-            label = "{}:{}:{}".format(mfCode, name, dataSrc)
+            try:
+                dataLabel = gData[dataSrcMeta][index][0]
+            except:
+                dataLabel = ""
+            label = "{}:{}:{}:{}".format(mfCode, name, dataSrc, dataLabel)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
@@ -1006,8 +1012,9 @@ def _show_plot():
     Show the data plotted till now.
     """
     leg = plt.legend()
+    plt.setp(leg.texts, family='monospace')
     for line in leg.get_lines():
-        line.set_linewidth(4)
+        line.set_linewidth(8)
     plt.grid(True)
     startDateIndex, endDateIndex = _get_daterange_indexes()
     curDates = gData['dates'][startDateIndex:endDateIndex+1]
