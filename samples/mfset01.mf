@@ -44,14 +44,14 @@ hybridFunds = [ "direct hybrid equity bnp", "direct hybrid equity canara" ]
 allFunds = indexes + largeFunds + mixedFunds + hybridFunds
 mfCodes = get_mfcodes(allFunds)
 
-procdata_ex(["dma20=dma20(data)", "dma50=dma50(data)", "dma200=dma200(data)"])
-datas = [ 'data', 'dma20', 'dma50', 'dma200' ]
+procdata_ex(["dma20=dma20(data)", "dma200=dma200(data)"])
+datas = [ 'data', 'dma20', 'dma200' ]
 plot_show(datas, mfCodes)
 
-procdata_ex([ "srel=srel(data)", "dma20SRel=dma20(srel)", "dma50SRel=dma50(srel)", "dma200SRel=dma200(srel)" ])
-datas = [ 'srel', 'dma20SRel', 'dma50SRel', 'dma200SRel' ]
-for mfCode in mfCodes:
-	plot_show(datas, [mfCode])
+procdata_ex([ "srel=srel(data)", "dma20SRel=dma20(srel)", "dma200SRel=dma200(srel)" ])
+datas = [ 'dma20SRel', 'dma200SRel' ]
+for data in datas:
+	plot_show(data, mfCodes)
 
 procdata_ex([ "roll365=roll365(data)", "dma50Roll365=dma50(roll365)" ])
 procdata_ex([ "roll1095=roll1095(data)", "dma50Roll1095=dma50(roll1095)" ])
