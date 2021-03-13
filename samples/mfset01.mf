@@ -38,7 +38,11 @@ def get_mfcodes(mfNameTemplates):
 
 
 indexes = [ "sensex index direct tata", "etf nasdaq 100 motilal" ]
-mfCodes = get_mfcodes(indexes)
+largeFunds = [ "direct bluechip axis", "direct bluechip emerging mirae" ]
+mixedFunds = [ "direct long term axis", "direct tax saver mirae" ]
+hybridFunds = [ "direct hybrid equity bnp", "direct hybrid equity canara" ]
+allFunds = indexes + largeFunds + mixedFunds + hybridFunds
+mfCodes = get_mfcodes(allFunds)
 
 procdata_ex(["dma20=dma20(data)", "dma50=dma50(data)", "dma200=dma200(data)"])
 datas = [ 'data', 'dma20', 'dma50', 'dma200' ]
@@ -56,7 +60,9 @@ datas = [ 'dma50Roll365', 'dma50Roll1095', 'dma50Roll1825' ]
 for mfCode in mfCodes:
 	plot_show(datas, [mfCode])
 
-plot_show(['dma50Roll1095', 'dma50Roll1825'], mfCodes)
+for data in datas:
+	plot_show(data, mfCodes)
+
 
 #
 # Quit if you dont want to further look at the data.
