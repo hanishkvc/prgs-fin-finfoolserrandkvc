@@ -942,17 +942,28 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_ex(dataSrc, op, theDate=-1, numEntries=10):
-    startDateIndex, dateIndex = _date2index(theDate, theDate)
-    theArray = gData[dataSrc][:,dateIndex].copy()
+def analdata_ex(dataSrc, op, theDate=None, numEntries=10):
+    if type(theDate) == type(None):
+        for i in range(-1, -(gData['dateIndex']+1),-1):
+            print("DBUG:AnalDataEx:FindDateIndex:{}".format(i))
+            theSaneArray = gData[dataSrc][:,i].copy()
+            theSaneArray[numpy.isinf(theSaneArray)] = 0
+            theSaneArray[numpy.isnan(theSaneArray)] = 0
+            if numpy.count_nonzero(theSaneArray) > 0:
+                dateIndex = gData['dateIndex']+1+i
+                print("DBUG:AnalDataEx:DateIndex:{}".format(dateIndex))
+                break
+    else:
+        startDateIndex, dateIndex = _date2index(theDate, theDate)
+        theSaneArray = gData[dataSrc][:,dateIndex].copy()
+        theSaneArray[numpy.isinf(theSaneArray)] = 0
+        theSaneArray[numpy.isnan(theSaneArray)] = 0
     if op == 'top':
-        theArray[numpy.isinf(theArray)] = 0
-        theArray[numpy.isnan(theArray)] = 0
-        theRows=numpy.argsort(theArray)[-numEntries:]
+        theRows=numpy.argsort(theSaneArray)[-numEntries:]
         theWinners = []
         for i in range(-1,-(numEntries+1),-1):
             index = theRows[i]
-            curEntry = [gData['index2code'][index], gData['names'][index], theArray[index]]
+            curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
             theWinners.append(curEntry)
             print("INFO:analdata_ex:{}:{}".format(op, curEntry))
         return theWinners
