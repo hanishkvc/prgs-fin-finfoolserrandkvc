@@ -890,11 +890,16 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 tResult[r,:inv] = numpy.nan
                 tResult[r,gData['dateIndex']-inv:] = numpy.nan
             elif op.startswith("roll"):
+                durationForPA = 1
                 days = int(op[4:])
+                if '_' in op:
+                    op,pa = op.split('_')
+                    if pa == 'pa':
+                        durationForPA = days/365
                 if gbRelDataPlusFloat:
-                    tResult[r,days:] = gData[dataSrc][r,days:]/gData[dataSrc][r,:-days]
+                    tResult[r,days:] = (gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])**(1/durationForPA)
                 else:
-                    tResult[r,days:] = ((gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])-1)*100
+                    tResult[r,days:] = (((gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])**(1/durationForPA))-1)*100
                 tResult[r,:days] = numpy.nan
         gData[dataDst] = tResult
 
