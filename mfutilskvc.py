@@ -846,7 +846,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         dataDstMetaData, dataDstMetaLabel = datadst_metakeys(dataDst)
         gData[dataDstMetaLabel] = []
         if op == 'srel':
-            gData[dataDstMetaData] = numpy.array([gData['nextMFIndex'],3])
+            gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'],3])
         update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
             if op == "srel":
