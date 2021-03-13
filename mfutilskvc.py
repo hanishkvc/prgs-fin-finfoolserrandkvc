@@ -815,10 +815,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
                 of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
                 in these locations, so the result wont be proper, so force it to NaN).
-        "roll<DAYSInINT>": Calculate a rolling return rate across the full date range, with a
+        "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
                 windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
                 cant satisfy the windowsize to calculate the rolling return rate, will be set to
                 NaN.
+                If _abs is specified, it calculates absolute return. If Not (i.e by default)
+                it calculates the ReturnPerAnnum.
 
     NOTE: NaN is used, because plot will ignore those data points and keep the corresponding
     verticals blank.
@@ -890,12 +892,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 tResult[r,:inv] = numpy.nan
                 tResult[r,gData['dateIndex']-inv:] = numpy.nan
             elif op.startswith("roll"):
-                durationForPA = 1
                 days = int(op[4:])
+                durationForPA = days/365
                 if '_' in op:
-                    op,pa = op.split('_')
-                    if pa == 'pa':
-                        durationForPA = days/365
+                    op,opType = op.split('_')
+                    if opType == 'abs':
+                        durationForPA = 1
                 if gbRelDataPlusFloat:
                     tResult[r,days:] = (gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])**(1/durationForPA)
                 else:
