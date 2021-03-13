@@ -136,6 +136,7 @@ def setup_gdata(startDate=-1, endDate=-1):
     gData['dateRange'] = [-1, -1]
     gData['plots'] = set()
     gData['mfTypes'] = {}
+    gData['metas'] = {}
 
 
 def setup():
@@ -724,6 +725,15 @@ def search_data(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=Tr
             print(n)
 
 
+def datadst_metakey(dataDst):
+    return "{}Meta".format(dataDst)
+
+
+def update_metas(op, dataSrc, dataDst):
+    if op == "srel":
+        gData['metas']['srel'] = datadst_metakey(dataDst)
+
+
 def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
     """
     Process the data relative to its 1st Non Zero value
@@ -819,8 +829,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         print("DBUG:procdata_ex:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = gData[dataSrc].copy()
-        dataDstMeta = "{}Meta".format(dataDst)
+        dataDstMeta = datadst_metakey(dataDst)
         gData[dataDstMeta] = []
+        update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
             if op == "srel":
                 #breakpoint()
@@ -888,14 +899,16 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
     if type(mfCodes) == int:
         mfCodes = [ mfCodes]
     for dataSrc in dataSrcs:
-        dataSrcMeta = "{}Meta".format(dataSrc)
+        dataSrcMeta = datadst_metakey(dataSrc)
         for mfCode in mfCodes:
             index = gData['code2index'][mfCode]
             name = gData['names'][index][:giLabelNameChopLen]
             try:
                 dataLabel = gData[dataSrcMeta][index][0]
             except:
-                dataLabel = ""
+                metaKey = gData['metas'].get('srel', None)
+                if metaKey != None:
+                    dataLabel = gData[metaKey][index][0]
             label = "{}:{}:{}:{}".format(mfCode, name, dataSrc, dataLabel)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)

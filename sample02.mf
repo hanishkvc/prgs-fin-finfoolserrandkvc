@@ -16,7 +16,8 @@ input("Dont forget to fetch data for the date range you are interested in, if re
 #
 # Load the data
 #
-load_data(2013, 2021)
+#load_data(2013, 2021)
+load_data(2018, 2021)
 
 
 #
