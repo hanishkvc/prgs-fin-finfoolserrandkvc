@@ -1,0 +1,68 @@
+#
+# A Sample script to look at indexes using index ETF/MFs which track them
+# HanishKVC
+#
+
+print("A sample script for the mfutilskvc, which looks at Indian Sensex and US Nasdaq indirectly using index fund data...")
+
+
+#
+# Fetch data if required, commented out by default
+#
+input("Dont forget to fetch data for the date range you are interested in, if required, before using this script")
+#fetch_data(2013, 2021)
+
+
+#
+# Load the data
+#
+load_data(2013, 2021)
+
+
+#
+# Process and Look at loaded data from different angles
+#
+
+def plot_show(datas, mfCodes):
+	plot_data(datas, mfCodes)
+	show_plot()
+
+
+def get_mfcodes(mfNameTemplates):
+	mfCodes = []
+	for mfTmpl in mfNameTemplates:
+		fullMatch, partMatch = findmatchingmf(mfTmpl)
+		for mf in fullMatch:
+			mfCodes.append(mf[1])
+	return mfCodes
+
+
+indexes = [ "sensex index direct tata", "etf nasdaq 100 motilal" ]
+mfCodes = get_mfcodes(indexes)
+
+procdata_ex(["dma20=dma20(data)", "dma50=dma50(data)", "dma200=dma200(data)"])
+datas = [ 'data', 'dma20', 'dma50', 'dma200' ]
+plot_show(datas, mfCodes)
+
+procdata_ex([ "srel=srel(data)", "dma20SRel=dma20(srel)", "dma50SRel=dma50(srel)", "dma200SRel=dma200(srel)" ])
+procdata_ex([ "roll90=roll90(data)", "dma20Roll90=dma20(roll90)" ])
+procdata_ex([ "roll180=roll180(data)", "dma20Roll180=dma20(roll180)" ])
+procdata_ex([ "roll365=roll365(data)", "dma20Roll365=dma20(roll365)" ])
+procdata_ex([ "roll1095=roll1095(data)", "dma20Roll1095=dma20(roll1095)" ])
+
+datas = [ 'srel', 'dma20SRel', 'dma50SRel', 'dma200SRel' ]
+for mfCode in mfCodes:
+	plot_show(datas, [mfCode])
+
+datas = [ 'dma20Roll90', 'dma20Roll180', 'dma20Roll365', 'dma20Roll1095' ]
+datas = [ 'dma20Roll365', 'dma20Roll1095' ]
+for mfCode in mfCodes:
+	plot_show(datas, [mfCode])
+
+plot_show(['dma20Roll365', 'dma20Roll1095'], mfCodes)
+
+#
+# Quit if you dont want to further look at the data.
+#
+#quit()
+
