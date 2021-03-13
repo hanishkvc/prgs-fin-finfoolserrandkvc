@@ -726,14 +726,26 @@ def search_data(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=Tr
 
 
 def datadst_metakeys(dataDst):
+    """
+    Returns the Meta Keys related to given dataDst key.
+
+    MetaData: This key points to raw meta data wrt each MF, which can be
+        processed further for comparing with other MFs etc.
+    MetaLabel: This key points to processed label/summary info wrt each MF.
+        This is useful for labeling plots etc.
+    """
     dataKey="{}MetaData".format(dataDst)
     labelKey="{}MetaLabel".format(dataDst)
     return dataKey, labelKey
 
 
 def update_metas(op, dataSrc, dataDst):
+    """
+    Helps identify the last set of meta keys for a given kind of operation.
+    """
     if op == "srel":
-        gData['metas']['srelMetaData'], gData['metas']['srelMetaLabel'] = datadst_metakeys(dataDst)
+        srelMetaData, srelMetaLabel = datadst_metakeys('srel')
+        gData['metas'][srelMetaData], gData['metas'][srelMetaLabel] = datadst_metakeys(dataDst)
 
 
 def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
@@ -912,7 +924,8 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             try:
                 dataLabel = gData[dataSrcMetaLabel][index]
             except:
-                metaKey = gData['metas'].get('srelMetaLabel', None)
+                srelMetaData, srelMetaLabel = datadst_metakeys('srel')
+                metaKey = gData['metas'].get(srelMetaLabel, None)
                 if metaKey != None:
                     dataLabel = gData[metaKey][index]
             label = "{}:{}:{}:{}".format(mfCode, name, dataSrc, dataLabel)
