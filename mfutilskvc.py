@@ -942,7 +942,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10):
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, bIgnoreLessThanAYear=True):
     """
     Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
@@ -974,6 +974,13 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10):
 
         A date in YYYYMMDD format.
 
+    bIgnoreLessThanAYear: srel related operations, will ignore entities
+        who have been in existance of less than a year, AND OR if we
+        have data for only less than a year for the entity.
+
+        NOTE: If you have loaded less than a year of data, then remember
+        to set this to False, if required.
+
     """
     if opType == 'normal':
         if type(theDate) == type(None):
@@ -997,6 +1004,8 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10):
             theSaneArray = gData[dataSrcMetaData][:,0]
         elif opType == 'srel_retpa':
             theSaneArray = gData[dataSrcMetaData][:,1]
+        if bIgnoreLessThanAYear:
+            theSaneArray[gData[dataSrcMetaData][:,2] < 1.0] = 0
     theRows=numpy.argsort(theSaneArray)[-numEntries:]
     if op == 'top':
         lStart = -1
