@@ -961,7 +961,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, bIgnoreLessThanAYear=True, bCurrentEntitiesOnly=True, bDebug=False):
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, bIgnoreLessThanAYear=True, bCurrentEntitiesOnly=True, bDebug=False):
     """
     Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
@@ -1045,14 +1045,14 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
             for index in oldEntities:
                 print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gData['names'][index], gData['lastSeen'][index]))
         theSaneArray[oldEntities] = iSkip
-    theRows=numpy.argsort(theSaneArray)[-numEntries:]
+    theRows=numpy.argsort(theSaneArray)[-numEntities:]
     if op == 'top':
         lStart = -1
-        lStop = -(numEntries+1)
+        lStop = -(numEntities+1)
         lDelta = -1
     elif op == 'bottom':
         lStart = 0
-        lStop = numEntries
+        lStop = numEntities
         lDelta = 1
     theSelected = []
     for i in range(lStart,lStop,lDelta):
