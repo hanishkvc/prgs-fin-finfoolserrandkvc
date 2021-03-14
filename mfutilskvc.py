@@ -917,8 +917,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     tArray = tResult[r,:]
                     tFinite = tArray[numpy.isfinite(tArray)]
                     tNonZero = numpy.nonzero(tFinite)[0]
-                    tStart,tEnd = tFinite[tNonZero[0]],tFinite[tNonZero[-1]]
-                    label = "{:8.4f} - {:8.4f}".format(tStart, tEnd)
+                    if len(tNonZero) >= 2:
+                        tStart,tEnd = tFinite[tNonZero[0]],tFinite[tNonZero[-1]]
+                        label = "{:8.4f} - {:8.4f}".format(tStart, tEnd)
+                    else:
+                        label = ""
                     gData[dataDstMetaLabel].append(label)
             elif op.startswith("roll"):
                 days = int(op[4:])
