@@ -11,6 +11,7 @@ L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         "mftypes_list", "mftypes_members",
         "procdata_ex", "plot_data",
         "loadfilters_set", "loadfilters_clear",
+        "analdata_simple",
         "quit"
         ]
 

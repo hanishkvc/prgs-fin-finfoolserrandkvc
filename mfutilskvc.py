@@ -944,11 +944,22 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
 
 def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10):
     """
-    Find the top/bottom N items, wrt the given date, from the given dataSrc.
+    Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
     op: could be either 'top' or 'bottom'
 
     opType: could be one of 'normal', 'srel_absret', 'srel_retpa'
+
+        normal: Look at data corresponding to the identified date,
+        in the given dataSrc, to decide on entities to select.
+
+        srel_absret: Look at the Absolute Returns data associated
+        with the given dataSrc (which should be generated using
+        srel procdata_ex operation), to decide on entities.
+
+        srel_retpa: Look at the Returns PerAnnum data associated
+        with the given dataSrc (which should be generated using
+        srel procdata_ex operation), to decide on entities.
 
     theDate:
         If None, then the logic will try to find a date
@@ -959,7 +970,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10):
 
         If -1, then the lastDate wrt the currently loaded dataset,
         is used as the date from which values should be used to
-        identify the items.
+        identify the entities.
 
         A date in YYYYMMDD format.
 
@@ -980,16 +991,20 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10):
             theSaneArray = gData[dataSrc][:,dateIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = 0
             theSaneArray[numpy.isnan(theSaneArray)] = 0
-    elif opType == 'srel_absret':
-    elif opType == 'srel_retpa':
+    elif opType.startswith("srel"):
+        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
+        if opType == 'srel_absret':
+            theSaneArray = gData[dataSrcMetaData][:,0]
+        elif opType == 'srel_retpa':
+            theSaneArray = gData[dataSrcMetaData][:,1]
     theRows=numpy.argsort(theSaneArray)[-numEntries:]
     if op == 'top':
         lStart = -1
-        lEnd = -(numEntries+1)
+        lStop = -(numEntries+1)
         lDelta = -1
     elif op == 'bottom':
         lStart = 0
-        lEnd = numEntries
+        lStop = numEntries
         lDelta = 1
     theSelected = []
     for i in range(lStart,lStop,lDelta):
