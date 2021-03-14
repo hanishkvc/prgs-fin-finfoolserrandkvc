@@ -991,14 +991,18 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
     which is fine for top operation, but is a disaster for bottom operation.
 
     """
+    if op == 'top':
+        iSkip = -numpy.inf
+    else:
+        iSkip = numpy.inf
     if opType == 'normal':
         if type(theDate) == type(None):
             for i in range(-1, -(gData['dateIndex']+1),-1):
                 if bDebug:
                     print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
                 theSaneArray = gData[dataSrc][:,i].copy()
-                theSaneArray[numpy.isinf(theSaneArray)] = 0
-                theSaneArray[numpy.isnan(theSaneArray)] = 0
+                theSaneArray[numpy.isinf(theSaneArray)] = iSkip
+                theSaneArray[numpy.isnan(theSaneArray)] = iSkip
                 if numpy.count_nonzero(theSaneArray) > 0:
                     dateIndex = gData['dateIndex']+1+i
                     print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
@@ -1007,8 +1011,8 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
             startDateIndex, dateIndex = _date2index(theDate, theDate)
             print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
             theSaneArray = gData[dataSrc][:,dateIndex].copy()
-            theSaneArray[numpy.isinf(theSaneArray)] = 0
-            theSaneArray[numpy.isnan(theSaneArray)] = 0
+            theSaneArray[numpy.isinf(theSaneArray)] = iSkip
+            theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif opType.startswith("srel"):
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         if opType == 'srel_absret':
@@ -1016,7 +1020,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
         elif opType == 'srel_retpa':
             theSaneArray = gData[dataSrcMetaData][:,1].copy()
         if bIgnoreLessThanAYear:
-            theSaneArray[gData[dataSrcMetaData][:,2] < 1.0] = 0
+            theSaneArray[gData[dataSrcMetaData][:,2] < 1.0] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))[0]
         if bDebug:
@@ -1024,7 +1028,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
             #print(aNames[oldEntities])
             for index in oldEntities:
                 print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gData['names'][index], gData['lastSeen'][index]))
-        theSaneArray[oldEntities] = 0
+        theSaneArray[oldEntities] = iSkip
     theRows=numpy.argsort(theSaneArray)[-numEntries:]
     if op == 'top':
         lStart = -1
