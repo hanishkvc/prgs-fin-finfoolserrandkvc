@@ -1,0 +1,66 @@
+#
+# A Sample script to explore all the category of MFs available.
+# HanishKVC
+#
+
+print("A rough look at all the category of MFs available in India...")
+
+
+#
+# Fetch data if required, commented out by default
+#
+input("Dont forget to fetch data for the date range you are interested in, if required, before using this script")
+#fetch_data(2013, 2021)
+
+
+#
+# Process and Look at loaded data from different angles
+#
+
+def plot_show(datas, mfCodes):
+	plot_data(datas, mfCodes)
+	show_plot()
+
+
+def get_mfcodes(mfNameTemplates):
+	mfCodes = []
+	for mfTmpl in mfNameTemplates:
+		fullMatch, partMatch = findmatchingmf(mfTmpl)
+		for mf in fullMatch:
+			mfCodes.append(mf[1])
+	return mfCodes
+
+
+load_data(20210301, 20210307)
+gMFTypes = gData['mfTypes'].keys()
+
+for mfType in gMFTypes:
+	print("INFO:MFType:", mfType)
+	loadfilters_clear()
+	loadfilters_set([mfType])
+	load_data(2013, 2021)
+	# Relative Data
+	procdata_ex([ "srel=srel(data)", "dma20SRel=dma20(srel)", "dma200SRel=dma200(srel)" ])
+	fm,pm = findmatchingmf("-RE-.*")
+	mfCodes = [ x[1] for x in fm]
+	datas = [ 'dma20SRel', 'dma200SRel' ]
+	for data in datas:
+		plot_show(data, mfCodes)
+	# Rolling Data
+	procdata_ex([ "roll365=roll365(data)", "dma50Roll365=dma50(roll365)" ])
+	procdata_ex([ "roll1095=roll1095(data)", "dma50Roll1095=dma50(roll1095)" ])
+	procdata_ex([ "roll1825=roll1825(data)", "dma50Roll1825=dma50(roll1825)" ])
+	datas = [ 'dma50Roll365', 'dma50Roll1095', 'dma50Roll1825' ]
+	topList = analdata_simple('dma50Roll1095', 'top')
+	mfCodes = [ x[0] for x in topList ]
+	for mfCode in mfCodes:
+		plot_show(datas, [mfCode])
+	for data in datas:
+		plot_show(data, mfCodes)
+
+
+#
+# Quit if you dont want to further look at the data.
+#
+#quit()
+
