@@ -851,6 +851,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     if not _daterange_checkfine(startDateIndex, endDateIndex, "procdata_ex"):
         return
+    if type(opsList) == str:
+        opsList = [ opsList ]
     for curOp in opsList:
         curOpFull = curOp
         if '=' in curOp:
@@ -993,14 +995,25 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
 
         A date in YYYYMMDD format.
 
-    minEntityLifeDataInYears: srel related operations, will ignore entities
-        who have been in existance of less than the specified duration
+    minEntityLifeDataInYears: This ranking logic will ignore entities
+        who have been in existance for less than the specified duration
         of years, AND OR if we have data for only less than the specified
         duration of years for the entity.
 
         NOTE: The default is 1.5 years, If you have loaded less than that
         amount of data, then remember to set this to a smaller value,
         if required.
+
+        NOTE: It expects the info about duration for which data is
+        available for each entity, to be available under 'srelMetaData'
+        key. If this is not the case, it will trigger a generic 'srel'
+        operation through procdata_ex to generate the same.
+
+            It also means that the check is done wrt overall amount
+            of data available for a given entity in the loaded dataset,
+            While a dataSrc key which corresponds to a view of partial
+            data from the loaded dataset, which is less than specified
+            minEntityLifeDataInYears, can still be done.
 
     bCurrentEntitiesOnly: Will drop entities which have not been seen
         in the last 1 week, wrt the dateRange currently loaded.
@@ -1034,7 +1047,15 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             theSaneArray = gData[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
             theSaneArray = gData[dataSrcMetaData][:,1].copy()
-        theSaneArray[gData[dataSrcMetaData][:,2] < minEntityLifeDataInYears] = iSkip
+    if minEntityLifeDataInYears > 0:
+        dataYearsAvailable = gData['dateIndex']/365
+        if (dataYearsAvailable < minEntityLifeDataInYears):
+            print("ERROR:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
+        srelMetaData, srelMetaLabel = datadst_metakeys('srel')
+        theSRelMetaData = gData.get(srelMetaData, None)
+        if type(theSRelMetaData) == type(None):
+            procdata_ex('srel=srel(data)')
+        theSaneArray[gData[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))[0]
         if bDebug:
