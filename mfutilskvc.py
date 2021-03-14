@@ -362,7 +362,7 @@ def parse_csv(sFile):
             try:
                 nav  = float(la[4])
             except:
-                nav = -1
+                nav = 0
             date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
             date = dateint(date.year,date.month,date.day)
             #print(code, name, nav, date)
