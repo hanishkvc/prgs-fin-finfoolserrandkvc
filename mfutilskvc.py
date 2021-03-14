@@ -955,7 +955,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                         iStart = iEnd-blockDays
                         lAvgs.insert(0, numpy.average(tResult[r,iStart:iEnd]))
                         iEnd = iStart
-                    label = "{}".format(numpy.round(lAvgs,2))
+                    avgAvgs = numpy.average(lAvgs)
+                    label = "{} {}".format(numpy.round(lAvgs,2), avgAvgs)
                 else:
                     label = ""
                 gData[dataDstMetaLabel].append(label)
