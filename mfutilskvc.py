@@ -58,7 +58,7 @@ gbDEBUG=False
 # and matching MFs will be silently ignored while loading the MF data.
 MF_ALLOW_MFTYPETOKENS = [ "equity", "other", "hybrid", "solution" ]
 MF_ALLOW_MFNAMETOKENS = None
-MF_SKIP_MFNAMETOKENS = [ "~PART~dividend", "-RE-(?i).*regular plan.*" ]
+MF_SKIP_MFNAMETOKENS = [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
 
 #
 # Data processing and related
