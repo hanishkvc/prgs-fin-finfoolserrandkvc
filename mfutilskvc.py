@@ -942,11 +942,13 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_simple(dataSrc, op, theDate=None, numEntries=10):
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10):
     """
     Find the top/bottom N items, wrt the given date, from the given dataSrc.
 
     op: could be either 'top' or 'bottom'
+
+    opType: could be one of 'normal', 'srel_absret', 'srel_retpa'
 
     theDate:
         If None, then the logic will try to find a date
@@ -962,21 +964,24 @@ def analdata_simple(dataSrc, op, theDate=None, numEntries=10):
         A date in YYYYMMDD format.
 
     """
-    if type(theDate) == type(None):
-        for i in range(-1, -(gData['dateIndex']+1),-1):
-            print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
-            theSaneArray = gData[dataSrc][:,i].copy()
+    if opType == 'normal':
+        if type(theDate) == type(None):
+            for i in range(-1, -(gData['dateIndex']+1),-1):
+                print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
+                theSaneArray = gData[dataSrc][:,i].copy()
+                theSaneArray[numpy.isinf(theSaneArray)] = 0
+                theSaneArray[numpy.isnan(theSaneArray)] = 0
+                if numpy.count_nonzero(theSaneArray) > 0:
+                    dateIndex = gData['dateIndex']+1+i
+                    print("DBUG:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
+                    break
+        else:
+            startDateIndex, dateIndex = _date2index(theDate, theDate)
+            theSaneArray = gData[dataSrc][:,dateIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = 0
             theSaneArray[numpy.isnan(theSaneArray)] = 0
-            if numpy.count_nonzero(theSaneArray) > 0:
-                dateIndex = gData['dateIndex']+1+i
-                print("DBUG:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
-                break
-    else:
-        startDateIndex, dateIndex = _date2index(theDate, theDate)
-        theSaneArray = gData[dataSrc][:,dateIndex].copy()
-        theSaneArray[numpy.isinf(theSaneArray)] = 0
-        theSaneArray[numpy.isnan(theSaneArray)] = 0
+    elif opType == 'srel_absret':
+    elif opType == 'srel_retpa':
     theRows=numpy.argsort(theSaneArray)[-numEntries:]
     if op == 'top':
         lStart = -1
