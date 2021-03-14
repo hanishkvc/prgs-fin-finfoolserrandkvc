@@ -171,7 +171,7 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
-def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True):
+def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True, bDebug=False):
     """
     call the passed function for each date with the given start and end range.
         The date will be passed to the passed function as year, month, date
@@ -220,7 +220,8 @@ def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True):
                     continue
                 if bNotBeyondYesterday and (y == now.tm_year) and (m == now.tm_mon) and (d >= now.tm_mday):
                     continue
-                print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
+                if bDebug:
+                    print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
                 try:
                     handle_date_func(y,m,d)
                 except:
