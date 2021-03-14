@@ -913,6 +913,13 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 inv = int(days/2)
                 tResult[r,:inv] = numpy.nan
                 tResult[r,gData['dateIndex']-inv:] = numpy.nan
+                if True:
+                    tArray = tResult[r,:]
+                    tFinite = tArray[numpy.isfinite(tArray)]
+                    tNonZero = numpy.nonzero(tFinite)[0]
+                    tStart,tEnd = tFinite[tNonZero[0]],tFinite[tNonZero[-1]]
+                    label = "{:8.4f} - {:8.4f}".format(tStart, tEnd)
+                    gData[dataDstMetaLabel].append(label)
             elif op.startswith("roll"):
                 days = int(op[4:])
                 durationForPA = days/365
@@ -945,6 +952,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
         dataSrcs = [ dataSrcs ]
     if type(mfCodes) == int:
         mfCodes = [ mfCodes]
+    srelMetaData, srelMetaLabel = datadst_metakeys('srel')
     for dataSrc in dataSrcs:
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         for mfCode in mfCodes:
@@ -953,13 +961,16 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             try:
                 dataLabel = gData[dataSrcMetaLabel][index]
             except:
-                srelMetaData, srelMetaLabel = datadst_metakeys('srel')
+                dataLabel = ""
+            try:
                 metaKey = gData['metas'].get(srelMetaLabel, None)
                 if metaKey != None:
-                    dataLabel = gData[metaKey][index]
+                    srelLabel = gData[metaKey][index]
                 else:
-                    dataLabel = ""
-            label = "{}:{:{width}}: {:16} : {}".format(mfCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
+                    srelLabel = ""
+            except:
+                srelLabel = ""
+            label = "{}:{:{width}}: {:16} : {} : {}".format(mfCode, name, dataSrc, srelLabel, dataLabel, width=giLabelNameChopLen)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
