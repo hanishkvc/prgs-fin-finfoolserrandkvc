@@ -1066,6 +1066,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
                 print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gData['names'][index], gData['lastSeen'][index]))
         theSaneArray[oldEntities] = iSkip
     theRows=numpy.argsort(theSaneArray)[-numEntities:]
+    rowsLen = len(theRows)
+    if numEntities > rowsLen:
+        print("WARN:AnalDataSimple:{}:RankContenders[{}] < numEntities[{}] requested, adjusting".format(op, rowsLen, numEntities))
+        numEntities = rowsLen
     if op == 'top':
         lStart = -1
         lStop = -(numEntities+1)
