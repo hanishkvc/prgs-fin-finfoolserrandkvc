@@ -939,7 +939,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     tResult[r,days:] = (((gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])**(1/durationForPA))-1)*100
                 tResult[r,:days] = numpy.nan
                 # Additional meta data
-                numDays = endDateIndex - startDateIndex + 1
+                numDays = endDateIndex - days + 1
                 if numDays > days:
                     blockDays = 352
                     while True:
@@ -955,7 +955,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                         iStart = iEnd-blockDays
                         lAvgs.insert(0, numpy.average(tResult[r,iStart:iEnd]))
                         iEnd = iStart
-                    gData[dataDstMetaLabel].append(str(numpy.round(lAvgs,2)))
+                    label = "{}".format(numpy.round(lAvgs,2))
+                else:
+                    label = ""
+                gData[dataDstMetaLabel].append(label)
         gData[dataDst] = tResult
 
 
