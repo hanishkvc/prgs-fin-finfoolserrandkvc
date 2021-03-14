@@ -945,7 +945,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, bIgnoreLessThanAYear=True, bCurrentEntitiesOnly=True):
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, bIgnoreLessThanAYear=True, bCurrentEntitiesOnly=True, bDebug=False):
     """
     Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
@@ -994,16 +994,18 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
     if opType == 'normal':
         if type(theDate) == type(None):
             for i in range(-1, -(gData['dateIndex']+1),-1):
-                print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
+                if bDebug:
+                    print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
                 theSaneArray = gData[dataSrc][:,i].copy()
                 theSaneArray[numpy.isinf(theSaneArray)] = 0
                 theSaneArray[numpy.isnan(theSaneArray)] = 0
                 if numpy.count_nonzero(theSaneArray) > 0:
                     dateIndex = gData['dateIndex']+1+i
-                    print("DBUG:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
+                    print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
                     break
         else:
             startDateIndex, dateIndex = _date2index(theDate, theDate)
+            print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
             theSaneArray = gData[dataSrc][:,dateIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = 0
             theSaneArray[numpy.isnan(theSaneArray)] = 0
@@ -1016,11 +1018,12 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
         if bIgnoreLessThanAYear:
             theSaneArray[gData[dataSrcMetaData][:,2] < 1.0] = 0
     if bCurrentEntitiesOnly:
-        oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))
-        #aNames = numpy.array(gData['names'])
-        #print(aNames[oldEntities])
-        for index in oldEntities:
-            print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gData['names'][index], gData['lastSeen'][index]))
+        oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))[0]
+        if bDebug:
+            #aNames = numpy.array(gData['names'])
+            #print(aNames[oldEntities])
+            for index in oldEntities:
+                print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gData['names'][index], gData['lastSeen'][index]))
         theSaneArray[oldEntities] = 0
     theRows=numpy.argsort(theSaneArray)[-numEntries:]
     if op == 'top':
