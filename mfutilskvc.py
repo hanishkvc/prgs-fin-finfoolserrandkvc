@@ -867,6 +867,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
         print("DBUG:procdata_ex:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = gData[dataSrc].copy()
+        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         dataDstMetaData, dataDstMetaLabel = datadst_metakeys(dataDst)
         gData[dataDstMetaLabel] = []
         if op == 'srel':
@@ -914,6 +915,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 tResult[r,:inv] = numpy.nan
                 tResult[r,gData['dateIndex']-inv:] = numpy.nan
                 if True:
+                    dataSrcLabel = gData[dataSrcMetaLabel][r]
                     tArray = tResult[r,:]
                     tFinite = tArray[numpy.isfinite(tArray)]
                     tNonZero = numpy.nonzero(tFinite)[0]
@@ -922,6 +924,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                         label = "{:8.4f} - {:8.4f}".format(tStart, tEnd)
                     else:
                         label = ""
+                    label = "{} : {}".format(dataSrcLabel, label)
                     gData[dataDstMetaLabel].append(label)
             elif op.startswith("roll"):
                 days = int(op[4:])
@@ -950,9 +953,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     lAvgs = []
                     for i in range(numBlocks):
                         iStart = iEnd-blockDays
-                        lAvgs.insert(0, numpy.avg(tResult[r,iStart:iEnd]))
+                        lAvgs.insert(0, numpy.average(tResult[r,iStart:iEnd]))
                         iEnd = iStart
-                    gData[dataDstMetaLabel] = str(lAvgs)
+                    gData[dataDstMetaLabel].append(str(numpy.round(lAvgs,2)))
         gData[dataDst] = tResult
 
 
