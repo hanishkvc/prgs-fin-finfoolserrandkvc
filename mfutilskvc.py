@@ -956,7 +956,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                         lAvgs.insert(0, numpy.average(tResult[r,iStart:iEnd]))
                         iEnd = iStart
                     avgAvgs = numpy.average(lAvgs)
-                    label = "{} {}".format(numpy.round(lAvgs,2), avgAvgs)
+                    label = "{} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2))
                 else:
                     label = ""
                 gData[dataDstMetaLabel].append(label)
@@ -998,7 +998,9 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
                     srelLabel = ""
             except:
                 srelLabel = ""
-            label = "{}:{:{width}}: {:16} : {} : {}".format(mfCode, name, dataSrc, srelLabel, dataLabel, width=giLabelNameChopLen)
+            if dataLabel == "":
+                dataLabel = srelLabel
+            label = "{}:{:{width}}: {:16} : {}".format(mfCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
