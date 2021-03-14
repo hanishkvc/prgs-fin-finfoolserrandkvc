@@ -937,7 +937,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
                     dataLabel = gData[metaKey][index]
                 else:
                     dataLabel = ""
-            label = "{}:{}: {:16} : {}".format(mfCode, name, dataSrc, dataLabel)
+            label = "{}:{:{width}}: {:16} : {}".format(mfCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
