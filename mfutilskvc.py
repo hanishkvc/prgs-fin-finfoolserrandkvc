@@ -942,31 +942,57 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_ex(dataSrc, op, theDate=None, numEntries=10):
+def analdata_simple(dataSrc, op, theDate=None, numEntries=10):
+    """
+    Find the top/bottom N items, wrt the given date, from the given dataSrc.
+
+    op: could be either 'top' or 'bottom'
+
+    theDate:
+        If None, then the logic will try to find a date
+        which contains atleast some valid data, starting from the
+        lastDate and moving towards startDate wrt given dataSrc.
+
+        NOTE: ValidData: Any Non Zero, Non NaN, Non Inf data
+
+        If -1, then the lastDate wrt the currently loaded dataset,
+        is used as the date from which values should be used to
+        identify the items.
+
+        A date in YYYYMMDD format.
+
+    """
     if type(theDate) == type(None):
         for i in range(-1, -(gData['dateIndex']+1),-1):
-            print("DBUG:AnalDataEx:FindDateIndex:{}".format(i))
+            print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
             theSaneArray = gData[dataSrc][:,i].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = 0
             theSaneArray[numpy.isnan(theSaneArray)] = 0
             if numpy.count_nonzero(theSaneArray) > 0:
                 dateIndex = gData['dateIndex']+1+i
-                print("DBUG:AnalDataEx:DateIndex:{}".format(dateIndex))
+                print("DBUG:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
                 break
     else:
         startDateIndex, dateIndex = _date2index(theDate, theDate)
         theSaneArray = gData[dataSrc][:,dateIndex].copy()
         theSaneArray[numpy.isinf(theSaneArray)] = 0
         theSaneArray[numpy.isnan(theSaneArray)] = 0
+    theRows=numpy.argsort(theSaneArray)[-numEntries:]
     if op == 'top':
-        theRows=numpy.argsort(theSaneArray)[-numEntries:]
-        theWinners = []
-        for i in range(-1,-(numEntries+1),-1):
-            index = theRows[i]
-            curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
-            theWinners.append(curEntry)
-            print("INFO:analdata_ex:{}:{}".format(op, curEntry))
-        return theWinners
+        lStart = -1
+        lEnd = -(numEntries+1)
+        lDelta = -1
+    elif op == 'bottom':
+        lStart = 0
+        lEnd = numEntries
+        lDelta = 1
+    theSelected = []
+    for i in range(lStart,lStop,lDelta):
+        index = theRows[i]
+        curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
+        theSelected.append(curEntry)
+        print("INFO:AnalDataSimple:{}:{}:{}".format(op, dataSrc, curEntry))
+    return theSelected
 
 
 def _date2index(startDate, endDate):
