@@ -945,7 +945,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, bIgnoreLessThanAYear=True):
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, bIgnoreLessThanAYear=True, bCurrentEntitiesOnly=True):
     """
     Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
@@ -984,6 +984,12 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
         NOTE: If you have loaded less than a year of data, then remember
         to set this to False, if required.
 
+    bCurrentEntitiesOnly: Will drop entities which have not been seen
+        in the last 1 week, wrt the dateRange currently loaded.
+
+    TODO: Currently any entities to be ignored are set to a value of 0,
+    which is fine for top operation, but is a disaster for bottom operation.
+
     """
     if opType == 'normal':
         if type(theDate) == type(None):
@@ -1004,11 +1010,18 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntries=10, b
     elif opType.startswith("srel"):
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         if opType == 'srel_absret':
-            theSaneArray = gData[dataSrcMetaData][:,0]
+            theSaneArray = gData[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
-            theSaneArray = gData[dataSrcMetaData][:,1]
+            theSaneArray = gData[dataSrcMetaData][:,1].copy()
         if bIgnoreLessThanAYear:
             theSaneArray[gData[dataSrcMetaData][:,2] < 1.0] = 0
+    if bCurrentEntitiesOnly:
+        oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))
+        #aNames = numpy.array(gData['names'])
+        #print(aNames[oldEntities])
+        for index in oldEntities:
+            print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gData['names'][index], gData['lastSeen'][index]))
+        theSaneArray[oldEntities] = 0
     theRows=numpy.argsort(theSaneArray)[-numEntries:]
     if op == 'top':
         lStart = -1
