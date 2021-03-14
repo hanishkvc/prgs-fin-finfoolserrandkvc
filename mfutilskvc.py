@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import time
 import traceback
 import readline
+import re
 import tabcomplete as tc
 import hlpr
 
@@ -57,7 +58,7 @@ gbDEBUG=False
 # and matching MFs will be silently ignored while loading the MF data.
 MF_ALLOW_MFTYPETOKENS = [ "equity", "other", "hybrid", "solution" ]
 MF_ALLOW_MFNAMETOKENS = None
-MF_SKIP_MFNAMETOKENS = [ "~PART~dividend" ]
+MF_SKIP_MFNAMETOKENS = [ "~PART~dividend", "-RE-(?i).*regular plan.*" ]
 
 #
 # Data processing and related
@@ -614,6 +615,15 @@ def matches_templates(theString, matchTemplates, fullMatch=False, partialTokens=
 
     NOTE: If you want to mix NO and PART, do it in that order
     i.e -NO-~PART~TheToken.
+
+    NOTE: If -RE- is prefixed at begining of any of the match templates,
+    then that particular match template will be processed using pythons
+    re.fullmatch, instead of program's match logics.
+
+        You can ignore case while re matching by usinging -RE-(?i)
+
+        Remember its a full match so remember to put .* on eitherside
+        as required.
     """
     theString_asis = theString
     if ignoreCase:
@@ -623,11 +633,17 @@ def matches_templates(theString, matchTemplates, fullMatch=False, partialTokens=
     tmplIndex = -1
     #breakpoint()
     for matchTmpl in matchTemplates:
+        matchTmplRaw = matchTmpl
         if ignoreCase:
             matchTmpl = matchTmpl.upper()
         tmplIndex += 1
         if fullMatch:
             if theString == matchTmpl:
+                matchTmplFullMatch.append([theString_asis, tmplIndex])
+            continue
+        if matchTmpl.startswith('-RE-'):
+            matchTmpl = matchTmplRaw[4:]
+            if re.fullmatch(matchTmpl, theString_asis) != None:
                 matchTmplFullMatch.append([theString_asis, tmplIndex])
             continue
         matchTmplTokens = matchTmpl.split()
