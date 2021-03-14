@@ -961,7 +961,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, bIgnoreLessThanAYear=True, bCurrentEntitiesOnly=True, bDebug=False):
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False):
     """
     Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
@@ -993,18 +993,17 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
 
         A date in YYYYMMDD format.
 
-    bIgnoreLessThanAYear: srel related operations, will ignore entities
-        who have been in existance of less than a year, AND OR if we
-        have data for only less than a year for the entity.
+    minEntityLifeDataInYears: srel related operations, will ignore entities
+        who have been in existance of less than the specified duration
+        of years, AND OR if we have data for only less than the specified
+        duration of years for the entity.
 
-        NOTE: If you have loaded less than a year of data, then remember
-        to set this to False, if required.
+        NOTE: The default is 1.5 years, If you have loaded less than that
+        amount of data, then remember to set this to a smaller value,
+        if required.
 
     bCurrentEntitiesOnly: Will drop entities which have not been seen
         in the last 1 week, wrt the dateRange currently loaded.
-
-    TODO: Currently any entities to be ignored are set to a value of 0,
-    which is fine for top operation, but is a disaster for bottom operation.
 
     """
     if op == 'top':
@@ -1035,8 +1034,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             theSaneArray = gData[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
             theSaneArray = gData[dataSrcMetaData][:,1].copy()
-        if bIgnoreLessThanAYear:
-            theSaneArray[gData[dataSrcMetaData][:,2] < 1.0] = iSkip
+        theSaneArray[gData[dataSrcMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))[0]
         if bDebug:
