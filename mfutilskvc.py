@@ -137,6 +137,7 @@ def setup_gdata(startDate=-1, endDate=-1):
     gData['plots'] = set()
     gData['mfTypes'] = {}
     gData['metas'] = {}
+    gData['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
 
 
 def setup():
@@ -378,6 +379,7 @@ def parse_csv(sFile):
                 if name != gData['names'][mfIndex]:
                     input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
             gData['data'][mfIndex,gData['dateIndex']] = nav
+            gData['lastSeen'][mfIndex] = date
         except:
             print("ERRR:parse_csv:{}".format(l))
             print(sys.exc_info())
@@ -537,6 +539,7 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None,
     load4daterange(startDate, endDate)
     if bOptimizeSize:
         gData['data'] = gData['data'][:gData['nextMFIndex'],:gData['dateIndex']+1]
+        gData['lastSeen'] = gData['lastSeen'][:gData['nextMFIndex']]
 
 
 def mftypes_list():
