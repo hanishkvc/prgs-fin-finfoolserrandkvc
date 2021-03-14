@@ -1031,7 +1031,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
                 theSaneArray = gData[dataSrc][:,i].copy()
                 theSaneArray[numpy.isinf(theSaneArray)] = iSkip
                 theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-                if numpy.count_nonzero(theSaneArray) > 0:
+                if not numpy.all(numpy.isinf(theSaneArray) | numpy.isnan(theSaneArray)):
                     dateIndex = gData['dateIndex']+1+i
                     print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
                     break
