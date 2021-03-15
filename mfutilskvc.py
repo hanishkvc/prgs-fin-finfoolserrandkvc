@@ -1512,7 +1512,7 @@ def do_run(theFile=None):
                     cmd = "_THE_RESULT = {}".format(cmd)
                     bPrint=True
             exec(cmd,globals())
-            if bPrint and (_THE_RESULT != None):
+            if bPrint and (type(_THE_RESULT) != type(None)):
                 print(_THE_RESULT)
         except:
             excInfo = sys.exc_info()
