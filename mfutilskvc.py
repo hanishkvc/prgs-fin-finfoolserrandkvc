@@ -137,6 +137,8 @@ def setup_gdata(startDate=-1, endDate=-1):
     gData['dateRange'] = [-1, -1]
     gData['plots'] = set()
     gData['mfTypes'] = {}
+    gData['mfTypesId'] = {}
+    gData['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
     gData['metas'] = {}
     gData['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
 
@@ -326,6 +328,7 @@ def parse_csv(sFile):
     tFile = open(sFile)
     curMFType = ""
     bSkipCurMFType = False
+    typeId = -1
     for l in tFile:
         l = l.strip()
         if l == '':
@@ -335,7 +338,13 @@ def parse_csv(sFile):
             if l[-1] == ')':
                 curMFType = l
                 if curMFType not in gData['mfTypes']:
+                    typeId += 1
                     gData['mfTypes'][curMFType] = []
+                    checkTypeId = gData['mfTypesId'].get(curMFType, -1)
+                    if checkTypeId != -1:
+                        if checkTypeId != typeId:
+                            input("DBUG:ParseCSV:TypeId Mismatch")
+                    gData['mfTypesId'][curMFType] = typeId
                 if gData['whiteListMFTypes'] == None:
                     bSkipCurMFType = False
                 else:
@@ -377,6 +386,7 @@ def parse_csv(sFile):
                 gData['index2code'][mfIndex] = code
                 gData['names'].append(name)
                 gData['mfTypes'][curMFType].append(code)
+                gData['typeId'][mfIndex] = typeId
             else:
                 if name != gData['names'][mfIndex]:
                     input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
@@ -542,6 +552,7 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None,
     if bOptimizeSize:
         gData['data'] = gData['data'][:gData['nextMFIndex'],:gData['dateIndex']+1]
         gData['lastSeen'] = gData['lastSeen'][:gData['nextMFIndex']]
+        gData['typeId'] = gData['typeId'][:gData['nextMFIndex']]
 
 
 def mftypes_list():
