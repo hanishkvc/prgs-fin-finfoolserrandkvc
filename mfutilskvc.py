@@ -1503,15 +1503,17 @@ def do_run(theFile=None):
     """
     bQuit = False
     while not bQuit:
+        bPrint = False
         try:
             #breakpoint()
             cmd = input_multi(theFile=theFile)
             if gbREPLPrint:
                 if '\n' not in cmd:
-                    if '=' not in cmd:
-                        if not cmd.startswith("print"):
-                            cmd = "print({})".format(cmd)
+                    cmd = "_THE_RESULT = {}".format(cmd)
+                    bPrint=True
             exec(cmd,globals())
+            if bPrint and (_THE_RESULT != None):
+                print(_THE_RESULT)
         except:
             excInfo = sys.exc_info()
             if excInfo[0] == SystemExit:
