@@ -989,7 +989,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         iStart = iEnd-rollBlockDays
                         tBlockData = tResult[r,iStart:iEnd]
                         tBlockData = tBlockData[numpy.isfinite(tBlockData)]
-                        lAvgs.insert(0, numpy.average(tBlockData))
+                        lAvgs.insert(0, numpy.mean(tBlockData))
                         iEnd = iStart
                         if len(tBlockData) == 0:
                             tBlockData = [0]
