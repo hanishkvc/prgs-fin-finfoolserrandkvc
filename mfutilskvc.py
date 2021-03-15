@@ -824,6 +824,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
 
 
 gbRelDataPlusFloat = False
+gfRollingRetPAMinThreshold = 4.0
 def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
     """
     Allow data from any valid data key in gData to be operated on and the results to be saved
@@ -898,7 +899,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         break
                 dataDstMetaDataAvgs = "{}Avgs".format(dataDstMetaData)
                 dataDstMetaDataQntls = "{}Qntls".format(dataDstMetaData)
-                gData[dataDstMetaData] = numpy.zeros(gData['nextMFIndex'])
+                gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'], 2])
                 gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks])
                 gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks,5])
         update_metas(op, dataSrc, dataDst)
@@ -972,6 +973,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     tResult[r,rollDays:] = (((gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
                 tResult[r,:rollDays] = numpy.nan
                 # Additional meta data
+                trValidResult = tResult[r][numpy.isfinite(tResult[r])]
+                trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
+                trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/len(trValidResult))*100
+                trBelowMinThresholdLabel = "[{:5.2f}%:(]".format(trBelowMinThreshold)
                 if rollTotalDays > rollDays:
                     # Calc the Avgs
                     iEnd = endDateIndex+1
@@ -987,10 +992,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         gData[dataDstMetaDataQntls][r, rollNumBlocks-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
                     avgAvgs = numpy.nanmean(lAvgs)
                     gData[dataDstMetaDataAvgs][r,:] = lAvgs
-                    gData[dataDstMetaData][r] = avgAvgs
-                    label = "{} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2))
+                    gData[dataDstMetaData][r] = [avgAvgs, trBelowMinThreshold]
+                    label = "{} {} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2), trBelowMinThresholdLabel)
                 else:
-                    label = ""
+                    trAvg = numpy.mean(trValidResult)
+                    label = "{} {}".format(trAvg, trBelowMinThresholdLabel)
                 gData[dataDstMetaLabel].append(label)
         gData[dataDst] = tResult
 
