@@ -720,29 +720,41 @@ def findmatchingmf(mfNameTmpl, fullMatch=False, partialTokens=False, ignoreCase=
     #breakpoint()
     fmNew = []
     for curName, curIndex in fm:
-        fmNew.append([curName, gData['index2code'][curIndex], curIndex])
+        fmNew.append([gData['index2code'][curIndex], curName, curIndex])
     pmNew = []
     for curName, curIndex in pm:
-        pmNew.append([curName, gData['index2code'][curIndex], curIndex])
+        pmNew.append([gData['index2code'][curIndex], curName, curIndex])
     return fmNew, pmNew
 
 
-def search_data(findName, bFullMatch=False, bPartialTokens=False, bIgnoreCase=True, bPrintAllTokenMatch=True, bPrintSomeTokenMatch=False):
+def search_data(findNameTmpls, bFullMatch=False, bPartialTokens=False, bIgnoreCase=True, bPrintAllTokenMatch=True, bPrintSomeTokenMatch=False):
     """
-    Search/Find if there are any MFs which match the given name parts in findName.
+    Search/Find if there are any MFs which match the given name parts in findNameTmpls.
+
+    findNameTmpls could either be a single matchingTemplate or a list of matchingTemplates.
 
     bPrintAllTokenMatch: If enabled prints MFs which match all the tokens in the specified findName.
     bPrintSomeTokenMatch: If enabled prints MFs even if they match only some of the tokens in the specified findName.
     """
-    f,p = findmatchingmf(findName, bFullMatch, bPartialTokens, bIgnoreCase)
-    if bPrintAllTokenMatch:
-        print("INFO:search_data: List of All tokens Match")
-        for n in f:
-            print(n)
-    if bPrintSomeTokenMatch:
-        print("INFO:search_data: List of Some tokens Match")
-        for n in p:
-            print(n)
+    fullMatch = []
+    partMatch = []
+    if type(findNameTmpls) == str:
+        findNameTmpls = [ findNameTmpls ]
+    for nameTmpl in findNameTmpls:
+        fM,pM = findmatchingmf(nameTmpl, bFullMatch, bPartialTokens, bIgnoreCase)
+        if bPrintAllTokenMatch:
+            print("INFO:search_data: List of Entities with All tokens Match for", nameTmpl)
+        for n in fM:
+            fullMatch.append(n)
+            if bPrintAllTokenMatch:
+                print(n)
+        if bPrintSomeTokenMatch:
+            print("INFO:search_data: List of Entities with Some tokens Match for", nameTmpl)
+        for n in pM:
+            partMatch.append(n)
+            if bPrintSomeTokenMatch:
+                print(n)
+    return fullMatch, partMatch
 
 
 def datadst_metakeys(dataDst):
@@ -1281,7 +1293,7 @@ def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
         f,p = findmatchingmf(name)
         for c in f:
             #print(c)
-            mfCodes.append(c[1])
+            mfCodes.append(c[0])
     lookatmfs_codes(mfCodes, startDate, endDate)
 
 
