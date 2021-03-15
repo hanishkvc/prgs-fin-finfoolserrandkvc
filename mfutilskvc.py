@@ -904,104 +904,108 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks,5])
         update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
-            if op == "srel":
-                #breakpoint()
-                iStart = -1
-                dStart = 0
-                nonZeros = numpy.nonzero(gData[dataSrc][r, startDateIndex:endDateIndex+1])[0]
-                if (len(nonZeros) > 0):
-                    iStart = nonZeros[0] + startDateIndex
-                    dStart = gData[dataSrc][r, iStart]
-                dEnd = gData[dataSrc][r, endDateIndex]
-                if dStart != 0:
+            try:
+                if op == "srel":
+                    #breakpoint()
+                    iStart = -1
+                    dStart = 0
+                    nonZeros = numpy.nonzero(gData[dataSrc][r, startDateIndex:endDateIndex+1])[0]
+                    if (len(nonZeros) > 0):
+                        iStart = nonZeros[0] + startDateIndex
+                        dStart = gData[dataSrc][r, iStart]
+                    dEnd = gData[dataSrc][r, endDateIndex]
+                    if dStart != 0:
+                        if gbRelDataPlusFloat:
+                            tResult[r,:] = (gData[dataSrc][r,:]/dStart)
+                        else:
+                            tResult[r,:] = ((gData[dataSrc][r,:]/dStart)-1)*100
+                        tResult[r,:iStart] = numpy.nan
+                        dAbsRet = tResult[r, -1]
+                        durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
+                        dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
+                        label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
+                        gData[dataDstMetaLabel].append(label)
+                        gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+                    else:
+                        durationInYears = (endDateIndex-startDateIndex+1)/365
+                        gData[dataDstMetaLabel].append("")
+                        gData[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
+                elif op.startswith("rel"):
+                    baseDate = op[3:]
+                    if baseDate != '':
+                        baseDate = int(baseDate)
+                        baseDateIndex = gData['dates'].index(baseDate)
+                        baseData = gData[dataSrc][r, baseDateIndex]
+                    else:
+                        baseData = gData[dataSrc][r, startDateIndex]
+                    tResult[r,:] = (((gData[dataSrc][r,:])/baseData)-1)*100
+                elif op.startswith("dma"):
+                    days = int(op[3:])
+                    tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                    inv = int(days/2)
+                    tResult[r,:inv] = numpy.nan
+                    tResult[r,gData['dateIndex']-inv:] = numpy.nan
+                    if True:
+                        try:
+                            dataSrcLabel = gData[dataSrcMetaLabel][r]
+                        except:
+                            if bDebug:
+                                print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
+                            dataSrcLabel = ""
+                        tArray = tResult[r,:]
+                        tFinite = tArray[numpy.isfinite(tArray)]
+                        tNonZero = numpy.nonzero(tFinite)[0]
+                        if len(tNonZero) >= 2:
+                            tStart,tEnd = tFinite[tNonZero[0]],tFinite[tNonZero[-1]]
+                            label = "{:8.4f} - {:8.4f}".format(tStart, tEnd)
+                        else:
+                            label = ""
+                        label = "{} : {}".format(dataSrcLabel, label)
+                        gData[dataDstMetaLabel].append(label)
+                elif op.startswith("roll"):
+                    durationForPA = rollDays/365
+                    if '_' in op:
+                        op,opType = op.split('_')
+                        if opType == 'abs':
+                            durationForPA = 1
                     if gbRelDataPlusFloat:
-                        tResult[r,:] = (gData[dataSrc][r,:]/dStart)
+                        tResult[r,rollDays:] = (gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA)
                     else:
-                        tResult[r,:] = ((gData[dataSrc][r,:]/dStart)-1)*100
-                    tResult[r,:iStart] = numpy.nan
-                    dAbsRet = tResult[r, -1]
-                    durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
-                    dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
-                    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
-                    gData[dataDstMetaLabel].append(label)
-                    gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
-                else:
-                    durationInYears = (endDateIndex-startDateIndex+1)/365
-                    gData[dataDstMetaLabel].append("")
-                    gData[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
-            elif op.startswith("rel"):
-                baseDate = op[3:]
-                if baseDate != '':
-                    baseDate = int(baseDate)
-                    baseDateIndex = gData['dates'].index(baseDate)
-                    baseData = gData[dataSrc][r, baseDateIndex]
-                else:
-                    baseData = gData[dataSrc][r, startDateIndex]
-                tResult[r,:] = (((gData[dataSrc][r,:])/baseData)-1)*100
-            elif op.startswith("dma"):
-                days = int(op[3:])
-                tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
-                inv = int(days/2)
-                tResult[r,:inv] = numpy.nan
-                tResult[r,gData['dateIndex']-inv:] = numpy.nan
-                if True:
-                    try:
-                        dataSrcLabel = gData[dataSrcMetaLabel][r]
-                    except:
-                        if bDebug:
-                            print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
-                        dataSrcLabel = ""
-                    tArray = tResult[r,:]
-                    tFinite = tArray[numpy.isfinite(tArray)]
-                    tNonZero = numpy.nonzero(tFinite)[0]
-                    if len(tNonZero) >= 2:
-                        tStart,tEnd = tFinite[tNonZero[0]],tFinite[tNonZero[-1]]
-                        label = "{:8.4f} - {:8.4f}".format(tStart, tEnd)
+                        tResult[r,rollDays:] = (((gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
+                    tResult[r,:rollDays] = numpy.nan
+                    # Additional meta data
+                    trValidResult = tResult[r][numpy.isfinite(tResult[r])]
+                    trLenValidResult = len(trValidResult)
+                    if trLenValidResult > 0:
+                        trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
+                        trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
+                        trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
                     else:
-                        label = ""
-                    label = "{} : {}".format(dataSrcLabel, label)
+                        trBelowMinThresholdLabel = "[--NA--<]"
+                    if rollTotalDays > rollDays:
+                        # Calc the Avgs
+                        iEnd = endDateIndex+1
+                        lAvgs = []
+                        for i in range(rollNumBlocks):
+                            iStart = iEnd-rollBlockDays
+                            tBlockData = tResult[r,iStart:iEnd]
+                            tBlockData = tBlockData[numpy.isfinite(tBlockData)]
+                            lAvgs.insert(0, numpy.mean(tBlockData))
+                            iEnd = iStart
+                            if len(tBlockData) == 0:
+                                tBlockData = [0]
+                            gData[dataDstMetaDataQntls][r, rollNumBlocks-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
+                        avgAvgs = numpy.nanmean(lAvgs)
+                        gData[dataDstMetaDataAvgs][r,:] = lAvgs
+                        gData[dataDstMetaData][r] = [avgAvgs, trBelowMinThreshold]
+                        label = "{} {:5.2f} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2), trBelowMinThresholdLabel)
+                    else:
+                        trAvg = numpy.mean(trValidResult)
+                        label = "{:5.2f} {}".format(trAvg, trBelowMinThresholdLabel)
                     gData[dataDstMetaLabel].append(label)
-            elif op.startswith("roll"):
-                durationForPA = rollDays/365
-                if '_' in op:
-                    op,opType = op.split('_')
-                    if opType == 'abs':
-                        durationForPA = 1
-                if gbRelDataPlusFloat:
-                    tResult[r,rollDays:] = (gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA)
-                else:
-                    tResult[r,rollDays:] = (((gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
-                tResult[r,:rollDays] = numpy.nan
-                # Additional meta data
-                trValidResult = tResult[r][numpy.isfinite(tResult[r])]
-                trLenValidResult = len(trValidResult)
-                if trLenValidResult > 0:
-                    trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
-                    trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
-                    trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
-                else:
-                    trBelowMinThresholdLabel = "[--NA--<]"
-                if rollTotalDays > rollDays:
-                    # Calc the Avgs
-                    iEnd = endDateIndex+1
-                    lAvgs = []
-                    for i in range(rollNumBlocks):
-                        iStart = iEnd-rollBlockDays
-                        tBlockData = tResult[r,iStart:iEnd]
-                        tBlockData = tBlockData[numpy.isfinite(tBlockData)]
-                        lAvgs.insert(0, numpy.mean(tBlockData))
-                        iEnd = iStart
-                        if len(tBlockData) == 0:
-                            tBlockData = [0]
-                        gData[dataDstMetaDataQntls][r, rollNumBlocks-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
-                    avgAvgs = numpy.nanmean(lAvgs)
-                    gData[dataDstMetaDataAvgs][r,:] = lAvgs
-                    gData[dataDstMetaData][r] = [avgAvgs, trBelowMinThreshold]
-                    label = "{} {:5.2f} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2), trBelowMinThresholdLabel)
-                else:
-                    trAvg = numpy.mean(trValidResult)
-                    label = "{:5.2f} {}".format(trAvg, trBelowMinThresholdLabel)
-                gData[dataDstMetaLabel].append(label)
+            except:
+                traceback.print_exc()
+                print("DBUG:ProcDataEx:Exception skipping entity at ",r)
         gData[dataDst] = tResult
 
 
