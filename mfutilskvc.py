@@ -1510,6 +1510,8 @@ def do_run(theFile=None):
         if required.
 
     NOTE: One can control printing of REPL, by controlling gbREPLPrint.
+    NOTE: User can suppress auto printing of individual python statements
+            entered into interactive mode by suffixing them with ';'
     """
     bQuit = False
     while not bQuit:
@@ -1518,7 +1520,8 @@ def do_run(theFile=None):
             #breakpoint()
             cmd = input_multi(theFile=theFile)
             if gbREPLPrint:
-                if (cmd.strip() != "") and ('\n' not in cmd):
+                cmdStripped = cmd.strip()
+                if (cmdStripped != "") and ('\n' not in cmd) and (cmdStripped[-1] != ';'):
                     cmd = "_THE_RESULT = {}".format(cmd)
                     bPrint=True
             exec(cmd,globals())
