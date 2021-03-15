@@ -896,6 +896,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     rollBlockDays = rollBlockDays/2
                     if rollBlockDays < 30:
                         break
+                dataDstMetaDataAvgs = "{}Avgs".format(dataDstMetaData)
+                dataDstMetaDataQntls = "{}Qntls".format(dataDstMetaData)
+                gData[dataDstMetaData] = numpy.zeros(gData['nextMFIndex'])
+                gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks])
+                gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks,5])
         update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
             if op == "srel":
@@ -968,6 +973,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 tResult[r,:rollDays] = numpy.nan
                 # Additional meta data
                 if rollTotalDays > rollDays:
+                    # Calc the Avgs
                     iEnd = endDateIndex+1
                     lAvgs = []
                     for i in range(rollNumBlocks):
@@ -977,6 +983,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         lAvgs.insert(0, numpy.average(tBlockData))
                         iEnd = iStart
                     avgAvgs = numpy.nanmean(lAvgs)
+                    gData[dataDstMetaDataAvgs][r,:] = lAvgs
+                    gData[dataDstMetaData][r] = avgAvgs
                     label = "{} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2))
                 else:
                     label = ""
