@@ -974,9 +974,13 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 tResult[r,:rollDays] = numpy.nan
                 # Additional meta data
                 trValidResult = tResult[r][numpy.isfinite(tResult[r])]
-                trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
-                trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/len(trValidResult))*100
-                trBelowMinThresholdLabel = "[{:5.2f}%:(]".format(trBelowMinThreshold)
+                trLenValidResult = len(trValidResult)
+                if trLenValidResult > 0:
+                    trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
+                    trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
+                    trBelowMinThresholdLabel = "[{:5.2f}%:(]".format(trBelowMinThreshold)
+                else:
+                    trBelowMinThresholdLabel = "[---NA---]"
                 if rollTotalDays > rollDays:
                     # Calc the Avgs
                     iEnd = endDateIndex+1
