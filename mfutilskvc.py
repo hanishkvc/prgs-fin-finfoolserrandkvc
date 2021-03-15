@@ -1146,6 +1146,12 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             theSaneArray = gData[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
             theSaneArray = gData[dataSrcMetaData][:,1].copy()
+    elif opType.startswith("roll"):
+        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
+        if opType == 'roll_avg':
+            theSaneArray = gData[dataSrcMetaData][:,0].copy()
+            theSaneArray[numpy.isinf(theSaneArray)] = iSkip
+            theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
