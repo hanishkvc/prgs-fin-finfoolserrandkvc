@@ -899,8 +899,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         elif op.startswith("roll"):
             rollDays = int(op[4:])
             rollTotalDays = endDateIndex - rollDays + 1
-            if rollTotalDays > rollDays:
-                rollBlockDays = 352
+            rollBlockDays = 352
+            rollNumBlocks = -1
+            if rollTotalDays > rollBlockDays:
                 while True:
                     rollNumBlocks = int(rollTotalDays/rollBlockDays)
                     if rollNumBlocks > 4:
@@ -993,7 +994,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
                     else:
                         trBelowMinThresholdLabel = "[--NA--<]"
-                    if rollTotalDays > rollDays:
+                    if rollTotalDays > rollBlockDays:
                         # Calc the Avgs
                         iEnd = endDateIndex+1
                         lAvgs = []
