@@ -927,7 +927,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                 tResult[r,:inv] = numpy.nan
                 tResult[r,gData['dateIndex']-inv:] = numpy.nan
                 if True:
-                    dataSrcLabel = gData[dataSrcMetaLabel][r]
+                    try:
+                        dataSrcLabel = gData[dataSrcMetaLabel][r]
+                    except:
+                        print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
+                        dataSrcLabel = ""
                     tArray = tResult[r,:]
                     tFinite = tArray[numpy.isfinite(tArray)]
                     tNonZero = numpy.nonzero(tFinite)[0]
