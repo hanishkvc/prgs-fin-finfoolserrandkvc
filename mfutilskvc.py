@@ -1554,7 +1554,7 @@ def handle_args():
 #
 print("MFUtilsKVC: A stupid exploration of MF NAV data")
 print("License: GPL")
-print("PLEASE DONT USE THIS PROGRAM TO MAKE ANY DECISIONS OR INFERENCES OR ...")
+input("PLEASE DO NOT USE THIS PROGRAM TO MAKE ANY DECISIONS OR INFERENCES OR ...")
 
 setup()
 if len(sys.argv) > 1:
