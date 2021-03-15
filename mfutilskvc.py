@@ -982,6 +982,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         tBlockData = tBlockData[numpy.isfinite(tBlockData)]
                         lAvgs.insert(0, numpy.average(tBlockData))
                         iEnd = iStart
+                        if len(tBlockData) == 0:
+                            tBlockData = [0]
                         gData[dataDstMetaDataQntls][r,i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
                     avgAvgs = numpy.nanmean(lAvgs)
                     gData[dataDstMetaDataAvgs][r,:] = lAvgs
