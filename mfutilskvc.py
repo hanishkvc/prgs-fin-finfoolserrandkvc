@@ -208,7 +208,7 @@ def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True, bDebug=Fal
                     continue
                 elif (m == end['m']):
                     endDate = end.get('d', None)
-            print("INFO:proc_days:handlingmonth:{}{:02}:{} to {}".format(y,m,startDate, endDate))
+            print("INFO:proc_days:handlingmonth:{}{:02}:DayLimitsIfAny [{} to {}]".format(y,m,startDate, endDate))
             for d in gCal.itermonthdays(y,m):
                 if d == 0:
                     continue
@@ -824,7 +824,7 @@ def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
 
 
 gbRelDataPlusFloat = False
-def procdata_ex(opsList, startDate=-1, endDate=-1):
+def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
     """
     Allow data from any valid data key in gData to be operated on and the results to be saved
     into a destination data key in gData.
@@ -930,7 +930,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     try:
                         dataSrcLabel = gData[dataSrcMetaLabel][r]
                     except:
-                        print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
+                        if bDebug:
+                            print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
                         dataSrcLabel = ""
                     tArray = tResult[r,:]
                     tFinite = tArray[numpy.isfinite(tArray)]
