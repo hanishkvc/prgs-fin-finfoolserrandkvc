@@ -978,9 +978,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 if trLenValidResult > 0:
                     trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
                     trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
-                    trBelowMinThresholdLabel = "[{:5.2f}%:(]".format(trBelowMinThreshold)
+                    trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
                 else:
-                    trBelowMinThresholdLabel = "[---NA---]"
+                    trBelowMinThresholdLabel = "[--NA--<]"
                 if rollTotalDays > rollDays:
                     # Calc the Avgs
                     iEnd = endDateIndex+1
@@ -997,10 +997,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     avgAvgs = numpy.nanmean(lAvgs)
                     gData[dataDstMetaDataAvgs][r,:] = lAvgs
                     gData[dataDstMetaData][r] = [avgAvgs, trBelowMinThreshold]
-                    label = "{} {} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2), trBelowMinThresholdLabel)
+                    label = "{} {:5.2f} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2), trBelowMinThresholdLabel)
                 else:
                     trAvg = numpy.mean(trValidResult)
-                    label = "{} {}".format(trAvg, trBelowMinThresholdLabel)
+                    label = "{:5.2f} {}".format(trAvg, trBelowMinThresholdLabel)
                 gData[dataDstMetaLabel].append(label)
         gData[dataDst] = tResult
 
@@ -1518,7 +1518,7 @@ def do_run(theFile=None):
             #breakpoint()
             cmd = input_multi(theFile=theFile)
             if gbREPLPrint:
-                if '\n' not in cmd:
+                if (cmd.strip() != "") and ('\n' not in cmd):
                     cmd = "_THE_RESULT = {}".format(cmd)
                     bPrint=True
             exec(cmd,globals())
