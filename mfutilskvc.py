@@ -884,6 +884,18 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         gData[dataDstMetaLabel] = []
         if op == 'srel':
             gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'],3])
+        elif op.startswith("roll"):
+            rollDays = int(op[4:])
+            rollTotalDays = endDateIndex - rollDays + 1
+            if rollTotalDays > rollDays:
+                rollBlockDays = 352
+                while True:
+                    rollNumBlocks = int(rollTotalDays/rollBlockDays)
+                    if rollNumBlocks > 4:
+                        break
+                    rollBlockDays = rollBlockDays/2
+                    if rollBlockDays < 30:
+                        break
         update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
             if op == "srel":
@@ -944,32 +956,22 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     label = "{} : {}".format(dataSrcLabel, label)
                     gData[dataDstMetaLabel].append(label)
             elif op.startswith("roll"):
-                days = int(op[4:])
-                durationForPA = days/365
+                durationForPA = rollDays/365
                 if '_' in op:
                     op,opType = op.split('_')
                     if opType == 'abs':
                         durationForPA = 1
                 if gbRelDataPlusFloat:
-                    tResult[r,days:] = (gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])**(1/durationForPA)
+                    tResult[r,rollDays:] = (gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA)
                 else:
-                    tResult[r,days:] = (((gData[dataSrc][r,days:]/gData[dataSrc][r,:-days])**(1/durationForPA))-1)*100
-                tResult[r,:days] = numpy.nan
+                    tResult[r,rollDays:] = (((gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
+                tResult[r,:rollDays] = numpy.nan
                 # Additional meta data
-                numDays = endDateIndex - days + 1
-                if numDays > days:
-                    blockDays = 352
-                    while True:
-                        numBlocks = int(numDays/blockDays)
-                        if numBlocks > 4:
-                            break
-                        blockDays = blockDays/2
-                        if blockDays < 30:
-                            break
+                if rollTotalDays > rollDays:
                     iEnd = endDateIndex+1
                     lAvgs = []
-                    for i in range(numBlocks):
-                        iStart = iEnd-blockDays
+                    for i in range(rollNumBlocks):
+                        iStart = iEnd-rollBlockDays
                         tBlockData = tResult[r,iStart:iEnd]
                         tBlockData = tBlockData[numpy.isfinite(tBlockData)]
                         lAvgs.insert(0, numpy.average(tBlockData))
