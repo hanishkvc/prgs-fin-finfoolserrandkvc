@@ -969,7 +969,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1):
                     lAvgs = []
                     for i in range(numBlocks):
                         iStart = iEnd-blockDays
-                        lAvgs.insert(0, numpy.average(tResult[r,iStart:iEnd]))
+                        tBlockData = tResult[r,iStart:iEnd]
+                        tBlockData = tBlockData[numpy.isfinite(tBlockData)]
+                        lAvgs.insert(0, numpy.average(tBlockData))
                         iEnd = iStart
                     avgAvgs = numpy.nanmean(lAvgs)
                     label = "{} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2))
