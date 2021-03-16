@@ -51,50 +51,28 @@ def parse_csv(sFile):
     """
     tFile = open(sFile)
     curMFType = ""
-    bSkipCurMFType = False
+    today = {
+                'mfTypes': [],
+                'code2index': {},
+                'mfs': []
+            }
     typeId = -1
+    mfIndex = -1
     for l in tFile:
         l = l.strip()
         if l == '':
             continue
         if l[0].isalpha():
-            #print("WARN:parse_csv:Skipping:{}".format(l))
             if l[-1] == ')':
                 curMFType = l
-                if curMFType not in gData['mfTypes']:
+                if curMFType not in today['mfTypes']:
                     typeId += 1
-                    gData['mfTypes'][curMFType] = []
-                    checkTypeId = gData['mfTypesId'].get(curMFType, -1)
-                    if checkTypeId != -1:
-                        if checkTypeId != typeId:
-                            input("DBUG:ParseCSV:TypeId Mismatch")
-                    gData['mfTypesId'][curMFType] = typeId
-                if gData['whiteListEntTypes'] == None:
-                    bSkipCurMFType = False
-                else:
-                    #breakpoint()
-                    fm,pm = hlpr.matches_templates(curMFType, gData['whiteListEntTypes'])
-                    if len(fm) == 0:
-                        bSkipCurMFType = True
-                    else:
-                        bSkipCurMFType = False
-            continue
-        if bSkipCurMFType:
+                    today['mfTypes'].append([curMFType,[]])
             continue
         try:
             la = l.split(';')
             code = int(la[0])
             name = hlpr.string_cleanup(la[1], gNameCleanupMap)
-            if (gData['whiteListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['whiteListEntNames'])
-                if len(fm) == 0:
-                    gData['skipped'].add(str([code, name]))
-                    continue
-            if (gData['blackListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['blackListEntNames'])
-                if len(fm) > 0:
-                    gData['skipped'].add(str([code, name]))
-                    continue
             try:
                 nav  = float(la[4])
             except:
@@ -102,24 +80,19 @@ def parse_csv(sFile):
             date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
             date = hlpr.dateint(date.year,date.month,date.day)
             #print(code, name, nav, date)
-            mfIndex = gData['code2index'].get(code, None)
-            if mfIndex == None:
-                mfIndex = gData['nextMFIndex']
-                gData['nextMFIndex'] += 1
-                gData['code2index'][code] = mfIndex
-                gData['index2code'][mfIndex] = code
-                gData['names'].append(name)
-                gData['mfTypes'][curMFType].append(code)
-                gData['typeId'][mfIndex] = typeId
+            checkMFIndex = today['code2index'].get(code, None)
+            if checkMFIndex == None:
+                mfIndex += 1
+                today['code2index'][code] = mfIndex
+                today['mfs'].append([code, name, nav, typeId])
+                today['mfTypes'][typeId][1].append(code)
             else:
-                if name != gData['names'][mfIndex]:
-                    input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
-            gData['data'][mfIndex,gData['dateIndex']] = nav
-            gData['lastSeen'][mfIndex] = date
+                input("WARN:IndiaMF:parse_csv:Duplicate MF {}:{}=={}".format(code, name, today['mfs'][checkMFIndex][1]))
         except:
-            print("ERRR:parse_csv:{}".format(l))
+            print("ERRR:IndiaMF:parse_csv:{}".format(l))
             print(sys.exc_info())
     tFile.close()
+    return today
 
 
 def _loaddata(today):
