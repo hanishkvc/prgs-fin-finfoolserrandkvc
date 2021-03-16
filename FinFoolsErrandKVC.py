@@ -331,43 +331,43 @@ def load4daterange(startDate, endDate):
         print_skipped()
 
 
-gWhiteListMFTypes = None
-gWhiteListMFNames = None
-gBlackListMFNames = None
+gWhiteListEntTypes = None
+gWhiteListEntNames = None
+gBlackListEntNames = None
 
 
-def loadfilters_set(whiteListMFTypes=None, whiteListMFNames=None, blackListMFNames=None):
+def loadfilters_set(whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
     """
     Setup global filters used by load logic.
 
-    If whiteListMFTypes is set, loads only MFs which belong to the given MFType.
-    If whiteListMFNames is set, loads only MFs whose name matches any one of the given match templates.
-    If blackListMFNames is set, loads only MFs whose names dont match any of the corresponding match templates.
+    If whiteListEntTypes is set, loads only Entities which belong to the given EntityType.
+    If whiteListEntNames is set, loads only Entities whose name matches any one of the given match templates.
+    If blackListEntNames is set, loads only Entities whose names dont match any of the corresponding match templates.
 
     NOTE: Call load_filter with required filters, before calling load_data.
     """
-    global gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames
-    if whiteListMFTypes != None:
-        gWhiteListMFTypes = whiteListMFTypes
-    if whiteListMFNames != None:
-        gWhiteListMFNames = whiteListMFNames
-    if blackListMFNames != None:
-        gBlackListMFNames = blackListMFNames
-    print("LoadFiltersSet:Global Filters:\n\tgWhiteListMFTypes {}\n\tgWhiteListMFNames {}\n\tgBlackListMFNames {}".format(gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames))
+    global gWhiteListEntTypes, gWhiteListEntNames, gBlackListEntNames
+    if whiteListEntTypes != None:
+        gWhiteListEntTypes = whiteListEntTypes
+    if whiteListEntNames != None:
+        gWhiteListEntNames = whiteListEntNames
+    if blackListEntNames != None:
+        gBlackListEntNames = blackListEntNames
+    print("LoadFiltersSet:Global Filters:\n\tgWhiteListEntTypes {}\n\tgWhiteListEntNames {}\n\tgBlackListEntNames {}".format(gWhiteListEntTypes, gWhiteListEntNames, gBlackListEntNames))
 
 
 def loadfilters_clear():
     """
     Clear any global white/blacklist filters setup wrt load operation.
     """
-    global gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames
-    gWhiteListMFTypes = None
-    gWhiteListMFNames = None
+    global gWhiteListEntTypes, gWhiteListEntNames, gBlackListEntNames
+    gWhiteListEntTypes = None
+    gWhiteListEntNames = None
     gBlackListMFTypes = None
-    print("LoadFiltersClear:Global Filters Cleared:\n\tgWhiteListMFTypes {}\n\tgWhiteListMFNames {}\n\tgBlackListMFNames {}".format(gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames))
+    print("LoadFiltersClear:Global Filters Cleared:\n\tgWhiteListEntTypes {}\n\tgWhiteListEntNames {}\n\tgBlackListEntNames {}".format(gWhiteListEntTypes, gWhiteListEntNames, gBlackListEntNames))
 
 
-def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None, whiteListMFNames=None, blackListMFNames=None, bOptimizeSize=True):
+def load_data(startDate, endDate = None, bClearData=True, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None, bOptimizeSize=True):
     """
     Load data for given date range.
 
@@ -375,27 +375,27 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None,
 
     bClearData if set, resets the gData by calling setup_gdata.
 
-    User can optionally specify whiteListMFTypes/whiteListMFNames/blackListMFNames.
+    User can optionally specify whiteListEntTypes/whiteListEntNames/blackListEntNames.
 
         if any of them is set to a list, the same will be written into gData.
         if any of them is set to None, then the logic will check to see, if
             there is a corresponding global list available or not.
             If available, the same will be written into gData.
-                gWhiteListMFTypes, gWhiteListMFNames, gBlackListMFNames.
+                gWhiteListEntTypes, gWhiteListEntNames, gBlackListEntNames.
             Else the corresponding key in gData will point to None.
 
     These are used by the underlying parse and load logic, as follows.
 
-        if gData['whiteListMFTypes'] is a valid list (i.e not None), then the logic will load
+        if gData['whiteListEntTypes'] is a valid list (i.e not None), then the logic will load
         only MFs, which belong to a MFType which has matching tokens corresponding to all the
         tokens in one of the strings in the passed list. Else MFs are not filtered based on
         MFType.
 
-        if gData['whiteListMFNames'] is a valid list (i.e not None), then the logic will load
+        if gData['whiteListEntNames'] is a valid list (i.e not None), then the logic will load
         only MFs, whose name contain matching tokens corresponding to all the tokens in one of
         the strings in the passed list.
 
-        if gData['blackListMFNames'] is a valid list (i.e not None), then the logic will load
+        if gData['blackListEntNames'] is a valid list (i.e not None), then the logic will load
         only MFs, whose name dont contain matching tokens corresponding to all the tokens in
         any of the strings in the passed list.
 
@@ -421,15 +421,15 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListMFTypes=None,
         endDate = startDate
     if bClearData:
         setup_gdata(startDate, endDate)
-    if whiteListMFTypes == None:
-        whiteListMFTypes = gWhiteListMFTypes
-    if whiteListMFNames == None:
-        whiteListMFNames = gWhiteListMFNames
-    if blackListMFNames == None:
-        blackListMFNames = gBlackListMFNames
-    gData['whiteListMFTypes'] = whiteListMFTypes
-    gData['whiteListMFNames'] = whiteListMFNames
-    gData['blackListMFNames'] = blackListMFNames
+    if whiteListEntTypes == None:
+        whiteListEntTypes = gWhiteListEntTypes
+    if whiteListEntNames == None:
+        whiteListEntNames = gWhiteListEntNames
+    if blackListEntNames == None:
+        blackListEntNames = gBlackListEntNames
+    gData['whiteListEntTypes'] = whiteListEntTypes
+    gData['whiteListEntNames'] = whiteListEntNames
+    gData['blackListEntNames'] = blackListEntNames
     load4daterange(startDate, endDate)
     if bOptimizeSize:
         gData['data'] = gData['data'][:gData['nextMFIndex'],:gData['dateIndex']+1]

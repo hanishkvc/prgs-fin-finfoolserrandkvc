@@ -69,11 +69,11 @@ def parse_csv(sFile):
                         if checkTypeId != typeId:
                             input("DBUG:ParseCSV:TypeId Mismatch")
                     gData['mfTypesId'][curMFType] = typeId
-                if gData['whiteListMFTypes'] == None:
+                if gData['whiteListEntTypes'] == None:
                     bSkipCurMFType = False
                 else:
                     #breakpoint()
-                    fm,pm = hlpr.matches_templates(curMFType, gData['whiteListMFTypes'])
+                    fm,pm = hlpr.matches_templates(curMFType, gData['whiteListEntTypes'])
                     if len(fm) == 0:
                         bSkipCurMFType = True
                     else:
@@ -85,13 +85,13 @@ def parse_csv(sFile):
             la = l.split(';')
             code = int(la[0])
             name = hlpr.string_cleanup(la[1], gNameCleanupMap)
-            if (gData['whiteListMFNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['whiteListMFNames'])
+            if (gData['whiteListEntNames'] != None):
+                fm, pm = hlpr.matches_templates(name, gData['whiteListEntNames'])
                 if len(fm) == 0:
                     gData['skipped'].add(str([code, name]))
                     continue
-            if (gData['blackListMFNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['blackListMFNames'])
+            if (gData['blackListEntNames'] != None):
+                fm, pm = hlpr.matches_templates(name, gData['blackListEntNames'])
                 if len(fm) > 0:
                     gData['skipped'].add(str([code, name]))
                     continue
@@ -152,11 +152,11 @@ def _loaddata(today):
                         if checkTypeId != typeId:
                             input("DBUG:ParseCSV:TypeId Mismatch")
                     gData['mfTypesId'][curMFType] = typeId
-                if gData['whiteListMFTypes'] == None:
+                if gData['whiteListEntTypes'] == None:
                     bSkipCurMFType = False
                 else:
                     #breakpoint()
-                    fm,pm = hlpr.matches_templates(curMFType, gData['whiteListMFTypes'])
+                    fm,pm = hlpr.matches_templates(curMFType, gData['whiteListEntTypes'])
                     if len(fm) == 0:
                         bSkipCurMFType = True
                     else:
@@ -168,13 +168,13 @@ def _loaddata(today):
             la = l.split(';')
             code = int(la[0])
             name = hlpr.string_cleanup(la[1], gNameCleanupMap)
-            if (gData['whiteListMFNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['whiteListMFNames'])
+            if (gData['whiteListEntNames'] != None):
+                fm, pm = hlpr.matches_templates(name, gData['whiteListEntNames'])
                 if len(fm) == 0:
                     gData['skipped'].add(str([code, name]))
                     continue
-            if (gData['blackListMFNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['blackListMFNames'])
+            if (gData['blackListEntNames'] != None):
+                fm, pm = hlpr.matches_templates(name, gData['blackListEntNames'])
                 if len(fm) > 0:
                     gData['skipped'].add(str([code, name]))
                     continue
