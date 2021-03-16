@@ -148,7 +148,7 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
-def pickleok(fName, minSize=30e3):
+def pickleok(fName, minSize=16e3):
     """
     Check that a associated pickle file exists and that it has a safe
     minimum size to consider as potentially being valid pickle file.
