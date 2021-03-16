@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Get and work with MF nav data
+# Get and work with data about MFs, indexes, stocks, etc, in a blind and stupid way
 # HanishKVC, 2021
 # GPL
 #
