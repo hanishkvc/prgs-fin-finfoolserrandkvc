@@ -5,6 +5,7 @@ import os
 import calendar
 import sys
 import datetime
+import pickle
 import hlpr
 
 
@@ -84,7 +85,7 @@ def parse_csv(sFile):
             if checkMFIndex == None:
                 mfIndex += 1
                 today['code2index'][code] = mfIndex
-                today['mfs'].append([code, name, nav, typeId])
+                today['mfs'].append([code, name, nav, date, typeId])
                 today['mfTypes'][typeId][1].append(code)
             else:
                 input("WARN:IndiaMF:parse_csv:Duplicate MF {}:{}=={}".format(code, name, today['mfs'][checkMFIndex][1]))
@@ -105,42 +106,37 @@ def _loaddata(today):
     passing these lists explicitly to load_data and or by setting related
     global variables before calling load_data.
     """
-    tFile = open(sFile)
-    curMFType = ""
-    bSkipCurMFType = False
-    typeId = -1
-    for l in tFile:
-        l = l.strip()
-        if l == '':
-            continue
-        if l[0].isalpha():
-            #print("WARN:parse_csv:Skipping:{}".format(l))
-            if l[-1] == ')':
-                curMFType = l
-                if curMFType not in gData['mfTypes']:
-                    typeId += 1
-                    gData['mfTypes'][curMFType] = []
-                    checkTypeId = gData['mfTypesId'].get(curMFType, -1)
-                    if checkTypeId != -1:
-                        if checkTypeId != typeId:
-                            input("DBUG:ParseCSV:TypeId Mismatch")
-                    gData['mfTypesId'][curMFType] = typeId
-                if gData['whiteListEntTypes'] == None:
-                    bSkipCurMFType = False
-                else:
-                    #breakpoint()
-                    fm,pm = hlpr.matches_templates(curMFType, gData['whiteListEntTypes'])
-                    if len(fm) == 0:
-                        bSkipCurMFType = True
-                    else:
-                        bSkipCurMFType = False
-            continue
+    # Handle MFTypes
+    mfTypesId = -1
+    mfIndex = -1
+    for [curMFType, mfCodes] in today['mfTypes']:
+        mfTypesId += 1
+        if curMFType not in gData['mfTypes']:
+            gData['mfTypes'][curMFType] = []
+            checkTypeId = gData['mfTypesId'].get(curMFType, -1)
+            if checkTypeId != -1:
+                if checkTypeId != mfTypesId:
+                    input("DBUG:IndiaMF:_LoadData:MFTypesId Mismatch")
+            gData['mfTypesId'][curMFType] = mfTypesId
+        if gData['whiteListEntTypes'] == None:
+            bSkipCurMFType = False
+        else:
+            fm,pm = hlpr.matches_templates(curMFType, gData['whiteListEntTypes'])
+            if len(fm) == 0:
+                bSkipCurMFType = True
+            else:
+                bSkipCurMFType = False
         if bSkipCurMFType:
             continue
-        try:
-            la = l.split(';')
-            code = int(la[0])
-            name = hlpr.string_cleanup(la[1], gNameCleanupMap)
+
+        # Handle MFs
+        for mfCode in mfCodes:
+            mfIndex += 1
+            todayMFIndex = today['code2index'][mfCode]
+            code, name, nav, date, typeId = today['mfs'][todayMFIndex]
+            if (mfCode != code) or (typeId != mfTypesId):
+                print("DBUG:IndiaMF:_LoadData: Code[{}]|TypeId[{}] NotMatchExpected [{}]|[{}], skipping".format(code, typeId, mfCode, mfTypesId))
+                continue
             if (gData['whiteListEntNames'] != None):
                 fm, pm = hlpr.matches_templates(name, gData['whiteListEntNames'])
                 if len(fm) == 0:
@@ -151,31 +147,25 @@ def _loaddata(today):
                 if len(fm) > 0:
                     gData['skipped'].add(str([code, name]))
                     continue
-            try:
-                nav  = float(la[4])
-            except:
-                nav = 0
-            date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
-            date = hlpr.dateint(date.year,date.month,date.day)
-            #print(code, name, nav, date)
-            mfIndex = gData['code2index'].get(code, None)
-            if mfIndex == None:
-                mfIndex = gData['nextMFIndex']
+
+            checkMFIndex = gData['code2index'].get(code, None)
+            if checkMFIndex == None:
+                theIndex = gData['nextMFIndex']
+                if mfIndex != theIndex:
+                    print("DBUG:IndiaMF:_LoadData:{}: mfIndex[{}] NotMatchExpected [{}], skipping".format(code, mfIndex, theIndex))
+                    continue
                 gData['nextMFIndex'] += 1
                 gData['code2index'][code] = mfIndex
                 gData['index2code'][mfIndex] = code
                 gData['names'].append(name)
                 gData['mfTypes'][curMFType].append(code)
-                gData['typeId'][mfIndex] = typeId
+                gData['typeId'][mfIndex] = mfTypesId
             else:
-                if name != gData['names'][mfIndex]:
-                    input("WARN:parse_csv:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
+                if (name != gData['names'][checkMFIndex]) or (checkMFIndex != mfIndex):
+                    input("DBUG:IndiaMF:_LoadData:Name[{}]|mfIndex[{}]  mismatch [{}]|[{}]".format(name, mfIndex, gData['names'][checkMFIndex], checkMFIndex))
+                    continue
             gData['data'][mfIndex,gData['dateIndex']] = nav
             gData['lastSeen'][mfIndex] = date
-        except:
-            print("ERRR:parse_csv:{}".format(l))
-            print(sys.exc_info())
-    tFile.close()
 
 
 def _fetchdata(url, fName):
@@ -211,6 +201,7 @@ def fetch4date(y, m, d):
 
 def _savepickle(fName, today):
     fName = "{}.pickle".format(fName)
+    print("INFO:IndiaMF:SavePickle:", fName)
     f = open(fName, 'wb+')
     pickle.dump(today, f)
     f.close()
