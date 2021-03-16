@@ -64,7 +64,7 @@ def parse_csv(sFile):
                     bSkipCurMFType = False
                 else:
                     #breakpoint()
-                    fm,pm = matches_templates(curMFType, gData['whiteListMFTypes'])
+                    fm,pm = hlpr.matches_templates(curMFType, gData['whiteListMFTypes'])
                     if len(fm) == 0:
                         bSkipCurMFType = True
                     else:
@@ -77,12 +77,12 @@ def parse_csv(sFile):
             code = int(la[0])
             name = string_cleanup(la[1], gNameCleanupMap)
             if (gData['whiteListMFNames'] != None):
-                fm, pm = matches_templates(name, gData['whiteListMFNames'])
+                fm, pm = hlpr.matches_templates(name, gData['whiteListMFNames'])
                 if len(fm) == 0:
                     gData['skipped'].add(str([code, name]))
                     continue
             if (gData['blackListMFNames'] != None):
-                fm, pm = matches_templates(name, gData['blackListMFNames'])
+                fm, pm = hlpr.matches_templates(name, gData['blackListMFNames'])
                 if len(fm) > 0:
                     gData['skipped'].add(str([code, name]))
                     continue
