@@ -224,7 +224,8 @@ def load4date(y, m, d):
     you will have to call fillin4holidays explicitly.
     """
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    today = _loadpickle(fName)
-    _loaddata(today)
+    ok,today = _loadpickle(fName)
+    if ok:
+        _loaddata(today)
 
 
