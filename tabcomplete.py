@@ -12,6 +12,7 @@ L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         "procdata_ex", "plot_data",
         "loadfilters_set", "loadfilters_clear",
         "analdata_simple",
+        "session_save", "session_restore",
         "quit"
         ]
 

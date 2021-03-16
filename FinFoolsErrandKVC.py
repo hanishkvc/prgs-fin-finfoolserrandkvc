@@ -1253,6 +1253,23 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     _restore_dataproccontrols(savedDataProcControls)
 
 
+def session_save(sessionName):
+    """
+    Save current gData into a pickle, so that it can be restored fast later.
+    """
+    fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
+    hlpr.savepickle(fName, gData)
+
+
+def session_restore(sessionName):
+    """
+    Restore a previously saved gData fast from a pickle.
+    """
+    global gData
+    fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
+    ok, gData = hlpr.loadpickle(fName)
+
+
 def input_multi(prompt="OO>", altPrompt="...", theFile=None):
     """
     Allow reading a single line or multiline of python block
