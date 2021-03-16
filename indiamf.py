@@ -108,7 +108,6 @@ def _loaddata(today):
     """
     # Handle MFTypes
     mfTypesId = -1
-    mfIndex = -1
     for [curMFType, mfCodes] in today['mfTypes']:
         mfTypesId += 1
         if curMFType not in gData['mfTypes']:
@@ -131,7 +130,6 @@ def _loaddata(today):
 
         # Handle MFs
         for mfCode in mfCodes:
-            mfIndex += 1
             todayMFIndex = today['code2index'][mfCode]
             code, name, nav, date, typeId = today['mfs'][todayMFIndex]
             if (mfCode != code) or (typeId != mfTypesId):
@@ -148,12 +146,9 @@ def _loaddata(today):
                     gData['skipped'].add(str([code, name]))
                     continue
 
-            checkMFIndex = gData['code2index'].get(code, None)
-            if checkMFIndex == None:
-                theIndex = gData['nextMFIndex']
-                if mfIndex != theIndex:
-                    print("DBUG:IndiaMF:_LoadData:{}: mfIndex[{}] NotMatchExpected [{}], skipping".format(code, mfIndex, theIndex))
-                    continue
+            mfIndex = gData['code2index'].get(code, None)
+            if mfIndex == None:
+                mfIndex = gData['nextMFIndex']
                 gData['nextMFIndex'] += 1
                 gData['code2index'][code] = mfIndex
                 gData['index2code'][mfIndex] = code
@@ -161,9 +156,8 @@ def _loaddata(today):
                 gData['mfTypes'][curMFType].append(code)
                 gData['typeId'][mfIndex] = mfTypesId
             else:
-                if (name != gData['names'][checkMFIndex]) or (checkMFIndex != mfIndex):
-                    input("DBUG:IndiaMF:_LoadData:Name[{}]|mfIndex[{}]  mismatch [{}]|[{}]".format(name, mfIndex, gData['names'][checkMFIndex], checkMFIndex))
-                    continue
+                if (name != gData['names'][mfIndex]):
+                    input("DBUG:IndiaMF:_LoadData:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
             gData['data'][mfIndex,gData['dateIndex']] = nav
             gData['lastSeen'][mfIndex] = date
 
