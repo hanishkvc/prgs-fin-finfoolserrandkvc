@@ -130,3 +130,12 @@ def matches_templates(theString, matchTemplates, fullMatch=False, partialTokens=
     return matchTmplFullMatch, matchTmplPartMatch
 
 
+def string_cleanup(theString, cleanupMap):
+    """
+    Use the given cleanup map to replace elements of the passed string.
+    """
+    for cm in cleanupMap:
+        theString = theString.replace(cm[0], cm[1])
+    return theString
+
+

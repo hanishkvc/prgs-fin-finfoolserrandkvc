@@ -148,22 +148,6 @@ def setup():
     setup_paths()
     setup_modules()
     loadfilters_set(MF_ALLOW_MFTYPETOKENS, MF_ALLOW_MFNAMETOKENS, MF_SKIP_MFNAMETOKENS)
-    print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
-
-
-gNameCleanupMap = [
-        ['-', ' '],
-        ['Divided', 'Dividend'],
-        ['Diviend', 'Dividend'],
-        ['Divdend', 'Dividend'],
-        ]
-def string_cleanup(theString, cleanupMap):
-    """
-    Use the given cleanup map to replace elements of the passed string.
-    """
-    for cm in cleanupMap:
-        theString = theString.replace(cm[0], cm[1])
-    return theString
 
 
 def dateint(y, m, d):

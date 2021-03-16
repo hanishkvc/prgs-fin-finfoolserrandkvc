@@ -3,6 +3,7 @@
 
 import os
 import calendar
+import sys
 import hlpr
 
 
@@ -28,8 +29,15 @@ def setup_paths(basePath):
 
 def setup(basePath):
     setup_paths(basePath)
+    print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
 
 
+gNameCleanupMap = [
+        ['-', ' '],
+        ['Divided', 'Dividend'],
+        ['Diviend', 'Dividend'],
+        ['Divdend', 'Dividend'],
+        ]
 def parse_csv(sFile):
     """
     Parse the specified data csv file and load it into global data dictionary.
@@ -75,7 +83,7 @@ def parse_csv(sFile):
         try:
             la = l.split(';')
             code = int(la[0])
-            name = string_cleanup(la[1], gNameCleanupMap)
+            name = hlpr.string_cleanup(la[1], gNameCleanupMap)
             if (gData['whiteListMFNames'] != None):
                 fm, pm = hlpr.matches_templates(name, gData['whiteListMFNames'])
                 if len(fm) == 0:
