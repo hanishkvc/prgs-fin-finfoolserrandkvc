@@ -7,13 +7,11 @@
 import sys
 import calendar
 import os
-import datetime
 import numpy
 import matplotlib.pyplot as plt
 import time
 import traceback
 import readline
-import re
 import tabcomplete as tc
 import hlpr
 import indiamf

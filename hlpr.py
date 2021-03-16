@@ -4,6 +4,7 @@
 # GPL
 
 import os
+import re
 
 
 def wget_better(url, localFName):
