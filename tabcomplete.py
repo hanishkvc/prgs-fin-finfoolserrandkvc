@@ -43,6 +43,11 @@ def complete(text, state):
     return None
 
 
+def rlcompleter():
+    import rlcompleter
+
+
+
 readline.parse_and_bind("tab: complete")
 readline.set_completer(complete)
 
