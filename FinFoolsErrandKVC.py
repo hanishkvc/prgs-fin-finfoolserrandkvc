@@ -148,13 +148,6 @@ def setup():
     loadfilters_set(MF_ALLOW_MFTYPETOKENS, MF_ALLOW_MFNAMETOKENS, MF_SKIP_MFNAMETOKENS)
 
 
-def dateint(y, m, d):
-    """
-    Convert year, month and day into a numeric YYYYMMDD format.
-    """
-    return y*10000+m*100+d
-
-
 def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True, bDebug=False):
     """
     call the passed function for each date with the given start and end range.
@@ -310,7 +303,7 @@ def load4date(y, m, d):
     you will have to call fillin4holidays explicitly.
     """
     gData['dateIndex'] += 1
-    gData['dates'].append(dateint(y,m,d))
+    gData['dates'].append(hlpr.dateint(y,m,d))
     indiamf.load4date(y,m,d)
 
 

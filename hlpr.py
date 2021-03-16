@@ -140,3 +140,10 @@ def string_cleanup(theString, cleanupMap):
     return theString
 
 
+def dateint(y, m, d):
+    """
+    Convert year, month and day into a numeric YYYYMMDD format.
+    """
+    return y*10000+m*100+d
+
+
