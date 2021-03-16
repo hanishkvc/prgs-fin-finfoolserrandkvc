@@ -897,24 +897,27 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         if op == 'srel':
             gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'],3])
         elif op.startswith("roll"):
+            # RollWindowSize number of days at beginning will not have
+            # Rolling ret data, bcas there arent enough days to calculate
+            # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = int(op[4:])
-            rollTotalDays = endDateIndex - rollDays + 1
-            rollBlockDays = 352
+            rollValidDays = endDateIndex - rollDays + 1
+            rollCheckBlockDays = 352
             rollNumBlocks = -1
-            if rollTotalDays > rollBlockDays:
+            if rollValidDays > rollCheckBlockDays:
                 while True:
-                    rollNumBlocks = int(rollTotalDays/rollBlockDays)
+                    rollNumBlocks = int(rollValidDays/rollCheckBlockDays)
                     if rollNumBlocks > 4:
                         break
-                    rollBlockDays = int(rollBlockDays/2)
-                    if rollBlockDays < 30:
+                    rollCheckBlockDays = int(rollCheckBlockDays/2)
+                    if rollCheckBlockDays < 30:
                         break
                 dataDstMetaDataAvgs = "{}Avgs".format(dataDstMetaData)
                 dataDstMetaDataQntls = "{}Qntls".format(dataDstMetaData)
                 gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'], 2])
                 gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks])
                 gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks,5])
-            print("DBUG:ProcDataEx:Roll: rollDays{}, rollTotalDays{}, rollBlockDays{}, rollNumBlocks{}".format(rollDays, rollTotalDays, rollBlockDays, rollNumBlocks))
+            print("DBUG:ProcDataEx:Roll: rollDays{}, rollValidDays{}, rollCheckBlockDays{}, rollNumBlocks{}".format(rollDays, rollValidDays, rollCheckBlockDays, rollNumBlocks))
         update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
             try:
@@ -995,12 +998,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
                     else:
                         trBelowMinThresholdLabel = "[--NA--<]"
-                    if rollTotalDays > rollBlockDays:
+                    if rollValidDays > rollCheckBlockDays:
                         # Calc the Avgs
                         iEnd = endDateIndex+1
                         lAvgs = []
                         for i in range(rollNumBlocks):
-                            iStart = iEnd-rollBlockDays
+                            iStart = iEnd-rollCheckBlockDays
                             tBlockData = tResult[r,iStart:iEnd]
                             tBlockData = tBlockData[numpy.isfinite(tBlockData)]
                             lAvgs.insert(0, numpy.mean(tBlockData))
