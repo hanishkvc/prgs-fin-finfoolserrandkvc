@@ -906,7 +906,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     rollNumBlocks = int(rollTotalDays/rollBlockDays)
                     if rollNumBlocks > 4:
                         break
-                    rollBlockDays = rollBlockDays/2
+                    rollBlockDays = int(rollBlockDays/2)
                     if rollBlockDays < 30:
                         break
                 dataDstMetaDataAvgs = "{}Avgs".format(dataDstMetaData)
@@ -914,6 +914,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'], 2])
                 gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks])
                 gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks,5])
+            print("DBUG:ProcDataEx:Roll: rollDays{}, rollTotalDays{}, rollBlockDays{}, rollNumBlocks{}".format(rollDays, rollTotalDays, rollBlockDays, rollNumBlocks))
         update_metas(op, dataSrc, dataDst)
         for r in range(gData['nextMFIndex']):
             try:
