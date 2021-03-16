@@ -5,7 +5,6 @@ import os
 import calendar
 import sys
 import datetime
-import pickle
 import hlpr
 
 
@@ -176,38 +175,16 @@ def _fetchdata(url, fName):
     f.close()
 
 
-def _pickleok(fName):
-    fName = "{}.pickle".format(fName)
-    return os.path.exists(fName)
-
-
 def fetch4date(y, m, d):
     """
     Fetch data for the given date.
     """
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    if not _pickleok(fName):
+    if not hlpr.pickleok(fName):
         _fetchdata(url, fName)
         today = parse_csv(fName)
-        _savepickle(fName, today)
-
-
-def _savepickle(fName, today):
-    fName = "{}.pickle".format(fName)
-    print("INFO:IndiaMF:SavePickle:", fName)
-    f = open(fName, 'wb+')
-    pickle.dump(today, f)
-    f.close()
-
-
-def _loadpickle(fName):
-    fName = "{}.pickle".format(fName)
-    if os.path.exists(fName):
-        f = open(fName, 'rb')
-        today = pickle.load(f)
-        return True, today
-    return False, None
+        hlpr.savepickle(fName, today)
 
 
 def load4date(y, m, d):
@@ -218,7 +195,7 @@ def load4date(y, m, d):
     you will have to call fillin4holidays explicitly.
     """
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    ok,today = _loadpickle(fName)
+    ok,today = hlpr.loadpickle(fName)
     if ok:
         _loaddata(today)
 

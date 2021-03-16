@@ -5,6 +5,7 @@
 
 import os
 import re
+import pickle
 
 
 def wget_better(url, localFName):
@@ -145,5 +146,34 @@ def dateint(y, m, d):
     Convert year, month and day into a numeric YYYYMMDD format.
     """
     return y*10000+m*100+d
+
+
+def pickleok(fName, minSize=30e3):
+    """
+    Check that a associated pickle file exists and that it has a safe
+    minimum size to consider as potentially being valid pickle file.
+    """
+    fName = "{}.pickle".format(fName)
+    if os.path.exists(fName):
+        if os.stat(fName).st_size > minSize:
+            return True
+    return False
+
+
+def savepickle(fName, data):
+    fName = "{}.pickle".format(fName)
+    print("INFO:IndiaMF:SavePickle:", fName)
+    f = open(fName, 'wb+')
+    pickle.dump(data, f)
+    f.close()
+
+
+def loadpickle(fName):
+    fName = "{}.pickle".format(fName)
+    if os.path.exists(fName):
+        f = open(fName, 'rb')
+        data = pickle.load(f)
+        return True, data
+    return False, None
 
 
