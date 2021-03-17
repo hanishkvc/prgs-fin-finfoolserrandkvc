@@ -1008,9 +1008,11 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         if (theSaneArray[index] == iSkip) or ((opType == 'roll_ranked') and (theSaneArray[index] == 0)):
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
-        curEntry = [gData['index2code'][index], gData['names'][index], numpy.round(theSaneArray[index],2)]
+        curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
         theSelected.append(curEntry)
+        curEntry[2] = numpy.round(curEntry[2],2)
         if opType == "roll_ranked":
+            theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
             extra = "{}:{}".format(numpy.round(gData[metaDataAvgs][index],1), numpy.round(theRankArray[index],1))
         else:
             extra = ""
