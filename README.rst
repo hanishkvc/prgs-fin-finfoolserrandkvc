@@ -180,6 +180,8 @@ help(analdata_simple)
 
 help(plot_data)
 
+help(show_plot)
+
 to get some basic usage info about these.
 
 

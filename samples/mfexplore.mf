@@ -5,7 +5,8 @@
 
 print("A rough look at all the category of MFs available in India...")
 
-MFNAMETOKENS_TOSKIP = [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
+MFNAMETOKENS_TOALLOW = [ "direct" ]
+MFNAMETOKENS_TOSKIP  = [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
 
 
 #
@@ -38,7 +39,7 @@ gMFTypes = gData['entTypes'].keys()
 
 for mfType in gMFTypes:
 	input("INFO:MFType:{}".format(mfType))
-	loadfilters_setup("clean", [mfType], None, MFNAMETOKENS_TOSKIP)
+	loadfilters_setup("clean", [mfType], MFNAMETOKENS_TOALLOW, MFNAMETOKENS_TOSKIP)
 	load_data(2013, 2021, loadFiltersName="clean")
 	# Relative Data
 	procdata_ex([ "srel=srel(data)", "dma50SRel=dma50(srel)", "dma200SRel=dma200(srel)" ])
@@ -56,6 +57,7 @@ for mfType in gMFTypes:
 	datas = [ 'dma50SRel', 'dma200SRel', 'dma50Roll365', 'dma50Roll1095', 'dma50Roll1825' ]
 	topList = analdata_simple('dma50Roll1095', 'top')
 	topList = analdata_simple('roll1095', 'top', 'roll_ranked')
+	topList = analdata_simple('roll1095', 'top', 'roll_avg')
 	mfCodes = [ x[0] for x in topList ]
 	"""
 	for mfCode in mfCodes:
