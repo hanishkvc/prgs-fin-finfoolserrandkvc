@@ -161,15 +161,18 @@ def _fetchdata(url, fName):
     f.close()
 
 
-gbLocalFetch = False
+gbFetchLocal = False
 def fetch4date(y, m, d):
     """
     Fetch data for the given date.
+
+    NOTE: set gbFetchLocal to avoid trying to fetch from internet,
+    if and when required.
     """
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     if not hlpr.pickle_ok(fName):
-        if not gbLocalFetch:
+        if not gbFetchLocal:
             _fetchdata(url, fName)
         today = parse_csv(fName)
         hlpr.save_pickle(fName, today, "IndiaMF:fetch4Date")
