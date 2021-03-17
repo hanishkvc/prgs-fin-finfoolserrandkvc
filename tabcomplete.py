@@ -8,7 +8,7 @@ import readline
 gData = None
 L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         "show_plot",
-        "mftypes_list", "mftypes_members",
+        "enttypes_list", "enttypes_members",
         "procdata_ex", "plot_data",
         "loadfilters_set", "loadfilters_clear",
         "analdata_simple",
