@@ -120,15 +120,45 @@ Search
 
 Search through the loaded data set to see if it contains MFs with matching names.
 
-The user is required to specify a string containing tokens (a token is a alphanumeric
-with spaces around it, so each word in a string is a token). THe program will try to
-see if any of the MFs in the dataset contain all the tokens in the given string. If so,
-the corresponding MF name will be printed.
+search_data("match template tokens set1 ")
 
-The user can prefix -NO- to the tokens if required, in which case, if a MF name contains
-the corresponding token, the MF name will be skipped.
+search_data(["match template tokens set1", "match tokens set2", ...])
 
-search_data("match tokens -NO-SkipIfThisFound -NO-SkipEvenIfThisFound")
+The user can specify one or more match templates to this function/command.
+
+
+Match Tempaltes
+=================
+
+For each match template specified, the program will search through the currently
+loaded entities. If any match is found the same will be selected and used as
+appropriate based on the command.
+
+The program tries to check if each of the word/token in the given template is present
+in the names in its dataset. If all tokens in a match template are present in a given
+name, then it is considered as a match. The order of the tokens does not matter.
+
+By default the logic ignores the case of the words/tokens.
+
+User can prefix the tokens with few predefined strings to control the matching in
+a finer manner.
+
+If a token contains -NO- prefixed to it, then the matching name shouldnt contain
+this token in it.
+
+If a token is prefixed with ~PART~, then the matching name can contain that token as
+part of a bigger token. Otherwise normally each token/word should match fully.
+
+If the matching template itself is prefixed with -RE- then it is interpreted as a
+regular expression based matching template, instead of the programs internal logic.
+
+NOTE: a token is a alphanumeric word with spaces around it, so each word in a string
+is a token.
+
+ex: search_data("direct index fund tata")
+ex: search_data("fund tata index direct")
+ex: search_data("fund index -NO-bonus")
+ex: search_data(["direct bluechip -NO-dividend", "direct bluechip dividend us"])
 
 
 LookAt
