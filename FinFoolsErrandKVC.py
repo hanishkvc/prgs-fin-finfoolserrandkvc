@@ -965,6 +965,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
                 theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants, True)
             theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
             theSaneArray = theRankArray[:,tNumBlocks]
+            #breakpoint()
     theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
@@ -1004,7 +1005,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     print("INFO:AnalDataSimple:{}:{}:{}".format(op, dataSrc, opType))
     for i in range(lStart,lStop,lDelta):
         index = theRows[i]
-        if theSaneArray[index] == iSkip:
+        if (theSaneArray[index] == iSkip) or ((opType == 'roll_ranked') and (theSaneArray[index] == 0)):
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
         curEntry = [gData['index2code'][index], gData['names'][index], numpy.round(theSaneArray[index],2)]

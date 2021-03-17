@@ -257,6 +257,11 @@ If the program is called without any arguments, then it enters the interactive m
 user can enter the above and few more program provided functions as well as generic python
 expressions.
 
+   Terminate statement with ; to avoid printing the results of the statement automatically.
+   Termination with ; is also required to import modules at runtime.
+
+   IF-ELSE not supported directly at the main level. However it can exist within a block.
+
 However if the program is called with a single argument which is a file with extension ".mf",
 then the program will assume that it is a script file which contains commands for the program.
 They will be executed as if the user had entered them directly into the program one after the
