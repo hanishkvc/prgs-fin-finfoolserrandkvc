@@ -212,21 +212,32 @@ def sane_array(theArray, skip):
 
 def array_str(arr, width=5, precision=2):
     if type(precision) == str:
+        firstPrec = -1
+        lastPrec = -1
         i = 0
         while (i < len(precision)):
             if precision[i] == 'A':
                 allPrec = int(precision[i+1])
             elif precision[i] == 'L':
                 lastPrec = int(precision[i+1])
+            elif precision[i] == 'F':
+                firstPrec = int(precision[i+1])
             i += 1
+        if firstPrec == -1:
+            firstPrec = allPrec
+        if lastPrec == -1:
+            lastPrec = allPrec
     else:
         allPrec = precision
         lastPrec = precision
+        firstPrec = precision
     strA = "[ "
     iLast = len(arr)-1
     for i in range(iLast+1):
         if i == iLast:
             precision = lastPrec
+        elif i == 0:
+            precision = firstPrec
         else:
             precision = allPrec
         strA = "{}{:{width}.{precision}f} ".format(strA, arr[i], width=width, precision=precision)
