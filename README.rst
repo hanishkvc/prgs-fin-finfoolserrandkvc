@@ -170,7 +170,58 @@ procdata_ex("srel=srel(data)")
 
 procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
 
+procdata_ex(["srel=srel(data)", "dma20=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+
 NOTE: help(procdata_ex) will give some of the details about using this.
+
+srel - safe relative
+----------------------
+
+calculates the relative percentage difference for all data in the dataset, wrt the
+value of the same entity on the starting date (which defaults to start of the dateRange
+of data loaded). If a given entity has no value available for the given start date, then
+the next earliest available non zero value will be used as the base.
+
+It also stores the AbsoluteReturn as well as the ReturnsPerAnnum, as on the last date
+in the date range, as part of the MetaData.
+
+dma - moving average
+----------------------
+
+dstDataKey=dma<Days>(srcDataKey)
+
+ex: dma50Data=dma50(data)
+
+It calculates the moving average over a specified number of days, for the full dataset.
+
+Some common window size one could use for moving average are 20, 50, 200, ...
+
+
+
+roll - rolling return
+-----------------------
+
+dstDataKey=roll<Days>(srcDataKey)
+
+ex: rollData=roll365(data)
+
+It calculates rolling returnPerAnnum over the full dataset, wrt given rollingReturn windowSize.
+
+Some common window sizes one could use are 365 (i.e 1Yr), 1095 (i.e 3Yr), 1825 (i.e 5Yr).
+
+It also stores the following additional meta data:
+
+   Average rolling return over the full date range
+
+   Percentage of times, when the return was below a predefined minimum value like 4%.
+
+   Average rolling return over smaller time periods within the overall date range.
+   For large date ranges, it will be for every year.
+
+   Quantiles of the rolling return for each of the smaller time period within the overall date range.
+
+NOTE: Full dataset means for all the entities and over the full date range for which data
+is loaded.
 
 
 Look at raw/processed data
@@ -178,11 +229,25 @@ Look at raw/processed data
 
 help(analdata_simple)
 
+   roll_avg: The dataSrc should be one generated using roll<Days> operation of procdata_ex.
+   This looks at the full period average of the rolling returnPerAnnum over the full dateRange
+   loaded, for each entity, to decide how to rank the entities.
+
+   roll_ranked: The dataSrc should be one generated using roll<Days> procdata_ex oepration.
+   This identifies the pentile to which each entity belongs, when compared to all other
+   entities specified, wrt each sub time period to which the overall date range will be
+   divided. Inturn it calculates a naive average of the pentile rank across all the sub
+   date ranges, and uses the same to rank the entities.
+
+      NOTE: One needs to be extra careful, when trying to interpret this result.
+
+
 help(plot_data)
 
 help(show_plot)
 
-to get some basic usage info about these.
+
+help on the required function will get some basic usage info about these.
 
 
 Calling the Program
@@ -262,4 +327,9 @@ If startDate is not specified, it will be mapped to the startDate specified duri
 If endDate is not specified, it will be mapped to the endDate specified during load_data.
 
 
+Misc Notes
+==============
 
+As readme is created on a different day compared to when the logic is/was implemented, so
+there could be discrepencies, as I havent cross checked things, when putting what I remember
+into this document.
