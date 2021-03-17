@@ -105,7 +105,7 @@ def setup_paths():
     Account for FINFOOLSERRAND_BASE env variable if set
     """
     global FINFOOLSERRAND_BASE
-    FINFOOLSERRAND_BASE = os.environ.get('MFUTILS_BASE',"~/")
+    FINFOOLSERRAND_BASE = os.environ.get('FINFOOLSERRAND_BASE',"~/")
     print("INFO:Main:setup_paths:", FINFOOLSERRAND_BASE)
 
 
