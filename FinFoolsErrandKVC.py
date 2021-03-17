@@ -978,15 +978,16 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         lStop = numEntities
         lDelta = 1
     theSelected = []
+    print("INFO:AnalDataSimple:{}:{}".format(op, dataSrc))
     for i in range(lStart,lStop,lDelta):
         index = theRows[i]
-        curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
+        curEntry = [gData['index2code'][index], gData['names'][index], numpy.round(theSaneArray[index],4)]
         theSelected.append(curEntry)
         if opType == "roll_ranked":
-            extra = "{}:{}".format(numpy.round(gData[metaDataAvgs][index],2), numpy.round(theRankArray[index],2))
+            extra = "{}:{}".format(numpy.round(gData[metaDataAvgs][index],2), numpy.round(theRankArray[index],1))
         else:
             extra = ""
-        print("INFO:AnalDataSimple:{}:{}:{}{}".format(op, dataSrc, curEntry, extra))
+        print("    {}{}".format(extra, curEntry))
     return theSelected
 
 
