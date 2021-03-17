@@ -837,7 +837,19 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False):
+def _clear4entities(data, entCodes, skipValue):
+    """
+    Set the locations in the data, corresponding to the specified entCodes,
+    to skipValue.
+    """
+    if entCodes == None:
+        return data
+    indexes = [gData['code2index'][code] for code in entCodes]
+    data[indexes] = skipValue
+    return data
+
+
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, entCodes=None, minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False):
     """
     Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
@@ -878,6 +890,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         identify the entities.
 
         A date in YYYYMMDD format.
+
+    entCodes: One can restrict the logic to look at data belonging to
+        the specified list of entities. If None, then all entities
+        in the loaded dataset will be considered, for ranking.
 
     minEntityLifeDataInYears: This ranking logic will ignore entities
         who have been in existance for less than the specified duration
@@ -949,6 +965,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
                 theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants)
             theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
             theSaneArray = theRankArray[:,tNumBlocks]
+    theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
