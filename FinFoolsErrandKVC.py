@@ -1258,7 +1258,7 @@ def session_save(sessionName):
     Save current gData into a pickle, so that it can be restored fast later.
     """
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    hlpr.savepickle(fName, gData)
+    hlpr.savepickle(fName, gData, "Main:SessionSave")
 
 
 def session_restore(sessionName):

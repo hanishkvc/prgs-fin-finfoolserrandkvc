@@ -170,7 +170,7 @@ def fetch4date(y, m, d):
     if not hlpr.pickleok(fName):
         _fetchdata(url, fName)
         today = parse_csv(fName)
-        hlpr.savepickle(fName, today)
+        hlpr.savepickle(fName, today, "IndiaMF:fetch4Date")
 
 
 def load4date(y, m, d):

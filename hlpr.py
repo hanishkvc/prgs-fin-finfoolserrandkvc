@@ -160,9 +160,9 @@ def pickleok(fName, minSize=16e3):
     return False
 
 
-def savepickle(fName, data):
+def savepickle(fName, data, msgTag='SavePickle'):
     fName = "{}.pickle".format(fName)
-    print("INFO:IndiaMF:SavePickle:", fName)
+    print("INFO:{}:SavePickle:{}".format(msgTag, fName))
     f = open(fName, 'wb+')
     pickle.dump(data, f)
     f.close()
