@@ -224,4 +224,14 @@ then the program will assume that it is a script file which contains commands fo
 They will be executed as if the user had entered them directly into the program one after the
 other.
 
+Saving and Restoring Session
+==============================
+
+One can use session_save to save the gData corresponding to the currently loaded data, into
+disk. ANd inturn one can use session_load to restore a previously saved session back into
+runtime memory. This can help with avoiding the need to go through the individual data files
+and build the in memory data, which can save lot of time. This is not a full save and restore
+of the runtime session of the program, so one needs to understand the program flow and its
+implications, before using it.
+
 
