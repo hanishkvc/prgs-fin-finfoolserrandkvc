@@ -161,6 +161,54 @@ ex: search_data("fund index -NO-bonus")
 ex: search_data(["direct bluechip -NO-dividend", "direct bluechip dividend us"])
 
 
+Processing Data
+===================
+
+procdata_ex(<ListOfOperations>)
+
+procdata_ex("srel=srel(data)")
+
+procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
+
+NOTE: help(procdata_ex) will give some of the details about using this.
+
+
+Look at raw/processed data
+=============================
+
+help(analdata_simple)
+
+help(plot_data)
+
+to get some basic usage info about these.
+
+
+Calling the Program
+======================
+
+If the program is called without any arguments, then it enters the interactive mode, where
+user can enter the above and few more program provided functions as well as generic python
+expressions.
+
+However if the program is called with a single argument which is a file with extension ".mf",
+then the program will assume that it is a script file which contains commands for the program.
+They will be executed as if the user had entered them directly into the program one after the
+other.
+
+Saving and Restoring Session
+==============================
+
+One can use session_save to save the gData corresponding to the currently loaded data, into
+disk. ANd inturn one can use session_load to restore a previously saved session back into
+runtime memory. This can help with avoiding the need to go through the individual data files
+and build the in memory data, which can save lot of time. This is not a full save and restore
+of the runtime session of the program, so one needs to understand the program flow and its
+implications, before using it.
+
+
+Older logic, Not yet updated, wrt new logics/flows (i.e if reqd)
+#################################################################
+
 LookAt
 =======
 
@@ -211,27 +259,5 @@ If startDate is not specified, it will be mapped to the startDate specified duri
 
 If endDate is not specified, it will be mapped to the endDate specified during load_data.
 
-
-Calling the Program
-======================
-
-If the program is called without any arguments, then it enters the interactive mode, where
-user can enter the above and few more program provided functions as well as generic python
-expressions.
-
-However if the program is called with a single argument which is a file with extension ".mf",
-then the program will assume that it is a script file which contains commands for the program.
-They will be executed as if the user had entered them directly into the program one after the
-other.
-
-Saving and Restoring Session
-==============================
-
-One can use session_save to save the gData corresponding to the currently loaded data, into
-disk. ANd inturn one can use session_load to restore a previously saved session back into
-runtime memory. This can help with avoiding the need to go through the individual data files
-and build the in memory data, which can save lot of time. This is not a full save and restore
-of the runtime session of the program, so one needs to understand the program flow and its
-implications, before using it.
 
 
