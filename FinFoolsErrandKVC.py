@@ -962,7 +962,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
                 tValidArray = tArray[numpy.isfinite(tArray)]
                 tSaneArray = hlpr.sane_array(tArray, iSkip)
                 tQuants = numpy.quantile(tValidArray, [0, 0.2, 0.4, 0.6, 0.8, 1])
-                theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants)
+                theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants, True)
             theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
             theSaneArray = theRankArray[:,tNumBlocks]
     theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
@@ -1007,10 +1007,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         if theSaneArray[index] == iSkip:
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
-        curEntry = [gData['index2code'][index], gData['names'][index], numpy.round(theSaneArray[index],4)]
+        curEntry = [gData['index2code'][index], gData['names'][index], numpy.round(theSaneArray[index],2)]
         theSelected.append(curEntry)
         if opType == "roll_ranked":
-            extra = "{}:{}".format(numpy.round(gData[metaDataAvgs][index],2), numpy.round(theRankArray[index],1))
+            extra = "{}:{}".format(numpy.round(gData[metaDataAvgs][index],1), numpy.round(theRankArray[index],1))
         else:
             extra = ""
         print("    {}{}".format(extra, curEntry))
