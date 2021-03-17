@@ -783,7 +783,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         avgAvgs = numpy.nanmean(lAvgs)
                         gData[dataDstMetaDataAvgs][r,:] = lAvgs
                         gData[dataDstMetaData][r] = [avgAvgs, trBelowMinThreshold]
-                        label = "{} {:5.2f} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2), trBelowMinThresholdLabel)
+                        label = "{} {:5.2f} {}".format(hlpr.array_str(lAvgs,4,1), avgAvgs, trBelowMinThresholdLabel)
                     else:
                         trAvg = numpy.mean(trValidResult)
                         gData[dataDstMetaData][r] = [trAvg, trBelowMinThreshold]
@@ -1013,10 +1013,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         curEntry[2] = numpy.round(curEntry[2],2)
         if opType == "roll_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
-            extra = "{}:{}".format(numpy.round(gData[metaDataAvgs][index],1), numpy.round(theRankArray[index],1))
+            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,1), hlpr.array_str(gData[metaDataAvgs][index],6,2))
         else:
             extra = ""
-        print("    {}{}".format(extra, curEntry))
+        print("    {} {}".format(extra, curEntry))
     return theSelected
 
 

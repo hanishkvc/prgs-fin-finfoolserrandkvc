@@ -210,3 +210,11 @@ def sane_array(theArray, skip):
     return theSaneArray
 
 
+def array_str(arr, width=5, precision=2):
+    strA = "[ "
+    for e in arr:
+        strA = "{}{:{width}.{precision}f} ".format(strA, e, width=width, precision=precision)
+    strA += "]"
+    return strA
+
+
