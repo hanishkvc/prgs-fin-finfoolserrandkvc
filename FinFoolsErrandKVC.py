@@ -1258,7 +1258,7 @@ def session_save(sessionName):
     Save current gData into a pickle, so that it can be restored fast later.
     """
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    hlpr.savepickle(fName, gData, "Main:SessionSave")
+    hlpr.save_pickle(fName, gData, "Main:SessionSave")
 
 
 def session_restore(sessionName):
@@ -1267,7 +1267,7 @@ def session_restore(sessionName):
     """
     global gData
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    ok, gData = hlpr.loadpickle(fName)
+    ok, gData = hlpr.load_pickle(fName)
 
 
 def input_multi(prompt="OO>", altPrompt="...", theFile=None):

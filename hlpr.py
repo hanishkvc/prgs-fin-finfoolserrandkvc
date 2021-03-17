@@ -148,7 +148,7 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
-def pickleok(fName, minSize=16e3):
+def pickle_ok(fName, minSize=16e3):
     """
     Check that a associated pickle file exists and that it has a safe
     minimum size to consider as potentially being valid pickle file.
@@ -160,7 +160,7 @@ def pickleok(fName, minSize=16e3):
     return False
 
 
-def savepickle(fName, data, msgTag='SavePickle'):
+def save_pickle(fName, data, msgTag='SavePickle'):
     fName = "{}.pickle".format(fName)
     print("INFO:{}:SavePickle:{}".format(msgTag, fName))
     f = open(fName, 'wb+')
@@ -168,7 +168,7 @@ def savepickle(fName, data, msgTag='SavePickle'):
     f.close()
 
 
-def loadpickle(fName):
+def load_pickle(fName):
     fName = "{}.pickle".format(fName)
     if os.path.exists(fName):
         f = open(fName, 'rb')
