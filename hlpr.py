@@ -6,6 +6,7 @@
 import os
 import re
 import pickle
+import numpy
 
 
 def wget_better(url, localFName):
@@ -200,5 +201,12 @@ def loadfilters_setup(theLoadFilters, loadFiltersName, whiteListEntTypes=None, w
             'whiteListEntNames': whiteListEntNames,
             'blackListEntNames': blackListEntNames
         }
+
+
+def sane_array(theArray, skip):
+    theSaneArray = theArray.copy()
+    theSaneArray[numpy.isinf(theSaneArray)] = skip
+    theSaneArray[numpy.isnan(theSaneArray)] = skip
+    return theSaneArray
 
 

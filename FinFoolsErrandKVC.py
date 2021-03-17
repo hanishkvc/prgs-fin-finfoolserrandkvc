@@ -842,7 +842,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     op: could be either 'top' or 'bottom'
 
     opType: could be one of 'normal', 'srel_absret', 'srel_retpa',
-        'roll_avg'
+        'roll_avg', 'roll_ranked'
 
         normal: Look at data corresponding to the identified date,
         in the given dataSrc, to decide on entities to select.
@@ -858,6 +858,11 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         roll_avg: look at Average ReturnsPerAnnum, calculated using
         rolling return (dataSrc specified should be generated using
         roll procdata_ex operation), to decide on entities ranking.
+
+        roll_ranked: look at the AvgRollingRet calculated by roll,
+        for each sub date periods, rank them and average over all
+        the sub date periods to calculate the rank for full date
+        Range. Use this final rank to decide on entities ranking.
 
     theDate:
         If None, then the logic will try to find a date
@@ -930,8 +935,18 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             theSaneArray = gData[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-        elif opType == "roll_avgs":
-            pass
+        elif opType == "roll_ranked":
+            metaDataAvgs = "{}Avgs".format(dataSrcMetaData)
+            tNumEnts, tNumBlocks = gData[metaDataAvgs].shape
+            theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
+            for b in range(tNumBlocks):
+                tArray = gData[metaDataAvgs][:,b]
+                tValidArray = tArray[numpy.isfinite(tArray)]
+                tSaneArray = hlpr.sane_array(tArray, iSkip)
+                tQuants = numpy.quantile(tValidArray, [0, 0.2, 0.4, 0.6, 0.8, 1])
+                theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants)
+            theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
+            theSaneArray = theRankArray[:,tNumBlocks]
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
@@ -967,7 +982,11 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         index = theRows[i]
         curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
         theSelected.append(curEntry)
-        print("INFO:AnalDataSimple:{}:{}:{}".format(op, dataSrc, curEntry))
+        if opType == "roll_ranked":
+            extra = "{}:{}".format(numpy.round(gData[metaDataAvgs][index],2), numpy.round(theRankArray[index],2))
+        else:
+            extra = ""
+        print("INFO:AnalDataSimple:{}:{}:{}{}".format(op, dataSrc, curEntry, extra))
     return theSelected
 
 
