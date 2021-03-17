@@ -636,6 +636,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         dataDstMetaData, dataDstMetaLabel = datadst_metakeys(dataDst)
         gData[dataDstMetaLabel] = []
+        #### Op specific things to do before getting into individual records
         if op == 'srel':
             gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'],3])
         elif op.startswith("roll"):
@@ -661,6 +662,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks,5])
             print("DBUG:ProcDataEx:Roll: rollDays{}, rollValidDays{}, rollCheckBlockDays{}, rollNumBlocks{}".format(rollDays, rollValidDays, rollCheckBlockDays, rollNumBlocks))
         update_metas(op, dataSrc, dataDst)
+        #### Handle each individual record as specified by the op
         for r in range(gData['nextEntIndex']):
             try:
                 if op == "srel":
@@ -815,7 +817,8 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
 
     op: could be either 'top' or 'bottom'
 
-    opType: could be one of 'normal', 'srel_absret', 'srel_retpa'
+    opType: could be one of 'normal', 'srel_absret', 'srel_retpa',
+        'roll_avg'
 
         normal: Look at data corresponding to the identified date,
         in the given dataSrc, to decide on entities to select.
@@ -827,6 +830,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         srel_retpa: Look at the Returns PerAnnum data associated
         with the given dataSrc (which should be generated using
         srel procdata_ex operation), to decide on entities.
+
+        roll_avg: look at Average ReturnsPerAnnum, calculated using
+        rolling return (dataSrc specified should be generated using
+        roll procdata_ex operation), to decide on entities ranking.
 
     theDate:
         If None, then the logic will try to find a date
