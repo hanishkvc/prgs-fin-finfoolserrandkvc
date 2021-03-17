@@ -57,13 +57,7 @@ FINFOOLSERRAND_BASE = None
 #
 # A set of default load filters for different dataset sources
 #
-gDefaultLoadFilters = {
-        "indiamf": {
-            "whiteListEntTypes": [ "equity", "other", "hybrid", "solution" ],
-            "whiteListEntNames": None,
-            "blackListEntNames": [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
-        }
-    }
+gDefaultLoadFilters = { }
 
 #
 # Data processing and related
@@ -142,8 +136,7 @@ def setup_gdata(startDate=-1, endDate=-1):
 
 def setup_modules():
     tc.gData = gData
-    indiamf.gData = gData
-    indiamf.setup(FINFOOLSERRAND_BASE)
+    indiamf.setup(FINFOOLSERRAND_BASE, gData, gDefaultLoadFilters)
 
 
 def setup():

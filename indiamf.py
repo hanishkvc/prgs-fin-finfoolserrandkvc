@@ -28,8 +28,15 @@ def setup_paths(basePath):
     print("INFO:IndiaMF:setup_paths:", MFS_FNAMECSV_TMPL)
 
 
-def setup(basePath):
+def setup(basePath, theGData, defaultLoadFilters):
+    global gData
     setup_paths(basePath)
+    gData = theGData
+    defaultLoadFilters["indiamf"] = {
+            "whiteListEntTypes": [ "equity", "other", "hybrid", "solution" ],
+            "whiteListEntNames": None,
+            "blackListEntNames": [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
+        }
     print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
 
 
