@@ -128,7 +128,8 @@ def setup_gdata(startDate=-1, endDate=-1):
     gData['dateRange'] = [-1, -1]
     gData['plots'] = set()
     gData['entTypes'] = {}
-    gData['entTypesId'] = {}
+    gData['entTypesId'] = []
+    gData['entTypes2Id'] = {}
     gData['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
     gData['metas'] = {}
     gData['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)

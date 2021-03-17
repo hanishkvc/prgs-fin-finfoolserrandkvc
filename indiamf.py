@@ -117,11 +117,13 @@ def _loaddata(today):
         mfTypesId += 1
         if curMFType not in gData['entTypes']:
             gData['entTypes'][curMFType] = []
-            checkTypeId = gData['entTypesId'].get(curMFType, -1)
+            checkTypeId = gData['entTypes2Id'].get(curMFType, -1)
             if checkTypeId != -1:
                 if checkTypeId != mfTypesId:
                     input("DBUG:IndiaMF:_LoadData:MFTypesId Mismatch")
-            gData['entTypesId'][curMFType] = mfTypesId
+            else:
+                gData['entTypesId'].append(curMFType)
+            gData['entTypes2Id'][curMFType] = mfTypesId
         if gData['whiteListEntTypes'] == None:
             bSkipCurMFType = False
         else:
