@@ -764,6 +764,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
                         trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
                     else:
+                        trBelowMinThreshold = -99
                         trBelowMinThresholdLabel = "[--NA--<]"
                     if rollValidDays > rollCheckBlockDays:
                         # Calc the Avgs

@@ -34,13 +34,12 @@ def get_mfcodes(mfNameTemplates):
 
 
 load_data(20210301, 20210307)
-gMFTypes = gData['mfTypes'].keys()
+gMFTypes = gData['entTypes'].keys()
 
 for mfType in gMFTypes:
 	input("INFO:MFType:{}".format(mfType))
-	loadfilters_clear()
-	loadfilters_set([mfType], None, MFNAMETOKENS_TOSKIP)
-	load_data(2013, 2021)
+	loadfilters_setup("clean", [mfType], None, MFNAMETOKENS_TOSKIP)
+	load_data(2013, 2021, loadFiltersName="clean")
 	# Relative Data
 	procdata_ex([ "srel=srel(data)", "dma50SRel=dma50(srel)", "dma200SRel=dma200(srel)" ])
 	"""
@@ -56,6 +55,7 @@ for mfType in gMFTypes:
 	procdata_ex([ "roll1825=roll1825(data)", "dma50Roll1825=dma50(roll1825)" ])
 	datas = [ 'dma50SRel', 'dma200SRel', 'dma50Roll365', 'dma50Roll1095', 'dma50Roll1825' ]
 	topList = analdata_simple('dma50Roll1095', 'top')
+	topList = analdata_simple('roll1095', 'top', 'roll_ranked')
 	mfCodes = [ x[0] for x in topList ]
 	"""
 	for mfCode in mfCodes:
