@@ -845,7 +845,9 @@ def _clear4entities(data, entCodes, skipValue):
     if entCodes == None:
         return data
     indexes = [gData['code2index'][code] for code in entCodes]
-    data[indexes] = skipValue
+    mask = numpy.ones(data.size, dtype=bool)
+    mask[indexes] = False
+    data[mask] = skipValue
     return data
 
 
@@ -1419,7 +1421,7 @@ def handle_args():
 #
 # The main flow starts here
 #
-print("MFUtilsKVC: A stupid exploration of MF NAV data")
+print("FinFoolsErrandKVC: A stupid exploration of multiple sets of numbers (MFs/Indexes/...) data")
 print("License: GPL")
 input("PLEASE DO NOT USE THIS PROGRAM TO MAKE ANY DECISIONS OR INFERENCES OR ...")
 
