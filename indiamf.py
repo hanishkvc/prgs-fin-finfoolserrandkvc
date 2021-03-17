@@ -52,7 +52,7 @@ def parse_csv(sFile):
     tFile = open(sFile)
     curMFType = ""
     today = {
-                'mfTypes': [],
+                'entTypes': [],
                 'code2index': {},
                 'mfs': []
             }
@@ -65,9 +65,9 @@ def parse_csv(sFile):
         if l[0].isalpha():
             if l[-1] == ')':
                 curMFType = l
-                if curMFType not in today['mfTypes']:
+                if curMFType not in today['entTypes']:
                     typeId += 1
-                    today['mfTypes'].append([curMFType,[]])
+                    today['entTypes'].append([curMFType,[]])
             continue
         try:
             la = l.split(';')
@@ -85,7 +85,7 @@ def parse_csv(sFile):
                 mfIndex += 1
                 today['code2index'][code] = mfIndex
                 today['mfs'].append([code, name, nav, date, typeId])
-                today['mfTypes'][typeId][1].append(code)
+                today['entTypes'][typeId][1].append(code)
             else:
                 input("WARN:IndiaMF:parse_csv:Duplicate MF {}:{}=={}".format(code, name, today['mfs'][checkMFIndex][1]))
         except:
@@ -107,10 +107,10 @@ def _loaddata(today):
     """
     # Handle MFTypes
     mfTypesId = -1
-    for [curMFType, mfCodes] in today['mfTypes']:
+    for [curMFType, mfCodes] in today['entTypes']:
         mfTypesId += 1
-        if curMFType not in gData['mfTypes']:
-            gData['mfTypes'][curMFType] = []
+        if curMFType not in gData['entTypes']:
+            gData['entTypes'][curMFType] = []
             checkTypeId = gData['mfTypesId'].get(curMFType, -1)
             if checkTypeId != -1:
                 if checkTypeId != mfTypesId:
@@ -144,21 +144,7 @@ def _loaddata(today):
                 if len(fm) > 0:
                     gData['skipped'].add(str([code, name]))
                     continue
-
-            mfIndex = gData['code2index'].get(code, None)
-            if mfIndex == None:
-                mfIndex = gData['nextMFIndex']
-                gData['nextMFIndex'] += 1
-                gData['code2index'][code] = mfIndex
-                gData['index2code'][mfIndex] = code
-                gData['names'].append(name)
-                gData['mfTypes'][curMFType].append(code)
-                gData['typeId'][mfIndex] = mfTypesId
-            else:
-                if (name != gData['names'][mfIndex]):
-                    input("DBUG:IndiaMF:_LoadData:Name mismatch?:{} != {}".format(name, gData['names'][mfIndex]))
-            gData['data'][mfIndex,gData['dateIndex']] = nav
-            gData['lastSeen'][mfIndex] = date
+            gdata_add(gData, mfTypesId, code, name, nav, date, "IndiaMF:_LoadData")
 
 
 def _fetchdata(url, fName):

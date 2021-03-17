@@ -121,14 +121,14 @@ def setup_gdata(startDate=-1, endDate=-1):
     gData['code2index'] = {}
     gData['index2code'] = {}
     gData['data'] = numpy.zeros([8192*4, numDates])
-    gData['nextMFIndex'] = 0
+    gData['nextEntIndex'] = 0
     gData['dateIndex'] = -1
     gData['names'] = []
     gData['dates'] = []
     gData['skipped'] = set()
     gData['dateRange'] = [-1, -1]
     gData['plots'] = set()
-    gData['mfTypes'] = {}
+    gData['entTypes'] = {}
     gData['mfTypesId'] = {}
     gData['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
     gData['metas'] = {}
@@ -432,25 +432,25 @@ def load_data(startDate, endDate = None, bClearData=True, whiteListEntTypes=None
     gData['blackListEntNames'] = blackListEntNames
     load4daterange(startDate, endDate)
     if bOptimizeSize:
-        gData['data'] = gData['data'][:gData['nextMFIndex'],:gData['dateIndex']+1]
-        gData['lastSeen'] = gData['lastSeen'][:gData['nextMFIndex']]
-        gData['typeId'] = gData['typeId'][:gData['nextMFIndex']]
+        gData['data'] = gData['data'][:gData['nextEntIndex'],:gData['dateIndex']+1]
+        gData['lastSeen'] = gData['lastSeen'][:gData['nextEntIndex']]
+        gData['typeId'] = gData['typeId'][:gData['nextEntIndex']]
 
 
-def mftypes_list():
+def enttypes_list():
     """
-    List MFTypes found in currently loaded data.
+    List entityTypes found in currently loaded data.
     """
-    for k in gData['mfTypes']:
+    for k in gData['entTypes']:
         print(k)
 
 
-def mftypes_members(mfType):
+def enttypes_members(entType):
     """
-    List the members of the specified MFType
+    List the members of the specified entityType
     """
-    print("INFO:mfTypesMembers:", mfType)
-    for m in gData['mfTypes'][mfType]:
+    print("INFO:entTypesMembers:", entType)
+    for m in gData['entTypes'][entType]:
         print(m, gData['names'][gData['code2index'][m]])
 
 
@@ -473,7 +473,7 @@ def fillin4holidays():
     As there wont be any Nav data for holidays including weekends,
     so fill them with the nav from the prev working day for the corresponding mf.
     """
-    for r in range(gData['nextMFIndex']):
+    for r in range(gData['nextEntIndex']):
         _fillin4holidays(r)
 
 
@@ -675,7 +675,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         dataDstMetaData, dataDstMetaLabel = datadst_metakeys(dataDst)
         gData[dataDstMetaLabel] = []
         if op == 'srel':
-            gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'],3])
+            gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'],3])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
@@ -694,12 +694,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         break
                 dataDstMetaDataAvgs = "{}Avgs".format(dataDstMetaData)
                 dataDstMetaDataQntls = "{}Qntls".format(dataDstMetaData)
-                gData[dataDstMetaData] = numpy.zeros([gData['nextMFIndex'], 2])
-                gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks])
-                gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextMFIndex'],rollNumBlocks,5])
+                gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'], 2])
+                gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks])
+                gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks,5])
             print("DBUG:ProcDataEx:Roll: rollDays{}, rollValidDays{}, rollCheckBlockDays{}, rollNumBlocks{}".format(rollDays, rollValidDays, rollCheckBlockDays, rollNumBlocks))
         update_metas(op, dataSrc, dataDst)
-        for r in range(gData['nextMFIndex']):
+        for r in range(gData['nextEntIndex']):
             try:
                 if op == "srel":
                     #breakpoint()
@@ -1147,8 +1147,8 @@ def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
         print("ERRR:look4mfs: Unknown operation:", opType)
         return
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    tData = numpy.zeros([gData['nextMFIndex'], (endDateIndex-startDateIndex+1)])
-    for r in range(gData['nextMFIndex']):
+    tData = numpy.zeros([gData['nextEntIndex'], (endDateIndex-startDateIndex+1)])
+    for r in range(gData['nextEntIndex']):
         try:
             tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tAbsRetPercent, tRetPA, tDurYrs = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
         except:

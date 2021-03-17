@@ -177,3 +177,20 @@ def loadpickle(fName):
     return False, None
 
 
+def gdata_add(gData, entTypeId, code, name, nav, date, msgTag):
+    entIndex = gData['code2index'].get(code, None)
+    if entIndex == None:
+        entIndex = gData['nextEntIndex']
+        gData['nextEntIndex'] += 1
+        gData['code2index'][code] = entIndex
+        gData['index2code'][entIndex] = code
+        gData['names'].append(name)
+        gData['entTypes'][curMFType].append(code)
+        gData['typeId'][entIndex] = entTypeId
+    else:
+        if (name != gData['names'][entIndex]):
+            input("DBUG:{}:Name mismatch?:{} != {}".format(msgTag, name, gData['names'][entIndex]))
+    gData['data'][entIndex,gData['dateIndex']] = nav
+    gData['lastSeen'][entIndex] = date
+
+
