@@ -197,5 +197,7 @@ def load4date(y, m, d):
     ok,today = hlpr.load_pickle(fName)
     if ok:
         _loaddata(today)
+    else:
+        print("WARN:IndiaMF:load4date: No data pickle found for", fName)
 
 
