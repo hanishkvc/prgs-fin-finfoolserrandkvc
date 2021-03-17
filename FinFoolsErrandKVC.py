@@ -54,11 +54,16 @@ TODO:
 
 gbDEBUG = False
 FINFOOLSERRAND_BASE = None
-# The tokens in the SKIP_NAMETOKENS list will be matched against MFName,
-# and matching MFs will be silently ignored while loading the MF data.
-MF_ALLOW_MFTYPETOKENS = [ "equity", "other", "hybrid", "solution" ]
-MF_ALLOW_MFNAMETOKENS = None
-MF_SKIP_MFNAMETOKENS = [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
+#
+# A set of default load filters for different dataset sources
+#
+gDefaultLoadFilters = {
+        "indiamf": {
+            "whiteListEntTypes": [ "equity", "other", "hybrid", "solution" ],
+            "whiteListEntNames": None,
+            "blackListEntNames": [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
+        }
+    }
 
 #
 # Data processing and related
@@ -145,7 +150,7 @@ def setup():
     setup_gdata()
     setup_paths()
     setup_modules()
-    loadfilters_set(MF_ALLOW_MFTYPETOKENS, MF_ALLOW_MFNAMETOKENS, MF_SKIP_MFNAMETOKENS)
+    loadfilters_default("indiamf")
 
 
 def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True, bDebug=False):
@@ -358,6 +363,14 @@ def loadfilters_clear():
     Clear any global white/blacklist filters setup wrt load operation.
     """
     loadfilters_set(None, None, None)
+
+
+def loadfilters_default(group):
+    """
+    Helper function to load from a default set of loadfilters wrt different data sources.
+    """
+    group = gDefaultLoadFilters[group]
+    loadfilters_set(group['whiteListEntTypes'], group['whiteListEntNames'], group['blackListEntNames'])
 
 
 def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True):
