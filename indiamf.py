@@ -144,7 +144,7 @@ def _loaddata(today):
                 if len(fm) > 0:
                     gData['skipped'].add(str([code, name]))
                     continue
-            gdata_add(gData, mfTypesId, code, name, nav, date, "IndiaMF:_LoadData")
+            hlpr.gdata_add(gData, mfTypesId, curMFType, code, name, nav, date, "IndiaMF:_LoadData")
 
 
 def _fetchdata(url, fName):

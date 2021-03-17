@@ -177,7 +177,7 @@ def loadpickle(fName):
     return False, None
 
 
-def gdata_add(gData, entTypeId, code, name, nav, date, msgTag):
+def gdata_add(gData, entTypeId, entType, code, name, nav, date, msgTag):
     entIndex = gData['code2index'].get(code, None)
     if entIndex == None:
         entIndex = gData['nextEntIndex']
@@ -185,7 +185,7 @@ def gdata_add(gData, entTypeId, code, name, nav, date, msgTag):
         gData['code2index'][code] = entIndex
         gData['index2code'][entIndex] = code
         gData['names'].append(name)
-        gData['entTypes'][curMFType].append(code)
+        gData['entTypes'][entType].append(code)
         gData['typeId'][entIndex] = entTypeId
     else:
         if (name != gData['names'][entIndex]):
