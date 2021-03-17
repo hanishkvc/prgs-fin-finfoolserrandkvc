@@ -1013,7 +1013,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         curEntry[2] = numpy.round(curEntry[2],2)
         if opType == "roll_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
-            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,1), hlpr.array_str(gData[metaDataAvgs][index],6,2))
+            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gData[metaDataAvgs][index],6,2))
         else:
             extra = ""
         print("    {} {}".format(extra, curEntry))
