@@ -784,6 +784,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         label = "{} {:5.2f} {}".format(numpy.round(lAvgs,2), numpy.round(avgAvgs,2), trBelowMinThresholdLabel)
                     else:
                         trAvg = numpy.mean(trValidResult)
+                        gData[dataDstMetaData][r] = [trAvg, trBelowMinThreshold]
                         label = "{:5.2f} {}".format(trAvg, trBelowMinThresholdLabel)
                     gData[dataDstMetaLabel].append(label)
             except:
@@ -929,6 +930,8 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             theSaneArray = gData[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
+        elif opType == "roll_avgs":
+            pass
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
