@@ -974,6 +974,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         theSRelMetaData = gData.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
             procdata_ex('srel=srel(data)')
+        if bDebug:
+            tNames = numpy.array(gData['names'])
+            tDroppedNames = tNames[gData[srelMetaData][:,2] < minEntityLifeDataInYears]
+            print("INFO:AnalDataSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
         theSaneArray[gData[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))[0]
@@ -1000,6 +1004,9 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     print("INFO:AnalDataSimple:{}:{}:{}".format(op, dataSrc, opType))
     for i in range(lStart,lStop,lDelta):
         index = theRows[i]
+        if theSaneArray[index] == iSkip:
+            print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
+            break
         curEntry = [gData['index2code'][index], gData['names'][index], numpy.round(theSaneArray[index],4)]
         theSelected.append(curEntry)
         if opType == "roll_ranked":
