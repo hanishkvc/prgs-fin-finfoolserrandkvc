@@ -29,8 +29,7 @@ NOTE: This is a purely experimental program to explore somethings, which I had i
 mind. And is not suitable for making any investment or divestment decisions and or
 any inferences about things/... Also I am no expert in this matter, so my logics
 could be buggy and stupid in more ways than one. Also the data it works with may
-not be error free and uptodate always. So dont use this unless you want to take
-the logic and modify for your own experiments.
+not be error free and uptodate always. So dont use this program for anything.
 
 
 Usage
