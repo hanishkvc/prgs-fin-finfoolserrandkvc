@@ -57,7 +57,7 @@ FINFOOLSERRAND_BASE = None
 #
 # A set of default load filters for different dataset sources
 #
-gDefaultLoadFilters = { }
+gLoadFilters = { }
 
 #
 # Data processing and related
@@ -136,14 +136,15 @@ def setup_gdata(startDate=-1, endDate=-1):
 
 def setup_modules():
     tc.gData = gData
-    indiamf.setup(FINFOOLSERRAND_BASE, gData, gDefaultLoadFilters)
+    indiamf.setup(FINFOOLSERRAND_BASE, gData, gLoadFilters)
 
 
 def setup():
     setup_gdata()
     setup_paths()
     setup_modules()
-    loadfilters_default("indiamf")
+    gLoadFilters['default'] = gLoadFilters['indiamf'].copy()
+    loadfilters_list()
 
 
 def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True, bDebug=False):
@@ -334,15 +335,13 @@ gWhiteListEntNames = None
 gBlackListEntNames = None
 
 
-def loadfilters_set(whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
+def _loadfilters_set(whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
     """
     Setup global filters used by load logic.
 
     If whiteListEntTypes is set, loads only Entities which belong to a EntityType which matches one of the given EntityType templates.
     If whiteListEntNames is set, loads only Entities whose name matches any one of the given match templates.
     If blackListEntNames is set, loads only Entities whose names dont match any of the corresponding match templates.
-
-    NOTE: Call loadfilters_set with required filters, before calling load_data.
     """
     global gData
     gData['whiteListEntTypes'] = whiteListEntTypes
@@ -351,22 +350,42 @@ def loadfilters_set(whiteListEntTypes=None, whiteListEntNames=None, blackListEnt
     print("LoadFiltersSet:Global Filters:\n\twhiteListEntTypes {}\n\twhiteListEntNames {}\n\tblackListEntNames {}".format(whiteListEntTypes, whiteListEntNames, blackListEntNames))
 
 
-def loadfilters_clear():
+def _loadfilters_clear():
     """
     Clear any global white/blacklist filters setup wrt load operation.
     """
     loadfilters_set(None, None, None)
 
 
-def loadfilters_default(group):
+def _loadfilters_load(loadFiltersName=None):
     """
-    Helper function to load from a default set of loadfilters wrt different data sources.
+    Helper function to load from a previously defined set of loadfilters wrt different data sources/users preferences.
+
+    If None is passed, then loadfilters will be cleared.
     """
-    group = gDefaultLoadFilters[group]
-    loadfilters_set(group['whiteListEntTypes'], group['whiteListEntNames'], group['blackListEntNames'])
+    if loadFiltersName != None:
+        group = gLoadFilters[loadFiltersName]
+        _loadfilters_set(group['whiteListEntTypes'], group['whiteListEntNames'], group['blackListEntNames'])
+    else:
+        _loadfilters_clear()
 
 
-def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True):
+def loadfilters_setup(loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
+    """
+    Setup a named loadFilters, which inturn can be used with load_data later.
+    """
+    hlpr.loadfilters_setup(gLoadFilters, loadFiltersName, whiteListEntTypes, whiteListEntNames, blackListEntNames)
+
+
+def loadfilters_list():
+    print("INFO:MAIN:LoadFilters")
+    for lf in gLoadFilters:
+        print("    {}".format(lf))
+        for t in gLoadFilters[lf]:
+            print("        {} : {}".format(t, gLoadFilters[lf][t]))
+
+
+def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, loadFiltersName='default'):
     """
     Load data for given date range.
 
@@ -374,9 +393,12 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True):
 
     bClearData if set, resets the gData by calling setup_gdata.
 
-    NOTE: User can optionally specify whiteListEntTypes/whiteListEntNames/blackListEntNames,
-    by calling loadfilters_set before calling load_data. These will be used by the underlying
-    load logic, suitably.
+    loadFiltersName: User can optionally specify a previously defined loadFiltersName, in
+    which case the whiteListEntTypes/whiteListEntNames/blackListEntNames, used by underlying
+    load logic, if any, will be set as defined by the given loadFiltersName.
+
+        If this argument is not specified, then the default loadFilters will be used.
+        If you dont want any loadfilters to be applied, then pass None.
 
         NOTE: The _findmatching logic will be used for matching templates.
 
@@ -392,6 +414,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True):
         endDate = startDate
     if bClearData:
         setup_gdata(startDate, endDate)
+    _loadfilters_load(loadFiltersName)
     load4daterange(startDate, endDate)
     if bOptimizeSize:
         gData['data'] = gData['data'][:gData['nextEntIndex'],:gData['dateIndex']+1]

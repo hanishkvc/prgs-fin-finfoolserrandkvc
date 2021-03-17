@@ -28,15 +28,14 @@ def setup_paths(basePath):
     print("INFO:IndiaMF:setup_paths:", MFS_FNAMECSV_TMPL)
 
 
-def setup(basePath, theGData, defaultLoadFilters):
+MF_ALLOW_ENTTYPES=[ "equity", "other", "hybrid", "solution" ]
+MF_ALLOW_ENTNAMES=None
+MF_SKIP_ENTNAMES =[ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
+def setup(basePath, theGData, theLoadFilters):
     global gData
     setup_paths(basePath)
     gData = theGData
-    defaultLoadFilters["indiamf"] = {
-            "whiteListEntTypes": [ "equity", "other", "hybrid", "solution" ],
-            "whiteListEntNames": None,
-            "blackListEntNames": [ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
-        }
+    hlpr.loadfilters_setup(theLoadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
     print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
 
 

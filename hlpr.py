@@ -194,3 +194,11 @@ def gdata_add(gData, entTypeId, entType, code, name, nav, date, msgTag):
     gData['lastSeen'][entIndex] = date
 
 
+def loadfilters_setup(theLoadFilters, loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
+    theLoadFilters[loadFiltersName] = {
+            'whiteListEntTypes': whiteListEntTypes,
+            'whiteListEntNames': whiteListEntNames,
+            'blackListEntNames': blackListEntNames
+        }
+
+

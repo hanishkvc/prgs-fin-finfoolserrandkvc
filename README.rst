@@ -1,9 +1,10 @@
-###########################
-Try look at MF Nav data
-###########################
+####################################
+Try look at MF/Indexes/... Nav data
+####################################
 Author: HanishKVC
-Version: v20210308IST1308
+Version: v20210317IST1234
 License: GPL
+Status: OUT OF SYNC with PROGRAM
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,7 +29,8 @@ NOTE: This is a purely experimental program to explore somethings, which I had i
 mind. And is not suitable for making any investment or divestment decisions and or
 any inferences about things/... Also I am no expert in this matter, so my logics
 could be buggy and stupid in more ways than one. Also the data it works with may
-not be error free and uptodate always.
+not be error free and uptodate always. So dont use this unless you want to take
+the logic and modify for your own experiments.
 
 
 Usage
@@ -81,6 +83,37 @@ data to have a look at it.
 load_data(YYYY[MM[DD]])
 
 load_data(YYYY[MM[DD]], YYYY[MM[DD]])
+
+load_data(YYYY[MM[DD]], YYYY[MM[DD]], loadFiltersName=theLoadFiltersName)
+
+
+LoadFilters
+-------------
+
+Many a times one may want to load only a subset of the fetched data, wrt entities in it.
+LoadFilters help wrt this. As one may want to filter either based on EntityType and or
+based on EntityName, so each loadfilter is a named dictionary containing
+
+   a whitelist of matching templates wrt entityType
+
+   a whitelist of matching templates wrt entityName
+
+   a blacklist of matching templates wrt entityName
+
+One can use loadfilters_setup to define these named loadFilters. One can define multiple
+such named loadFilters. Even the program may define some named loadFilters.
+
+loadfilters_setup(loadFiltersName, whiteListEntTypes, whiteListEntNames, blackListEntNames)
+
+One can use loadfilters_list to look at the currently defined loadfilters.
+
+Inturn while calling load_data, one can pass the optional loadFiltersName argument, to
+filter entities based on the corresponding list of filters. If user doesnt specify this
+argument, then the program will use the 'default' loadFilter. If user doesnt want to
+filter any of the entities, then pass None wrt loadFiltersName.
+
+NOTE: For MFs EntityType corresponds to Equity, Money market, etc. One can use
+enttypes_list to get the currently known list of entity types.
 
 
 Search
