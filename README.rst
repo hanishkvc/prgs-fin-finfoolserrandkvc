@@ -4,7 +4,7 @@ Try look at MF/Indexes/... Nav data
 Author: HanishKVC
 Version: v20210317IST1234
 License: GPL
-Status: OUT OF SYNC with PROGRAM
+Status: Partly OUT OF SYNC with PROGRAM
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,9 +21,27 @@ Overview
 #########
 
 As I didnt find any opensource program to look at the historical data of MF navs,
-so created a simple one to try and look at the same in some simple and stupid ways.
+so created a simple one to try and look at the same in some simple, silly and
+stupid ways.
+
+Also noticed that many of the sites show the sorted list based on the last Rolling
+Ret value, as it stands on the day one is looking, rather than by looking at it
+for how it panned out over the full time period or so. And also some times the
+rating (not sorted ranking) is missing for some of the entities. So also I wanted
+to have a stupid look across entities (MFs/indexes/...) in stupid/silly ways.
 
 This fetches the nav data from the AMFI website.
+
+NOTE: Rating provided by independent 3rd parties will be based on collating a
+score over multiple parameters and or some more additional validation/crosscheck.
+AND this program DOESNT have intelligence for either of it, So the sorted list
+this prg generates/shows is not accurate at all for n number of reasons.
+
+NOTE: Even the sites will show more as well as relavant parameters to get a guage
+of how the entity is performing wrt different important aspects. So please do
+look at those along with the ratings from independent agencies to get the better
+picture of how the entity is performing. This program doesnt do any of these more
+fine grained analysis, so dont use this for anything other than timepass.
 
 NOTE: This is a purely experimental program to explore somethings, which I had in
 mind. And is not suitable for making any investment or divestment decisions and or
@@ -36,6 +54,16 @@ Usage
 #######
 
 Some of the functions supported by the program include
+
+NOTE: calling help on any of the function will get some basic usage info about them.
+
+   help(function_name)
+
+NOTE: You may want to terminate your one line statements with ';' to stop the
+program from printing the value returned by your statement.
+
+A Entity could refer to a mutual fund or index or ... one may load into this program.
+
 
 Fetching
 ==========
@@ -71,6 +99,10 @@ then it will redownload the same. HOWEVER as the program uses the size of the na
 file and that too only if the length is larger than what it had downloaded previously,
 so it need not download the uptodate historical data in some cases. SO DONT DEPEND ON
 THIS PROGRAM for any decisions or inferences or ...
+
+   Rather one requires to remove the data pickle files for the new logic to try and
+   recheck with the internet for previously downloaded data. May add a force argument
+   to fetch or so in future.
 
 
 Loading
@@ -124,7 +156,8 @@ search_data("match template tokens set1 ")
 
 search_data(["match template tokens set1", "match tokens set2", ...])
 
-The user can specify one or more match templates to this function/command.
+The user can specify one or more match templates to this function/command. If one
+wants to check wrt multiple match templates, then pass it has a list of strings.
 
 
 Match Tempaltes
@@ -172,6 +205,8 @@ procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
 
 procdata_ex(["srel=srel(data)", "dma20=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
 
+procdata_ex(["srel=srel(data)", "dma20SRel=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+
 NOTE: help(procdata_ex) will give some of the details about using this.
 
 srel - safe relative
@@ -182,8 +217,19 @@ value of the same entity on the starting date (which defaults to start of the da
 of data loaded). If a given entity has no value available for the given start date, then
 the next earliest available non zero value will be used as the base.
 
-It also stores the AbsoluteReturn as well as the ReturnsPerAnnum, as on the last date
-in the date range, as part of the MetaData.
+It also stores the following as part of MetaData associated with it
+
+   the AbsoluteReturn as well as the ReturnsPerAnnum, as on the last date
+   in the date range
+
+   the Period for which the entity was active for the current date range.
+
+      NOTE: This only looks at starting date and not end date. So if a fund
+      is no longer active, but was active for part of the date range, its
+      life will be assumed to be till end of date range. One can notice such
+      situation by looking at the plot of data and seeing the last active value
+      stretching without change till end of date range.
+
 
 dma - moving average
 ----------------------
@@ -213,12 +259,18 @@ It also stores the following additional meta data:
 
    Average rolling return over the full date range
 
+   Standard Deviation|Average standard deviation (from across sub-timeBlocks) wrt rolling return
+   over the full date range.
+
    Percentage of times, when the return was below a predefined minimum value like 4%.
 
-   Average rolling return over smaller time periods within the overall date range.
-   For large date ranges, it will be for every year.
+   Average rolling return over sub-timeBlocks within the overall date range. For large date ranges,
+   it will be for ~every year.
 
-   Quantiles of the rolling return for each of the smaller time period within the overall date range.
+   Standard Deviation wrt rolling returns in each sub-timeBlocks within the overall date range.
+   For large date ranges, it will be for ~every year.
+
+   Quantiles of the rolling return for each of the sub-timeBlocks within the overall date range.
 
 NOTE: Full dataset means for all the entities and over the full date range for which data
 is loaded.
@@ -227,11 +279,17 @@ is loaded.
 Look at raw/processed data
 =============================
 
-help(analdata_simple)
+
+analdata_simple
+-----------------
+
+Some of the operations supported include
 
    roll_avg: The dataSrc should be one generated using roll<Days> operation of procdata_ex.
    This looks at the full period average of the rolling returnPerAnnum over the full dateRange
    loaded, for each entity, to decide how to rank the entities.
+
+      analdata_simple('roll1095', 'top', 'roll_avg')
 
    roll_ranked: The dataSrc should be one generated using roll<Days> procdata_ex oepration.
    This identifies the pentile to which each entity belongs, when compared to all other
@@ -240,14 +298,20 @@ help(analdata_simple)
    date ranges, and uses the same to rank the entities.
 
       NOTE: One needs to be extra careful, when trying to interpret this result.
+      If one sees change in ranking between roll_avg and roll_ranked, look at the rank array
+      to try and see why it might be so. Maybe the entity was performing good in only some of
+      the sub-timeblocks (or it peformed bad over many sub-timeblocks or ...) in the overall
+      date range or so...
 
+
+Others
+--------
 
 help(plot_data)
 
 help(show_plot)
 
 
-help on the required function will get some basic usage info about these.
 
 
 Calling the Program
@@ -266,6 +330,7 @@ However if the program is called with a single argument which is a file with ext
 then the program will assume that it is a script file which contains commands for the program.
 They will be executed as if the user had entered them directly into the program one after the
 other.
+
 
 Saving and Restoring Session
 ==============================
