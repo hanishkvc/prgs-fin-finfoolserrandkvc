@@ -259,10 +259,10 @@ It also stores the following additional meta data:
 
    Average rolling return over the full date range
 
-   Standard Deviation|Average standard deviation (from across sub-timeBlocks) wrt rolling return
-   over the full date range.
+   Standard Deviation and Average standard deviation from across sub-timeBlocks
+   wrt rolling return over the full date range.
 
-   Percentage of times, when the return was below a predefined minimum value like 4%.
+   Percentage of times, when the return was below a predefined minimum value like 4% (the default).
 
    Average rolling return over sub-timeBlocks within the overall date range. For large date ranges,
    it will be for ~every year.

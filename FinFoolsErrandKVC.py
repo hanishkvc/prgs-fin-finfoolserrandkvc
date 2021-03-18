@@ -769,6 +769,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     else:
                         trBelowMinThreshold = -99
                         trBelowMinThresholdLabel = "[--NA--<]"
+                    tBlocksLabel = ""
                     if rollValidDays > rollCheckBlockDays:
                         # Calc the Avgs
                         iEnd = endDateIndex+1
@@ -789,12 +790,14 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         gData[dataDstMetaDataAvgs][r,:] = lAvgs
                         gData[dataDstMetaDataStds][r,:] = lStds
                         gData[dataDstMetaData][r] = [avgAvgs, avgStds, trBelowMinThreshold]
-                        label = "{} {:5.2f} {:5.2f} {}".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds, trBelowMinThresholdLabel)
-                    else:
+                        tBlocksLabel = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
+                    if True:
                         trAvg = numpy.mean(trValidResult)
                         trStd = numpy.std(trValidResult)
                         gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold]
                         label = "{:5.2f} {:5.2f} {}".format(trAvg, trStd, trBelowMinThresholdLabel)
+                        if tBlocksLabel != "":
+                            label = "{} {}".format(tBlocksLabel, label)
                     gData[dataDstMetaLabel].append(label)
             except:
                 traceback.print_exc()
