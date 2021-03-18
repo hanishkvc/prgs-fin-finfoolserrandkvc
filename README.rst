@@ -81,6 +81,21 @@ fetch_data(YYYY[MM[DD]])
 
 fetch_data(YYYY[MM[DD]], YYYY[MM[DD]])
 
+fetch_data(YYYY[MM[DD]], YYYY[MM[DD]], opts)
+
+   opts argument is a dictionary which can one of the two booleans
+
+      'ForceRemote': The logic will try to fetch data from internet,
+         irrespective of whether there is a local data pickle file
+         or not.
+
+      'ForceLocal': The logic will avoid fetching the data file
+         from the internet, even if data pickle is missing/invalid.
+         Instead it will reconstruct the pickle from existing local
+         data file.
+
+      NOTE: ForceRemote takes precendence over ForceLocal
+
 Some sample usage:
 
    fetch_data(2020)

@@ -181,15 +181,18 @@ def fetch4date(y, m, d, opts):
         'ForceRemote': If true, then the logic will try to fetch
             the data file again from the internet, irrespective
             of the local data pickle file is ok or not.
+        NOTE: ForceRemote takes precedence over ForceLocal.
     """
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     bParseCSV=False
-    if opts['ForceRemote']:
+    if opts == None:
+        opts = {}
+    if opts.get('ForceRemote', False):
         _fetchdata(url, fName)
         bParseCSV=True
     elif not hlpr.pickle_ok(fName):
-        if not opts['ForceLocal']:
+        if not opts.get('ForceLocal', False):
             _fetchdata(url, fName)
         bParseCSV=True
     if bParseCSV:
