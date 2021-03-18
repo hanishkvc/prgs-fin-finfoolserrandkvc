@@ -805,12 +805,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         gData[dataDst] = tResult
 
 
-def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
+def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
     """
     Plot specified datas for the specified MFs, over the specified date range.
 
     dataSrcs: Is a key or a list of keys used to retreive the data from gData.
-    mfCodes: Is a mfCode or a list of mfCodes.
+    entCodes: Is a entCode or a list of entCodes.
     startDate and endDate: specify the date range over which the data should be
         retreived and plotted.
 
@@ -820,13 +820,13 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     if type(dataSrcs) == str:
         dataSrcs = [ dataSrcs ]
-    if type(mfCodes) == int:
-        mfCodes = [ mfCodes]
+    if type(entCodes) == int:
+        entCodes = [ entCodes]
     srelMetaData, srelMetaLabel = datadst_metakeys('srel')
     for dataSrc in dataSrcs:
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
-        for mfCode in mfCodes:
-            index = gData['code2index'][mfCode]
+        for entCode in entCodes:
+            index = gData['code2index'][entCode]
             name = gData['names'][index][:giLabelNameChopLen]
             try:
                 dataLabel = gData[dataSrcMetaLabel][index]
@@ -842,7 +842,7 @@ def plot_data(dataSrcs, mfCodes, startDate=-1, endDate=-1):
                 srelLabel = ""
             if dataLabel == "":
                 dataLabel = srelLabel
-            label = "{}:{:{width}}: {:16} : {}".format(mfCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
+            label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
             print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
@@ -1071,7 +1071,7 @@ def _daterange_checkfine(startDateIndex, endDateIndex, caller):
     return True
 
 
-def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
+def lookatmfs_codes(entCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
 
@@ -1086,7 +1086,7 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     if not _daterange_checkfine(startDateIndex, endDateIndex, "lookatmfs_codes"):
         return
-    for code in mfCodes:
+    for code in entCodes:
         index = gData['code2index'][code]
         name = gData['names'][index]
         aRawData = gData['data'][index, startDateIndex:endDateIndex+1]
@@ -1109,10 +1109,10 @@ def lookatmfs_codes(mfCodes, startDate=-1, endDate=-1):
             _plot_data(code, None, aRollingRet, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
 
 
-def _plot_data(mfCode, xData, yData, label, typeTag):
-    theTag = str([mfCode, typeTag])
+def _plot_data(entCode, xData, yData, label, typeTag):
+    theTag = str([entCode, typeTag])
     if theTag in gData['plots']:
-        print("WARN:_plot_data: Skipping", mfCode)
+        print("WARN:_plot_data: Skipping", entCode)
         return
     gData['plots'].add(theTag)
     label = "{}:{}".format(label, typeTag)
@@ -1180,13 +1180,13 @@ def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
     """
     if type(mfNames) != list:
         mfNames = mfNames.split(';')
-    mfCodes = []
+    entCodes = []
     for name in mfNames:
         f,p = findmatchingmf(name)
         for c in f:
             #print(c)
-            mfCodes.append(c[0])
-    lookatmfs_codes(mfCodes, startDate, endDate)
+            entCodes.append(c[0])
+    lookatmfs_codes(entCodes, startDate, endDate)
 
 
 def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
@@ -1212,7 +1212,7 @@ def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
             print("WARN:{}:{}".format(r,gData['names'][r]))
     #breakpoint()
     sortedIndex = numpy.argsort(tData[:,-1])
-    mfCodes = []
+    entCodes = []
     if opType.upper() == "TOP":
         startIndex = -1
         endIndex = startIndex-count
@@ -1224,10 +1224,10 @@ def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
     for si in range(startIndex, endIndex, delta):
         i = sortedIndex[si]
         mfName = gData['names'][i]
-        mfCode = gData['index2code'][i]
-        mfCodes.append(mfCode)
-        #print("{}: {}:{}".format(i, mfCode, mfName))
-    lookatmfs_codes(mfCodes, startDate, endDate)
+        entCode = gData['index2code'][i]
+        entCodes.append(entCode)
+        #print("{}: {}:{}".format(i, entCode, mfName))
+    lookatmfs_codes(entCodes, startDate, endDate)
 
 
 def _update_dataproccontrols(dataProcs):
