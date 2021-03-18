@@ -680,9 +680,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     if rollCheckBlockDays < 30:
                         break
                 dataDstMetaDataAvgs = "{}Avgs".format(dataDstMetaData)
+                dataDstMetaDataStds = "{}Stds".format(dataDstMetaData)
                 dataDstMetaDataQntls = "{}Qntls".format(dataDstMetaData)
-                gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'], 2])
+                gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'], 3])
                 gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks])
+                gData[dataDstMetaDataStds] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks])
                 gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks,5])
             print("DBUG:ProcDataEx:Roll: rollDays{}, rollValidDays{}, rollCheckBlockDays{}, rollNumBlocks{}".format(rollDays, rollValidDays, rollCheckBlockDays, rollNumBlocks))
         update_metas(op, dataSrc, dataDst)
@@ -771,23 +773,28 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         # Calc the Avgs
                         iEnd = endDateIndex+1
                         lAvgs = []
+                        lStds = []
                         for i in range(rollNumBlocks):
                             iStart = iEnd-rollCheckBlockDays
                             tBlockData = tResult[r,iStart:iEnd]
                             tBlockData = tBlockData[numpy.isfinite(tBlockData)]
                             lAvgs.insert(0, numpy.mean(tBlockData))
+                            lStds.insert(0, numpy.std(tBlockData))
                             iEnd = iStart
                             if len(tBlockData) == 0:
                                 tBlockData = [0]
                             gData[dataDstMetaDataQntls][r, rollNumBlocks-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
                         avgAvgs = numpy.nanmean(lAvgs)
+                        avgStds = numpy.nanmean(lStds)
                         gData[dataDstMetaDataAvgs][r,:] = lAvgs
-                        gData[dataDstMetaData][r] = [avgAvgs, trBelowMinThreshold]
-                        label = "{} {:5.2f} {}".format(hlpr.array_str(lAvgs,4,1), avgAvgs, trBelowMinThresholdLabel)
+                        gData[dataDstMetaDataStds][r,:] = lStds
+                        gData[dataDstMetaData][r] = [avgAvgs, avgStds, trBelowMinThreshold]
+                        label = "{} {:5.2f} {:5.2f} {}".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds, trBelowMinThresholdLabel)
                     else:
                         trAvg = numpy.mean(trValidResult)
-                        gData[dataDstMetaData][r] = [trAvg, trBelowMinThreshold]
-                        label = "{:5.2f} {}".format(trAvg, trBelowMinThresholdLabel)
+                        trStd = numpy.std(trValidResult)
+                        gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold]
+                        label = "{:5.2f} {:5.2f} {}".format(trAvg, trStd, trBelowMinThresholdLabel)
                     gData[dataDstMetaLabel].append(label)
             except:
                 traceback.print_exc()
