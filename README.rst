@@ -24,24 +24,27 @@ As I didnt find any opensource program to look at the historical data of MF navs
 so created a simple one to try and look at the same in some simple, silly and
 stupid ways.
 
-Also noticed that many of the sites show the sorted list based on the last Rolling
+Also noticed that some of the sites show the sorted list based on the last Rolling
 Ret value, as it stands on the day one is looking, rather than by looking at it
 for how it panned out over the full time period or so. And also some times the
-rating (not sorted ranking) is missing for some of the entities. So also I wanted
-to have a stupid look across entities (MFs/indexes/...) in stupid/silly ways.
+rating/ranking (not sorted order) is missing for some of the entities. So also
+I wanted to have a stupid look across entities (MFs/indexes/...) in stupid/silly
+ways.
 
-This fetches the nav data from the AMFI website.
+This fetches the Indian MFs nav data from the AMFI website.
 
-NOTE: Rating provided by independent 3rd parties will be based on collating a
-score over multiple parameters and or some more additional validation/crosscheck.
+NOTE: Rating/Ranking provided by independent 3rd parties will be based on collating
+a score over multiple parameters and or some more additional validation/crosscheck.
 AND this program DOESNT have intelligence for either of it, So the sorted list
-this prg generates/shows is not accurate at all for n number of reasons.
+this prg generates/shows is not accurate at all and can potentially be misleading
+for n number of reasons.
 
 NOTE: Even the sites will show more as well as relavant parameters to get a guage
 of how the entity is performing wrt different important aspects. So please do
 look at those along with the ratings from independent agencies to get the better
 picture of how the entity is performing. This program doesnt do any of these more
-fine grained analysis, so dont use this for anything other than timepass.
+fine grained and or appropriate analysis, so dont use this for anything other than
+timepass.
 
 NOTE: This is a purely experimental program to explore somethings, which I had in
 mind. And is not suitable for making any investment or divestment decisions and or
@@ -63,6 +66,10 @@ NOTE: You may want to terminate your one line statements with ';' to stop the
 program from printing the value returned by your statement.
 
 A Entity could refer to a mutual fund or index or ... one may load into this program.
+
+NOTE: When comparing entities, if they have been active for different amount of time
+within the current date range that has been loaded and looked at, then the results
+may not give the full picture, depending on how one looks at things.
 
 
 Fetching

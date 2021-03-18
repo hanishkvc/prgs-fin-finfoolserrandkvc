@@ -824,6 +824,7 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
         entCodes = [ entCodes]
     srelMetaData, srelMetaLabel = datadst_metakeys('srel')
     for dataSrc in dataSrcs:
+        print("DBUG:plot_data:{}".format(dataSrc))
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         for entCode in entCodes:
             index = gData['code2index'][entCode]
@@ -842,8 +843,9 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
                 srelLabel = ""
             if dataLabel == "":
                 dataLabel = srelLabel
+            label = "{}:{:{width}}: {}".format(entCode, name, dataLabel, width=giLabelNameChopLen)
+            print("\t{}:{}".format(label, index))
             label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
-            print("DBUG:plot_data:{}:{}".format(label, index))
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
