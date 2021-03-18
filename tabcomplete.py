@@ -35,7 +35,7 @@ def complete(text, state):
     if (numTokens < 1) or ((numTokens == 1) and (text != "")):
         match = [x for x in L1 if x.startswith(text)]
         return match[state]
-    if curLine.startswith("mftypes_members("):
+    if curLine.startswith("enttypes_members("):
         data = curLine[16:].lstrip()
         if data[0] == '"':
             data = data[1:]

@@ -31,9 +31,9 @@ Old/Low level:
         plt.plot(gData['data'][mfIndex])
         plt.show()
     InBetween:
-        lookatmfs_names("mf name parts")
-        lookatmfs_names("mf name parts 1; mf name parts 2; mf name parts 3")
-        lookatmfs_names(["mf name parts 1", "mf name parts 2"])
+        lookatents_names("mf name parts")
+        lookatents_names("mf name parts 1; mf name parts 2; mf name parts 3")
+        lookatents_names(["mf name parts 1", "mf name parts 2"])
         look4mfs()
         look4mfs("TOP", 20150101, 20210228)
 Newer:
@@ -1071,7 +1071,7 @@ def _daterange_checkfine(startDateIndex, endDateIndex, caller):
     return True
 
 
-def lookatmfs_codes(entCodes, startDate=-1, endDate=-1):
+def lookatents_codes(entCodes, startDate=-1, endDate=-1):
     """
     Given a list of MF codes (as in AMFI dataset), look at their data.
 
@@ -1084,7 +1084,7 @@ def lookatmfs_codes(entCodes, startDate=-1, endDate=-1):
           and user will be free again to look at a new date range of their choosing.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    if not _daterange_checkfine(startDateIndex, endDateIndex, "lookatmfs_codes"):
+    if not _daterange_checkfine(startDateIndex, endDateIndex, "lookatents_codes"):
         return
     for code in entCodes:
         index = gData['code2index'][code]
@@ -1169,7 +1169,7 @@ def show_plot(clearGDataDateRangePlus=True):
         gData['plots'] = set()
 
 
-def lookatmfs_names(entNames, startDate=-1, endDate=-1):
+def lookatents_names(entNames, startDate=-1, endDate=-1):
     """
     Given a list of MF names, look at their data.
 
@@ -1186,10 +1186,10 @@ def lookatmfs_names(entNames, startDate=-1, endDate=-1):
         for c in f:
             #print(c)
             entCodes.append(c[0])
-    lookatmfs_codes(entCodes, startDate, endDate)
+    lookatents_codes(entCodes, startDate, endDate)
 
 
-def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
+def lookatents_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
     """
     Look for MFs which are at the top or the bottom among all the MFs,
     based on their performance over the date range given.
@@ -1227,7 +1227,7 @@ def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
         entCode = gData['index2code'][i]
         entCodes.append(entCode)
         #print("{}: {}:{}".format(i, entCode, entName))
-    lookatmfs_codes(entCodes, startDate, endDate)
+    lookatents_codes(entCodes, startDate, endDate)
 
 
 def _update_dataproccontrols(dataProcs):
@@ -1298,11 +1298,11 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
     """
     savedDataProcControls = _update_dataproccontrols(dataProcs)
     if type(job) == list:
-        lookatmfs_names(job, startDate, endDate)
+        lookatents_names(job, startDate, endDate)
     else:
         if job.upper() in [ "OP:TOP", "OP:BOTTOM" ]:
             job = job[3:]
-            lookatmfs_ops(job, startDate, endDate, count)
+            lookatents_ops(job, startDate, endDate, count)
         else:
             print("ERRR:lookat_data: unknown operation:", job)
             print("INFO:lookat_data: If you want to look up MF names put them in a list")
