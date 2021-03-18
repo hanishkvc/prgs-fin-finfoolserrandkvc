@@ -487,13 +487,13 @@ def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ign
     return searchTmplFullMatch, searchTmplPartMatch
 
 
-def findmatchingmf(mfNameTmpl, fullMatch=False, partialTokens=False, ignoreCase=True):
+def findmatchingmf(entNameTmpl, fullMatch=False, partialTokens=False, ignoreCase=True):
     """
-    Find MFs from the MF dataSet, which match the given mfName Template.
+    Find MFs from the MF dataSet, which match the given entName Template.
 
     NOTE: look at help of _findmatching for the search/matching behaviour.
     """
-    fm, pm = _findmatching(mfNameTmpl, gData['names'], fullMatch, partialTokens, ignoreCase)
+    fm, pm = _findmatching(entNameTmpl, gData['names'], fullMatch, partialTokens, ignoreCase)
     #breakpoint()
     fmNew = []
     for curName, curIndex in fm:
@@ -1169,7 +1169,7 @@ def show_plot(clearGDataDateRangePlus=True):
         gData['plots'] = set()
 
 
-def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
+def lookatmfs_names(entNames, startDate=-1, endDate=-1):
     """
     Given a list of MF names, look at their data.
 
@@ -1178,10 +1178,10 @@ def lookatmfs_names(mfNames, startDate=-1, endDate=-1):
 
     The data is plotted for the range of date given.
     """
-    if type(mfNames) != list:
-        mfNames = mfNames.split(';')
+    if type(entNames) != list:
+        entNames = entNames.split(';')
     entCodes = []
-    for name in mfNames:
+    for name in entNames:
         f,p = findmatchingmf(name)
         for c in f:
             #print(c)
@@ -1223,10 +1223,10 @@ def lookatmfs_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
         delta = 1
     for si in range(startIndex, endIndex, delta):
         i = sortedIndex[si]
-        mfName = gData['names'][i]
+        entName = gData['names'][i]
         entCode = gData['index2code'][i]
         entCodes.append(entCode)
-        #print("{}: {}:{}".format(i, entCode, mfName))
+        #print("{}: {}:{}".format(i, entCode, entName))
     lookatmfs_codes(entCodes, startDate, endDate)
 
 
