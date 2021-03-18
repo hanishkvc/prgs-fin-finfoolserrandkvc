@@ -169,24 +169,35 @@ def _fetchdata(url, fName):
     f.close()
 
 
-gbFetchLocal = False
-def fetch4date(y, m, d):
+def fetch4date(y, m, d, opts):
     """
     Fetch data for the given date.
 
-    NOTE: set gbFetchLocal to avoid trying to fetch from internet,
-    if and when required.
+    opts: a list of options supported by this logic
+        'ForceLocal': When the logic decides that it has to fetch
+            data file from the internet, it will cross check, if
+            ForceLocal is True. If True, then the logic wont try
+            to redownload
+        'ForceRemote': If true, then the logic will try to fetch
+            the data file again from the internet, irrespective
+            of the local data pickle file is ok or not.
     """
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    if not hlpr.pickle_ok(fName):
-        if not gbFetchLocal:
+    bParseCSV=False
+    if opts['ForceRemote']:
+        _fetchdata(url, fName)
+        bParseCSV=True
+    elif not hlpr.pickle_ok(fName):
+        if not opts['ForceLocal']:
             _fetchdata(url, fName)
+        bParseCSV=True
+    if bParseCSV:
         today = parse_csv(fName)
         hlpr.save_pickle(fName, today, "IndiaMF:fetch4Date")
 
 
-def load4date(y, m, d):
+def load4date(y, m, d, opts):
     """
     Load data for the given date.
 

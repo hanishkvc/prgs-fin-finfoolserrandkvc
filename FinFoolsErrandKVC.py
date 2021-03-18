@@ -148,7 +148,7 @@ def setup():
     loadfilters_list()
 
 
-def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True, bDebug=False):
+def proc_days(start, end, handle_date_func, opts=None, bNotBeyondYesterday=True, bDebug=False):
     """
     call the passed function for each date with the given start and end range.
         The date will be passed to the passed function as year, month, date
@@ -200,12 +200,12 @@ def proc_days(start, end, handle_date_func, bNotBeyondYesterday=True, bDebug=Fal
                 if bDebug:
                     print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
                 try:
-                    handle_date_func(y,m,d)
+                    handle_date_func(y,m,d,opts)
                 except:
                     traceback.print_exc()
 
 
-def fetch4date(y, m, d):
+def fetch4date(y, m, d, opts):
     """
     Fetch data for the given date.
 
@@ -216,7 +216,7 @@ def fetch4date(y, m, d):
         day (month day) should be one of 1 to 31, as appropriate for month specified.
     """
     print(y,m,d)
-    indiamf.fetch4date(y, m, d)
+    indiamf.fetch4date(y, m, d, opts)
 
 
 def date2datedict(date, fallBackMonth=1):
@@ -256,17 +256,17 @@ def proc_date_startend(startDate, endDate):
     return start, end
 
 
-def fetch4daterange(startDate, endDate):
+def fetch4daterange(startDate, endDate, opts):
     """
     Fetch data for given date range.
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
     """
     start, end = proc_date_startend(startDate, endDate)
-    proc_days(start, end, fetch4date, gbNotBeyondYesterday)
+    proc_days(start, end, fetch4date, opts, gbNotBeyondYesterday)
 
 
-def fetch_data(startDate, endDate=None):
+def fetch_data(startDate, endDate=None, opts=None):
     """
     Fetch data for a given date or range of dates
 
@@ -278,7 +278,7 @@ def fetch_data(startDate, endDate=None):
     """
     if endDate == None:
         endDate = startDate
-    return fetch4daterange(startDate, endDate)
+    return fetch4daterange(startDate, endDate, opts)
 
 
 def print_skipped():
@@ -295,7 +295,7 @@ def print_skipped():
     print("WARN: The above MFs were skipped/filtered out when loading")
 
 
-def load4date(y, m, d):
+def load4date(y, m, d, opts):
     """
     Load data for the given date.
 
@@ -304,10 +304,10 @@ def load4date(y, m, d):
     """
     gData['dateIndex'] += 1
     gData['dates'].append(hlpr.dateint(y,m,d))
-    indiamf.load4date(y,m,d)
+    indiamf.load4date(y,m,d, opts)
 
 
-def load4daterange(startDate, endDate):
+def load4daterange(startDate, endDate, opts=None):
     """
     Load data for given date range.
 
@@ -322,7 +322,7 @@ def load4daterange(startDate, endDate):
     """
     start, end = proc_date_startend(startDate, endDate)
     try:
-        proc_days(start, end, load4date, gbNotBeyondYesterday)
+        proc_days(start, end, load4date, opts, gbNotBeyondYesterday)
     except:
         excInfo = sys.exc_info()
         print(excInfo)
