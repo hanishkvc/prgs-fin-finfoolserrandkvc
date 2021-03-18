@@ -33,7 +33,7 @@ def get_mfcodes(mfNameTemplates):
 	for mfTmpl in mfNameTemplates:
 		fullMatch, partMatch = findmatchingmf(mfTmpl)
 		for mf in fullMatch:
-			mfCodes.append(mf[1])
+			mfCodes.append(mf[0])
 	return mfCodes
 
 
