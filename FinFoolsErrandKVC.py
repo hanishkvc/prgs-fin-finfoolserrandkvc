@@ -1361,7 +1361,7 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
         lineStripped = line.strip()
         if (lineCnt == 1):
             lines = line
-            if (lineStripped != "") and (lineStripped[-1] == ':'):
+            if (lineStripped != "") and (lineStripped[-1] in ':,\\'):
                 bMulti = True
                 continue
             else:
