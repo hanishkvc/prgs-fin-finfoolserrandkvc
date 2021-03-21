@@ -960,6 +960,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         iSkip = -numpy.inf
     else:
         iSkip = numpy.inf
+    theSaneArray = None
     if opType == 'normal':
         if type(theDate) == type(None):
             for i in range(-1, -(gData['dateIndex']+1),-1):
@@ -1012,7 +1013,9 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         theRankArray = theRankArray[:, iValidBlockAtBegin:tNumBlocks+1]
         tNumBlocks = tNumBlocks - iValidBlockAtBegin
         theSaneArray = theRankArray[:,tNumBlocks]
-        #breakpoint()
+    if type(theSaneArray) == type(None):
+        print("DBUG:AnalDataSimple:{}:{}:{}: No SaneArray????".format(op, dataSrc, opType))
+        breakpoint()
     theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
