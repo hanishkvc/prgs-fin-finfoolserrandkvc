@@ -627,6 +627,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         "rel[<BaseDate>]": calculate absolute return ration across the full date range wrt the
                 val corresponding to the given baseDate.
                 If BaseDate is not given, then startDate will be used as the baseDate.
+                MetaData  = AbsoluteReturn, ReturnPerAnnum, durationInYears
+                MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBaseDateVal, dataSrcEndVal
+                    DurationInYears: the duration between endDate and baseDate in years.
         "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
                 of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
@@ -680,6 +683,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         #### Op specific things to do before getting into individual records
         if op == 'srel':
             gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'],3])
+        elif op.startswith("rel"):
+            gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'],3])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
@@ -731,10 +736,17 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     if baseDate != '':
                         baseDate = int(baseDate)
                         baseDateIndex = gData['dates'].index(baseDate)
-                        baseData = gData[dataSrc][r, baseDateIndex]
                     else:
-                        baseData = gData[dataSrc][r, startDateIndex]
+                        baseDateIndex = startDateIndex
+                    baseData = gData[dataSrc][r, baseDateIndex]
+                    dEnd = gData[dataSrc][r, endDateIndex]
                     tResult[r,:] = (((gData[dataSrc][r,:])/baseData)-1)*100
+                    dAbsRet = tResult[r, -1]
+                    durationInYears = (endDateIndex-baseDateIndex+1)/365
+                    dRetPA = ((((dAbsRet/100)+1)**(1/durationInYears))-1)*100
+                    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
+                    gData[dataDstMetaLabel].append(label)
+                    gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 elif op.startswith("dma"):
                     days = int(op[3:])
                     tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
