@@ -283,8 +283,16 @@ rel - relative to given date
 -----------------------------
 
 Calculate the relative percentage difference for all data in the dataset, wrt the
-value of the same entity on the given date, wrt each entity.
+value of the same entity on the given base date, wrt each entity.
 
+As part of its associated meta data, it stores the following info calculated btw
+the endDate and baseDate
+
+   the absolute return
+
+   the return per annum
+
+   duration in years
 
 
 dma - moving average
@@ -356,7 +364,20 @@ Look at raw/processed data
 analdata_simple
 -----------------
 
-Some of the operations supported include
+Sort/Rank the entities in the dataset based on the criteria (op + opType) given
+
+Some of the operationTypes supported include
+
+   normal: Depending on the value in the given dataSrc on the given date, decide how
+   to rank the entities.
+
+   srel_absret: The dataSrc should be one generated using srel procdata_ex operation.
+   Look at the associated absoluteReturn value for each of the specified entities, and
+   rank the entities.
+
+   srel_retpa: The dataSrc should be one generated using srel procdata_ex operation.
+   Look at the associated returnPerAnnum value for each of the specified entities, and
+   rank the entities.
 
    roll_avg: The dataSrc should be one generated using roll<Days> operation of procdata_ex.
    This looks at the full period average of the rolling returnPerAnnum over the full dateRange
@@ -364,17 +385,16 @@ Some of the operations supported include
 
       analdata_simple('roll1095', 'top', 'roll_avg')
 
-   roll_ranked: The dataSrc should be one generated using roll<Days> procdata_ex oepration.
+   block_ranked: The dataSrc should be one generated using block<Days> procdata_ex oepration.
    This identifies the pentile to which each entity belongs, when compared to all other
-   entities specified, wrt each sub time period to which the overall date range will be
-   divided. Inturn it calculates a naive average of the pentile rank across all the sub
-   date ranges, and uses the same to rank the entities.
+   entities specified, wrt each block period. Inturn it calculates a naive average of the
+   pentile rank across all the blocks, and uses the same to rank the entities.
 
       NOTE: One needs to be extra careful, when trying to interpret this result.
-      If one sees change in ranking between roll_avg and roll_ranked, look at the rank array
-      to try and see why it might be so. Maybe the entity was performing good in only some of
-      the sub-timeblocks (or it peformed bad over many sub-timeblocks or ...) in the overall
-      date range or so...
+      If one sees change in ranking between roll_avg and block_ranked(of blockOp on roll data),
+      look at the rank array to try and see why it might be so. Maybe the entity was performing
+      good in only some of the blocks (sub time periods) (or it peformed bad over many blocks
+      or ...) in the overall date range or so...
 
 
 Others
