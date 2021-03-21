@@ -636,7 +636,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 following
                     Average
                     Standard Deviation
-                    Pentile rank
+                    Quantiles
 
     NOTE: NaN is used, because plot will ignore those data points and keep the corresponding
     verticals blank.
@@ -684,6 +684,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             gData[dataDstAvgs] = numpy.zeros([gData['nextEntIndex'],blockCnt])
             gData[dataDstStds] = numpy.zeros([gData['nextEntIndex'],blockCnt])
             gData[dataDstQntls] = numpy.zeros([gData['nextEntIndex'],blockCnt,5])
+            tResult = []
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
         for r in range(gData['nextEntIndex']):
@@ -774,32 +775,32 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     label = "{:5.2f} {:5.2f} {}".format(trAvg, trStd, trBelowMinThresholdLabel)
                     gData[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
-                    tBlocksLabel = ""
-                    if rollValidDays > rollCheckBlockDays:
-                        # Calc the Avgs
-                        iEnd = endDateIndex+1
-                        lAvgs = []
-                        lStds = []
-                        for i in range(rollNumBlocks):
-                            iStart = iEnd-rollCheckBlockDays
-                            tBlockData = tResult[r,iStart:iEnd]
-                            tBlockData = tBlockData[numpy.isfinite(tBlockData)]
-                            lAvgs.insert(0, numpy.mean(tBlockData))
-                            lStds.insert(0, numpy.std(tBlockData))
-                            iEnd = iStart
-                            if len(tBlockData) == 0:
-                                tBlockData = [0]
-                            gData[dataDstMetaDataQntls][r, rollNumBlocks-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
-                        avgAvgs = numpy.nanmean(lAvgs)
-                        avgStds = numpy.nanmean(lStds)
-                        gData[dataDstMetaDataAvgs][r,:] = lAvgs
-                        gData[dataDstMetaDataStds][r,:] = lStds
-                        gData[dataDstMetaData][r] = [avgAvgs, avgStds, trBelowMinThreshold]
-                        tBlocksLabel = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
+                    # Calc the Avgs
+                    iEnd = endDateIndex+1
+                    lAvgs = []
+                    lStds = []
+                    for i in range(blockCnt):
+                        iStart = iEnd-blockDays
+                        tBlockData = gData[dataSrc][r,iStart:iEnd]
+                        tBlockData = tBlockData[numpy.isfinite(tBlockData)]
+                        lAvgs.insert(0, numpy.mean(tBlockData))
+                        lStds.insert(0, numpy.std(tBlockData))
+                        iEnd = iStart
+                        if len(tBlockData) == 0:
+                            tBlockData = [0]
+                        gData[dataDstQntls][r, blockCnt-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
+                    avgAvgs = numpy.nanmean(lAvgs)
+                    avgStds = numpy.nanmean(lStds)
+                    gData[dataDstAvgs][r,:] = lAvgs
+                    gData[dataDstStds][r,:] = lStds
+                    #gData[dataDstMetaData][r] = [avgAvgs, avgStds]
+                    label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
+                    gData[dataDstMetaLabel].append(label)
             except:
                 traceback.print_exc()
                 print("DBUG:ProcDataEx:Exception skipping entity at ",r)
-        gData[dataDst] = tResult
+        if len(tResult) > 0:
+            gData[dataDst] = tResult
 
 
 def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
