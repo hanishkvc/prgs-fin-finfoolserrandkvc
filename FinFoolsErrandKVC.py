@@ -1026,9 +1026,14 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
         curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
+        if opType == "roll_avg":
+            curEntry.extend(gData[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
         curEntry[2] = numpy.round(curEntry[2],2)
-        if opType == "block_ranked":
+        if opType == "roll_avg":
+            curEntry[3:] = numpy.round(curEntry[3:],2)
+            extra = ""
+        elif opType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
             extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gData[metaDataAvgs][index],6,2))
         else:
