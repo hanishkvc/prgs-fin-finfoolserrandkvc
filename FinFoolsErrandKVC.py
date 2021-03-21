@@ -772,10 +772,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trAvg = numpy.mean(trValidResult)
                         trStd = numpy.std(trValidResult)
                     else:
-                        trBelowMinThreshold = -99
+                        trBelowMinThreshold = numpy.nan
                         trBelowMinThresholdLabel = "[--NA--<]"
-                        trAvg = -99
-                        trStd = -99
+                        trAvg = numpy.nan
+                        trStd = numpy.nan
                     gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold]
                     label = "{:5.2f} {:5.2f} {}".format(trAvg, trStd, trBelowMinThresholdLabel)
                     gData[dataDstMetaLabel].append(label)
