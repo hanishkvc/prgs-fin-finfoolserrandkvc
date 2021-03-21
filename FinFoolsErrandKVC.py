@@ -990,6 +990,8 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
                     iValidBlockAtBegin = b+1
                 theRankArray[:,b] = numpy.zeros(len(theRankArray[:,b]))
         theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,iValidBlockAtBegin:tNumBlocks], axis=1)
+        theRankArray = theRankArray[:, iValidBlockAtBegin:tNumBlocks+1]
+        tNumBlocks = tNumBlocks - iValidBlockAtBegin
         theSaneArray = theRankArray[:,tNumBlocks]
         #breakpoint()
     theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
@@ -1044,7 +1046,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             extra = ""
         elif opType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
-            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gData[metaDataAvgs][index],6,2))
+            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gData[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
         else:
             extra = ""
         print("    {} {}".format(extra, curEntry))
