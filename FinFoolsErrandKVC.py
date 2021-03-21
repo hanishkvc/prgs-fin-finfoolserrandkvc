@@ -873,7 +873,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     op: could be either 'top' or 'bottom'
 
     opType: could be one of 'normal', 'srel_absret', 'srel_retpa',
-        'roll_avg', 'roll_ranked'
+        'roll_avg', 'block_ranked'
 
         normal: Look at data corresponding to the identified date,
         in the given dataSrc, to decide on entities to select.
@@ -890,7 +890,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         rolling return (dataSrc specified should be generated using
         roll procdata_ex operation), to decide on entities ranking.
 
-        roll_ranked: look at the AvgRollingRet calculated by roll,
+        block_ranked: look at the Avgs calculated by block op,
         for each sub date periods, rank them and average over all
         the sub date periods to calculate the rank for full date
         Range. Use this final rank to decide on entities ranking.
@@ -970,19 +970,19 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             theSaneArray = gData[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-        elif opType == "roll_ranked":
-            metaDataAvgs = "{}Avgs".format(dataSrcMetaData)
-            tNumEnts, tNumBlocks = gData[metaDataAvgs].shape
-            theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
-            for b in range(tNumBlocks):
-                tArray = gData[metaDataAvgs][:,b]
-                tValidArray = tArray[numpy.isfinite(tArray)]
-                tSaneArray = hlpr.sane_array(tArray, iSkip)
-                tQuants = numpy.quantile(tValidArray, [0, 0.2, 0.4, 0.6, 0.8, 1])
-                theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants, True)
-            theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
-            theSaneArray = theRankArray[:,tNumBlocks]
-            #breakpoint()
+    elif opType == "block_ranked":
+        metaDataAvgs = "{}Avgs".format(dataSrc)
+        tNumEnts, tNumBlocks = gData[metaDataAvgs].shape
+        theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
+        for b in range(tNumBlocks):
+            tArray = gData[metaDataAvgs][:,b]
+            tValidArray = tArray[numpy.isfinite(tArray)]
+            tSaneArray = hlpr.sane_array(tArray, iSkip)
+            tQuants = numpy.quantile(tValidArray, [0, 0.2, 0.4, 0.6, 0.8, 1])
+            theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants, True)
+        theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
+        theSaneArray = theRankArray[:,tNumBlocks]
+        #breakpoint()
     theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
@@ -1022,13 +1022,13 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     print("INFO:AnalDataSimple:{}:{}:{}".format(op, dataSrc, opType))
     for i in range(lStart,lStop,lDelta):
         index = theRows[i]
-        if (theSaneArray[index] == iSkip) or ((opType == 'roll_ranked') and (theSaneArray[index] == 0)):
+        if (theSaneArray[index] == iSkip) or ((opType == 'block_ranked') and (theSaneArray[index] == 0)):
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
         curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
         theSelected.append(curEntry)
         curEntry[2] = numpy.round(curEntry[2],2)
-        if opType == "roll_ranked":
+        if opType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
             extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gData[metaDataAvgs][index],6,2))
         else:

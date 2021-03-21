@@ -48,11 +48,11 @@ for mfType in gMFTypes:
 	# Relative Data
 	procdata_ex([ "srel=srel(data)", "dma50SRel=dma50(srel)", "dma200SRel=dma200(srel)" ])
 	# Rolling Data
-	procdata_ex([ "roll365=roll365(data)", "dma50Roll365=dma50(roll365)" ])
-	procdata_ex([ "roll1095=roll1095(data)", "dma50Roll1095=dma50(roll1095)" ])
-	procdata_ex([ "roll1825=roll1825(data)", "dma50Roll1825=dma50(roll1825)" ])
+	procdata_ex([ "roll365=roll365(data)", "block3YR365=block1095(roll365)", "dma50Roll365=dma50(roll365)" ])
+	procdata_ex([ "roll1095=roll1095(data)", "block3YR1095=block1095(roll1095)", "dma50Roll1095=dma50(roll1095)" ])
+	procdata_ex([ "roll1825=roll1825(data)", "block3YR1825=block1095(roll1825)", "dma50Roll1825=dma50(roll1825)" ])
 	datas = [ 'dma50SRel', 'dma200SRel', 'dma50Roll365', 'dma50Roll1095', 'dma50Roll1825' ]
-	topList = analdata_simple('roll1095', 'top', 'roll_ranked')
+	topList = analdata_simple('block3YR1095', 'top', 'block_ranked')
 	topList = analdata_simple('roll1095', 'top', 'roll_avg')
 	mfCodes = [ x[0] for x in topList ]
 	"""
