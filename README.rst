@@ -20,6 +20,8 @@ GNU General Public License for more details.
 Overview
 #########
 
+This is a relative look across multiple data sets.
+
 As I didnt find any opensource program to look at the historical data of MF navs,
 so created a simple one to try and look at the same in some simple, silly and
 stupid ways.
@@ -53,17 +55,40 @@ could be buggy and stupid in more ways than one. Also the data it works with may
 not be error free and uptodate always. So dont use this program for anything.
 
 
+Calling the Program
+======================
+
+If the program is called without any arguments, then it enters the interactive mode, where
+user can enter standard python statements as well as the functions provided by this program.
+
+   Terminate statement with ; to avoid implicit printing of the results of the statement.
+
+   NOTE: This ; based termination maybe useful for the functions provided by this program.
+   Especially for the functions which return list or so.
+
+   Termination with ; is also required to import modules at runtime.
+
+   Multiline statements are supported if user indicates the begining of such multiline
+   blocks by terminating them with : or , as part of the 1st line in the multiline block.
+
+      A empty line or a line with lesser indentation than what was at the begining of the
+      multiline block, will terminate the multiline block logic.
+
+However if the program is called with a single argument which is a file with extension ".mf",
+then the program will assume that it is a script file which contains commands for the program.
+They will be executed as if the user had entered them directly into the program one after the
+other.
+
+
+
 Usage
 #######
 
-Some of the functions supported by the program include
+Some of the functions supported by the program are specified in the sections below.
 
 NOTE: calling help on any of the function will get some basic usage info about them.
 
    help(function_name)
-
-NOTE: You may want to terminate your one line statements with ';' to stop the
-program from printing the value returned by your statement.
 
 A Entity could refer to a mutual fund or index or ... one may load into this program.
 
@@ -334,24 +359,6 @@ help(plot_data)
 help(show_plot)
 
 
-
-
-Calling the Program
-======================
-
-If the program is called without any arguments, then it enters the interactive mode, where
-user can enter the above and few more program provided functions as well as generic python
-expressions.
-
-   Terminate statement with ; to avoid printing the results of the statement automatically.
-   Termination with ; is also required to import modules at runtime.
-
-   IF-ELSE not supported directly at the main level. However it can exist within a block.
-
-However if the program is called with a single argument which is a file with extension ".mf",
-then the program will assume that it is a script file which contains commands for the program.
-They will be executed as if the user had entered them directly into the program one after the
-other.
 
 
 Saving and Restoring Session
