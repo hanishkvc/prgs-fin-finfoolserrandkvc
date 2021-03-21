@@ -1341,10 +1341,15 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
     than that used when multiline block entry started, will
     lead to the logic getting out of the multiline input mode.
 
-    NOTE: By default it follows the same prompts as python.
+    It allows user to split lists, sets, dictionary etc to be
+    set across multiple lines, provided there is ',' as the
+    last char in the inbetween lines.
+
+    It allows if-else or if-elif-else multiline blocks.
     """
     lines = ""
     bMulti = False
+    bIf = False
     lineCnt = 0
     refStartWS = 0
     while True:
@@ -1362,6 +1367,8 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
         if (lineCnt == 1):
             lines = line
             if (lineStripped != "") and (lineStripped[-1] in ':,\\'):
+                if lineStripped.split()[0] == 'if':
+                    bIf = True
                 bMulti = True
                 continue
             else:
@@ -1375,6 +1382,8 @@ def input_multi(prompt="OO>", altPrompt="...", theFile=None):
                 refStartWS = curStartWS
             lines = "{}\n{}".format(lines,line)
             if (refStartWS > curStartWS):
+                if bIf and (lineStripped.split()[0] in [ 'else:', 'elif']):
+                    continue
                 break
     return lines
 
