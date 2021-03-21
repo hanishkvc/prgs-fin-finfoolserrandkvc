@@ -631,6 +631,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 NaN.
                 If _abs is specified, it calculates absolute return. If Not (i.e by default)
                 it calculates the ReturnPerAnnum.
+        "block<BlockDays>: Divide the given dataSrc content into multiple blocks, where each block
+                corresponds to the BlockDays specified. Inturn for each of the block, calculate the
+                following
+                    Average
+                    Standard Deviation
+                    Pentile rank
 
     NOTE: NaN is used, because plot will ignore those data points and keep the corresponding
     verticals blank.
@@ -667,26 +673,17 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
-            rollDays = int(op[4:])
-            rollValidDays = endDateIndex - rollDays + 1
-            rollCheckBlockDays = 352
-            rollNumBlocks = -1
-            if rollValidDays > rollCheckBlockDays:
-                while True:
-                    rollNumBlocks = int(rollValidDays/rollCheckBlockDays)
-                    if rollNumBlocks > 4:
-                        break
-                    rollCheckBlockDays = int(rollCheckBlockDays/2)
-                    if rollCheckBlockDays < 30:
-                        break
-                dataDstMetaDataAvgs = "{}Avgs".format(dataDstMetaData)
-                dataDstMetaDataStds = "{}Stds".format(dataDstMetaData)
-                dataDstMetaDataQntls = "{}Qntls".format(dataDstMetaData)
-                gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'], 3])
-                gData[dataDstMetaDataAvgs] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks])
-                gData[dataDstMetaDataStds] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks])
-                gData[dataDstMetaDataQntls] = numpy.zeros([gData['nextEntIndex'],rollNumBlocks,5])
-            print("DBUG:ProcDataEx:Roll: rollDays{}, rollValidDays{}, rollCheckBlockDays{}, rollNumBlocks{}".format(rollDays, rollValidDays, rollCheckBlockDays, rollNumBlocks))
+            gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'], 3])
+        elif op.startswith("block"):
+            blockDays = int(op[5:])
+            blockTotalDays = endDateIndex - startDateIndex + 1
+            blockCnt = int(blockTotalDays/blockDays)
+            dataDstAvgs = "{}Avgs".format(dataDst)
+            dataDstStds = "{}Stds".format(dataDst)
+            dataDstQntls = "{}Qntls".format(dataDst)
+            gData[dataDstAvgs] = numpy.zeros([gData['nextEntIndex'],blockCnt])
+            gData[dataDstStds] = numpy.zeros([gData['nextEntIndex'],blockCnt])
+            gData[dataDstQntls] = numpy.zeros([gData['nextEntIndex'],blockCnt,5])
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
         for r in range(gData['nextEntIndex']):
@@ -766,9 +763,17 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
                         trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
                         trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
+                        trAvg = numpy.mean(trValidResult)
+                        trStd = numpy.std(trValidResult)
                     else:
                         trBelowMinThreshold = -99
                         trBelowMinThresholdLabel = "[--NA--<]"
+                        trAvg = -99
+                        trStd = -99
+                    gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold]
+                    label = "{:5.2f} {:5.2f} {}".format(trAvg, trStd, trBelowMinThresholdLabel)
+                    gData[dataDstMetaLabel].append(label)
+                elif op.startswith("block"):
                     tBlocksLabel = ""
                     if rollValidDays > rollCheckBlockDays:
                         # Calc the Avgs
@@ -791,14 +796,6 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         gData[dataDstMetaDataStds][r,:] = lStds
                         gData[dataDstMetaData][r] = [avgAvgs, avgStds, trBelowMinThreshold]
                         tBlocksLabel = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
-                    if True:
-                        trAvg = numpy.mean(trValidResult)
-                        trStd = numpy.std(trValidResult)
-                        gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold]
-                        label = "{:5.2f} {:5.2f} {}".format(trAvg, trStd, trBelowMinThresholdLabel)
-                        if tBlocksLabel != "":
-                            label = "{} {}".format(tBlocksLabel, label)
-                    gData[dataDstMetaLabel].append(label)
             except:
                 traceback.print_exc()
                 print("DBUG:ProcDataEx:Exception skipping entity at ",r)
