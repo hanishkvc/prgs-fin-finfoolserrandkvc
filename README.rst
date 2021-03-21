@@ -278,6 +278,15 @@ It also stores the following as part of MetaData associated with it
       stretching without change till end of date range.
 
 
+
+rel - relative to given date
+-----------------------------
+
+Calculate the relative percentage difference for all data in the dataset, wrt the
+value of the same entity on the given date, wrt each entity.
+
+
+
 dma - moving average
 ----------------------
 
@@ -304,23 +313,40 @@ Some common window sizes one could use are 365 (i.e 1Yr), 1095 (i.e 3Yr), 1825 (
 
 It also stores the following additional meta data:
 
-   Average rolling return over the full date range
+   Average of the rolling return over the full date range.
 
-   Standard Deviation and Average standard deviation from across sub-timeBlocks
-   wrt rolling return over the full date range.
+   Standard Deviation of the rolling return over the full date range.
 
    Percentage of times, when the return was below a predefined minimum value like 4% (the default).
 
-   Average rolling return over sub-timeBlocks within the overall date range. For large date ranges,
-   it will be for ~every year.
 
-   Standard Deviation wrt rolling returns in each sub-timeBlocks within the overall date range.
-   For large date ranges, it will be for ~every year.
+block - avg,std wrt each block
+-------------------------------
+
+dstDataKey=block<Days>(srcDataKey)
+
+Calculate the following wrt values in each block of BlockDays from the dateRangeEnd towards dateRangeStart,
+for the given srcDataKey.
+
+   average of values wrt each block
+
+   standard deviation of the values wrt each block
+
+   quantile(quartile) of values wrt each block
+
+As part of the MetaLabel give the following info:
+
+   A list containing average of values wrt each block in the date range.
+
+   Average of the averages across each block.
+
+   Average of the standard deviations across each block.
 
    Quantiles of the rolling return for each of the sub-timeBlocks within the overall date range.
 
-NOTE: Full dataset means for all the entities and over the full date range for which data
-is loaded.
+
+
+NOTE: Full dataset means for all the entities and over the full date range for which data is loaded.
 
 
 Look at raw/processed data

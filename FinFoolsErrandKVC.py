@@ -622,6 +622,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         "srel": calculate absolute return ratio across the full date range wrt given start date.
                 if the startDate contains a 0 value, then it tries to find a valid non zero value
                 and then use that.
+                MetaData  = AbsoluteReturn, ReturnPerAnnum, durationInYears
+                MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBeginVal, dataSrcEndVal
         "rel[<BaseDate>]": calculate absolute return ration across the full date range wrt the
                 val corresponding to the given baseDate.
                 If BaseDate is not given, then startDate will be used as the baseDate.
@@ -629,18 +631,23 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
                 of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
                 in these locations, so the result wont be proper, so force it to NaN).
+                MetaLabel = dataSrcMetaLabel, validDmaResultBeginVal, validDmaResultEndVal
         "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
                 windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
                 cant satisfy the windowsize to calculate the rolling return rate, will be set to
                 NaN.
-                If _abs is specified, it calculates absolute return. If Not (i.e by default)
-                it calculates the ReturnPerAnnum.
-        "block<BlockDays>: Divide the given dataSrc content into multiple blocks, where each block
-                corresponds to the BlockDays specified. Inturn for each of the block, calculate the
-                following
+                If _abs is specified, it calculates absolute return.
+                    If Not (i.e by default) it calculates the ReturnPerAnnum.
+                DAYSInINT: The gap in days over which the return is calculated.
+                MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold
+                MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold
+        "block<BlockDaysInt>: Divide the given dataSrc content into multiple blocks, where each
+                block corresponds to the BlockDays specified. Inturn for each of the block,
+                calculate the following
                     Average
                     Standard Deviation
                     Quantiles
+                MetaLabel = BlockAvgs, AvgBlockAvgs, AvgBlockStds
 
     NOTE: NaN is used, because plot will ignore those data points and keep the corresponding
     verticals blank.
