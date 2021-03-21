@@ -975,6 +975,8 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         metaDataAvgs = "{}Avgs".format(dataSrc)
         tNumEnts, tNumBlocks = gData[metaDataAvgs].shape
         theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
+        iValidBlockAtBegin = 0
+        bValidBlockFound = False
         for b in range(tNumBlocks):
             tArray = gData[metaDataAvgs][:,b]
             tValidArray = tArray[numpy.isfinite(tArray)]
@@ -982,9 +984,12 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             if len(tValidArray) != 0:
                 tQuants = numpy.quantile(tValidArray, [0, 0.2, 0.4, 0.6, 0.8, 1])
                 theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants, True)
+                bValidBlockFound = True
             else:
+                if not bValidBlockFound:
+                    iValidBlockAtBegin = b+1
                 theRankArray[:,b] = numpy.zeros(len(theRankArray[:,b]))
-        theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
+        theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,iValidBlockAtBegin:tNumBlocks], axis=1)
         theSaneArray = theRankArray[:,tNumBlocks]
         #breakpoint()
     theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
