@@ -979,8 +979,11 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             tArray = gData[metaDataAvgs][:,b]
             tValidArray = tArray[numpy.isfinite(tArray)]
             tSaneArray = hlpr.sane_array(tArray, iSkip)
-            tQuants = numpy.quantile(tValidArray, [0, 0.2, 0.4, 0.6, 0.8, 1])
-            theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants, True)
+            if len(tValidArray) != 0:
+                tQuants = numpy.quantile(tValidArray, [0, 0.2, 0.4, 0.6, 0.8, 1])
+                theRankArray[:,b] = numpy.digitize(tSaneArray, tQuants, True)
+            else:
+                theRankArray[:,b] = numpy.zeros(len(theRankArray[:,b]))
         theRankArray[:,tNumBlocks] = numpy.average(theRankArray[:,:tNumBlocks], axis=1)
         theSaneArray = theRankArray[:,tNumBlocks]
         #breakpoint()
