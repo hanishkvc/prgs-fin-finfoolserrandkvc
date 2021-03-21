@@ -677,6 +677,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
+            rollDays = int(op[4:])
             gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'], 3])
         elif op.startswith("block"):
             blockDays = int(op[5:])
