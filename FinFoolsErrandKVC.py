@@ -1040,6 +1040,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         if opType == "roll_avg":
             curEntry.extend(gData[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
+        curEntry[1] = "{:64}".format(curEntry[1])
         curEntry[2] = numpy.round(curEntry[2],2)
         if opType == "roll_avg":
             curEntry[3:] = numpy.round(curEntry[3:],2)
