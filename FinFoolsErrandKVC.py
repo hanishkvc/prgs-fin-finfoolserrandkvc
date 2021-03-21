@@ -936,6 +936,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         in the last 1 week, wrt the dateRange currently loaded.
 
     """
+    print("DBUG:AnalDataSimple:{}-{}:{}".format(dataSrc, opType, op))
     if op == 'top':
         iSkip = -numpy.inf
     else:
