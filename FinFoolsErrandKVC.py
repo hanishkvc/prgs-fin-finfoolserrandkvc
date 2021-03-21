@@ -275,6 +275,10 @@ def fetch_data(startDate, endDate=None, opts=None):
     only the YYYY or YYYYMM as the startDate, then the logic across the call
     chain will ensure that starts correspond to 1 and ends correspond to 12 or
     31, as the case may be..
+
+    NOTE: Fetch may look for two possible options ForceLocal and ForceRemote.
+    Based on these options and health of data pickle file, it may decide how
+    to handle the fetch.
     """
     if endDate == None:
         endDate = startDate
