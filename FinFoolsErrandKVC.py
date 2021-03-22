@@ -892,7 +892,8 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     return data
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, entCodes=None, minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False):
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, entCodes=None,
+                        minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64):
     """
     Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
 
@@ -960,6 +961,11 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
 
     bCurrentEntitiesOnly: Will drop entities which have not been seen
         in the last 1 week, wrt the dateRange currently loaded.
+
+    iClipNameWidth:
+        If None, the program prints full name, with space alloted by
+        default for 64 chars.
+        Else the program limits the Name to specified width.
 
     """
     print("DBUG:AnalDataSimple:{}-{}:{}".format(dataSrc, opType, op))
@@ -1075,7 +1081,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         if opType == "roll_avg":
             curEntry.extend(gData[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
-        curEntry[1] = "{:64}".format(curEntry[1])
+        if iClipNameWidth == None:
+            curEntry[1] = "{:64}".format(curEntry[1])
+        else:
+            curEntry[1] = "{:{width}}".format(curEntry[1][:iClipNameWidth], width=iClipNameWidth)
         curEntry[2] = numpy.round(curEntry[2],2)
         if opType == "roll_avg":
             curEntry[3:] = numpy.round(curEntry[3:],2)
