@@ -985,6 +985,9 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
             theSaneArray = gData[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
             theSaneArray = gData[dataSrcMetaData][:,1].copy()
+        else:
+            input("ERRR:AnalDataSimple:dataSrc[{}]:{} unknown srel opType, returning...".format(opType))
+            return None
     elif opType.startswith("roll"):
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         if opType == 'roll_avg':
@@ -1013,6 +1016,9 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         theRankArray = theRankArray[:, iValidBlockAtBegin:tNumBlocks+1]
         tNumBlocks = tNumBlocks - iValidBlockAtBegin
         theSaneArray = theRankArray[:,tNumBlocks]
+    else:
+        input("ERRR:AnalDataSimple:dataSrc[{}]:{} unknown opType, returning...".format(opType))
+        return None
     if type(theSaneArray) == type(None):
         print("DBUG:AnalDataSimple:{}:{}:{}: No SaneArray????".format(op, dataSrc, opType))
         breakpoint()
