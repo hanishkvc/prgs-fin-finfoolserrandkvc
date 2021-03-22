@@ -871,17 +871,24 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def _clear4entities(data, entCodes, skipValue):
+def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     """
-    Set the locations in the data, corresponding to the specified entCodes,
-    to skipValue.
+    Set the specified locations in the data, to the given forcedValue.
+
+    The locations is specified using a combination of entCodes and entSelectType.
+        'normal': for locations corresponding to the specified entCodes,
+        'invert': for locations not specified in entCodes.
     """
     if entCodes == None:
         return data
     indexes = [gData['code2index'][code] for code in entCodes]
-    mask = numpy.ones(data.size, dtype=bool)
-    mask[indexes] = False
-    data[mask] = skipValue
+    if entSelectType == 'normal':
+        mask = numpy.zeros(data.size, dtype=bool)
+        mask[indexes] = True
+    else:
+        mask = numpy.ones(data.size, dtype=bool)
+        mask[indexes] = False
+    data[mask] = forcedValue
     return data
 
 
@@ -1022,7 +1029,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     if type(theSaneArray) == type(None):
         print("DBUG:AnalDataSimple:{}:{}:{}: No SaneArray????".format(op, dataSrc, opType))
         breakpoint()
-    theSaneArray = _clear4entities(theSaneArray, entCodes, iSkip)
+    theSaneArray = _forceval_entities(theSaneArray, entCodes, iSkip, 'invert')
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = gData['dateIndex']/365
         if (dataYearsAvailable < minEntityLifeDataInYears):

@@ -387,14 +387,20 @@ Some of the operationTypes supported include
 
    block_ranked: The dataSrc should be one generated using block<Days> procdata_ex oepration.
    This identifies the pentile to which each entity belongs, when compared to all other
-   entities specified, wrt each block period. Inturn it calculates a naive average of the
-   pentile rank across all the blocks, and uses the same to rank the entities.
+   entities loaded, wrt each block period. Inturn it calculates a naive average of the
+   pentile rank across all the blocks, and uses the same to rank the specified subset of
+   entities.
 
       NOTE: One needs to be extra careful, when trying to interpret this result.
       If one sees change in ranking between roll_avg and block_ranked(of blockOp on roll data),
       look at the rank array to try and see why it might be so. Maybe the entity was performing
       good in only some of the blocks (sub time periods) (or it peformed bad over many blocks
       or ...) in the overall date range or so...
+
+      NOTE: If number of entities loaded is small, then block_ranked pentile ranking
+      may not be useful always. (Here we are talking about the total number of entities,
+      in the loaded dataset and not the subset that may be selected for sorting using
+      entCodes).
 
 
 Others
