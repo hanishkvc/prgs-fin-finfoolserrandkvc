@@ -630,7 +630,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 MetaData  = AbsoluteReturn, ReturnPerAnnum, durationInYears
                 MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBaseDateVal, dataSrcEndVal
                     DurationInYears: the duration between endDate and baseDate in years.
-        "historic": calculate the absolute returns relative to value on endDate.
+        "historic": calculate the absolute returns and returnsPerAnnum relative to value on endDate.
                 MetaData  = AbsRet for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
                 MetaLabel = AbsRet for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
         "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
@@ -708,7 +708,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         elif op.startswith("historic"):
             # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
             historic = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
-            gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],historic.shape[0]])*numpy.nan
+            gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],2,historic.shape[0]])*numpy.nan
+            validHistoric = historic[historic < (endDateIndex+1)]
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
         for r in range(gData['nextEntIndex']):
@@ -757,8 +758,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 elif op == "historic":
                     endData = gData[dataSrc][r, endDateIndex]
                     tResult[r,:] = ((endData/gData[dataSrc][r,:])-1)*100
-                    validHistoric = historic[historic < (endDateIndex+1)]
-                    gData[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
+                    gData[dataDstMetaData][r,0,:validHistoric.shape[0]] = tResult[r,-validHistoric]
                     gData[dataDstMetaLabel].append(hlpr.array_str(gData[dataDstMetaData][r]))
                 elif op.startswith("dma"):
                     days = int(op[3:])
