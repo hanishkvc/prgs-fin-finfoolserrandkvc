@@ -135,6 +135,12 @@ Some sample usage:
 
       This will try fetch data from 2010 May 1st to 2018 Dec 31st.
 
+   fetch_data(202103, opts={ 'ForceRemote': True })
+
+      This will try refetch the data for 2021 March from the internet again,
+      even if it is already downloaded, ie if there is any change in size of
+      the data file on the server.
+
 NOTE: If the given range goes into the future, then it wont try to fetch data belonging
 to the future.
 
