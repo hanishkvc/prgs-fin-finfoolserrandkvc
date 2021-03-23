@@ -764,7 +764,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     if histType == 'absret':
                         tResult[r,:] = ((endData/gData[dataSrc][r,:])-1)*100
                     else:
-                        tResult[r,:] = (((endData/gData[dataSrc][r,:])**(histDays/365))-1)*100
+                        tResult[r,:] = (((endData/gData[dataSrc][r,:])**(365/histDays))-1)*100
                     gData[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
                     gData[dataDstMetaLabel].append(hlpr.array_str(gData[dataDstMetaData][r]))
                 elif op.startswith("dma"):
