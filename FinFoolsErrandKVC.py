@@ -630,6 +630,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 MetaData  = AbsoluteReturn, ReturnPerAnnum, durationInYears
                 MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBaseDateVal, dataSrcEndVal
                     DurationInYears: the duration between endDate and baseDate in years.
+        "historic": calculate the absolute returns relative to value on endDate.
+                MetaData  = AbsRet for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+                MetaLabel = AbsRet for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
         "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
                 of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
@@ -702,6 +705,10 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             gData[dataDstStds] = numpy.zeros([gData['nextEntIndex'],blockCnt])
             gData[dataDstQntls] = numpy.zeros([gData['nextEntIndex'],blockCnt,5])
             tResult = []
+        elif op.startswith("historic"):
+            # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+            historic = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
+            gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],historic.shape[0]])*numpy.nan
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
         for r in range(gData['nextEntIndex']):
@@ -747,6 +754,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
                     gData[dataDstMetaLabel].append(label)
                     gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+                elif op == "historic":
+                    endData = gData[dataSrc][r, endDateIndex]
+                    tResult[r,:] = ((endData/gData[dataSrc][r,:])-1)*100
+                    validHistoric = historic[historic < (endDateIndex+1)]
+                    gData[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
+                    gData[dataDstMetaLabel].append(hlpr.array_str(gData[dataDstMetaData][r]))
                 elif op.startswith("dma"):
                     days = int(op[3:])
                     tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
