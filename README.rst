@@ -517,3 +517,19 @@ Misc Notes
 As readme is created on a different day compared to when the logic is/was implemented, so
 there could be discrepencies, as I havent cross checked things, when putting what I remember
 into this document.
+
+Changes
+----------
+
+This notes only some of the changes, look at git log for all changes.
+
+
+20210325IST0104
+
+THe logic updated to take care of recreating the data pickles, wrt fetched data,
+due to the restructuring involving splitting of gData into gData and gMeta.
+
+In case this doesnt seem to work for you, you can always force things by calling
+fetch_data and passing ForceRemote=True opts to it.
+
+

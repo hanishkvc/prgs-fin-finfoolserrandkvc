@@ -5,7 +5,7 @@
 import readline
 
 
-gData = None
+gMeta = None
 L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         "show_plot",
         "enttypes_list", "enttypes_members",
@@ -20,7 +20,7 @@ L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
 
 def matching_list(curPart, text):
     match = []
-    for x in gData['mfTypes']:
+    for x in gMeta['entTypes']:
         if x.startswith(curPart):
             match.append(text+x[len(curPart):])
     return match
