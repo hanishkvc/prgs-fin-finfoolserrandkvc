@@ -117,15 +117,15 @@ def _loaddata(today):
     mfTypesId = -1
     for [curMFType, mfCodes] in today['entTypes']:
         mfTypesId += 1
-        if curMFType not in gData['entTypes']:
-            gData['entTypes'][curMFType] = []
-            checkTypeId = gData['entTypes2Id'].get(curMFType, -1)
+        if curMFType not in gMeta['entTypes']:
+            gMeta['entTypes'][curMFType] = []
+            checkTypeId = gMeta['entType2Id'].get(curMFType, -1)
             if checkTypeId != -1:
                 if checkTypeId != mfTypesId:
                     input("DBUG:IndiaMF:_LoadData:MFTypesId Mismatch")
             else:
-                gData['entTypesId'].append(curMFType)
-            gData['entTypes2Id'][curMFType] = mfTypesId
+                gMeta['entType4Id'].append(curMFType)
+            gMeta['entType2Id'][curMFType] = mfTypesId
         if gMeta['whiteListEntTypes'] == None:
             bSkipCurMFType = False
         else:

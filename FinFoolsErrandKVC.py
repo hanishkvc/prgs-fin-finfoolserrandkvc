@@ -131,9 +131,9 @@ def setup_gdata(startDate=-1, endDate=-1):
     gMeta['skipped'] = set()
     gMeta['dateRange'] = [-1, -1]
     gMeta['plots'] = set()
-    gData['entTypes'] = {}
-    gData['entTypesId'] = []
-    gData['entTypes2Id'] = {}
+    gMeta['entTypes'] = {}
+    gMeta['entType4Id'] = []
+    gMeta['entType2Id'] = {}
     gMeta['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
     gData['metas'] = {}
     gMeta['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
@@ -436,7 +436,7 @@ def enttypes_list():
     """
     List entityTypes found in currently loaded data.
     """
-    for k in gData['entTypes']:
+    for k in gMeta['entTypes']:
         print(k)
 
 
@@ -445,7 +445,7 @@ def enttypes_members(entType):
     List the members of the specified entityType
     """
     print("INFO:entTypesMembers:", entType)
-    for m in gData['entTypes'][entType]:
+    for m in gMeta['entTypes'][entType]:
         print(m, gMeta['names'][gMeta['code2index'][m]])
 
 

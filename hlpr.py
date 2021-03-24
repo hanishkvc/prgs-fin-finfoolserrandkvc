@@ -192,7 +192,7 @@ def gdata_add(gData, gMeta, entTypeId, entType, code, name, nav, date, msgTag):
         gMeta['code2index'][code] = entIndex
         gMeta['index2code'][entIndex] = code
         gMeta['names'].append(name)
-        gData['entTypes'][entType].append(code)
+        gMeta['entTypes'][entType].append(code)
         gMeta['typeId'][entIndex] = entTypeId
     else:
         if (name != gMeta['names'][entIndex]):
