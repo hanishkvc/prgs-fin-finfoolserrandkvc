@@ -1160,6 +1160,12 @@ def infoset1_result(entNames=[], entCodes=[]):
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gData[dataSrc[1]][entIndex]))
 
+    for dataSrc in dataSrcs:
+        print("DataSrc:", dataSrc)
+        for entCode in entCodes:
+            entIndex = gData['code2index'][entCode]
+            entName = gData['names'][entIndex][:24]
+            print("\t{}:{:24}: {}".format(entCode, entName, gData[dataSrc[1]][entIndex]))
 
 
 def _date2index(startDate, endDate):
