@@ -721,9 +721,15 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             gData[dataDstQntls] = numpy.zeros([gData['nextEntIndex'],blockCnt,5])
             tResult = []
         elif op.startswith("reton"):
+            retonT, retonType = op.split('_')
+            if retonT == "reton":
+                retonDateIndex = endDateIndex
+            else:
+                retonDate = int(retonT[5:])
+                retonDateIndex = gData['dates'].index(retonDate)
             gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],gHistoricGaps.shape[0]])*numpy.nan
-            validHistoric = gHistoricGaps[gHistoricGaps < (endDateIndex+1)]
-            histDays = numpy.arange(endDateIndex,-1,-1)
+            validHistoric = gHistoricGaps[gHistoricGaps < (retonDateIndex+1)]
+            histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
         for r in range(gData['nextEntIndex']):
@@ -771,11 +777,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 elif op.startswith("reton"):
                     retonType = op.split('_')[1]
-                    endData = gData[dataSrc][r, endDateIndex]
+                    retonData = gData[dataSrc][r, retonDateIndex]
                     if retonType == 'absret':
-                        tResult[r,:] = ((endData/gData[dataSrc][r,:])-1)*100
+                        tResult[r,:] = ((retonData/gData[dataSrc][r,:])-1)*100
                     else:
-                        tResult[r,:] = (((endData/gData[dataSrc][r,:])**(365/histDays))-1)*100
+                        tResult[r,:] = (((retonData/gData[dataSrc][r,:])**(365/histDays))-1)*100
                     gData[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
                     gData[dataDstMetaLabel].append(hlpr.array_str(gData[dataDstMetaData][r]))
                 elif op.startswith("dma"):
