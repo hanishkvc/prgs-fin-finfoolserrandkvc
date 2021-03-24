@@ -422,6 +422,20 @@ Some of the operationTypes supported include
       entCodes).
 
 
+infoset1
+----------
+
+infoset1_prep()
+
+   process the raw data using a standard set of operations like srel, roll1095, roll1825
+   and reton, in order to generate useful info.
+
+infoset1_result(listOfEntityNameMatchTemplates)
+
+   Display info wrt specified entities, based on what was generated during infoset1_prep.
+
+
+
 Others
 --------
 
