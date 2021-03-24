@@ -1143,14 +1143,18 @@ def infoset1_prep():
 
 
 def infoset1_result(entCodes):
+    dataSrcs = [
+            ['srel', 'srelMetaLabel'],
+            ['absRet', 'roabsMetaLabel'],
+            ['retPA', 'rorpaMetaLabel'],
+            ['roll1095', 'roll1095MetaLabel'],
+            ['roll1825', 'roll1825MetaLabel'],
+            ]
     for entCode in entCodes:
         entIndex = gData['code2index'][entCode]
         print("Name:", gData['names'][entIndex])
-        print("\tsrel    :", gData['srelMetaLabel'][entIndex])
-        print("\tabsRet  :", gData['roabsMetaLabel'][entIndex])
-        print("\tRetPA   :", gData['rorpaMetaLabel'][entIndex])
-        print("\tRoll1095:", gData['roll1095MetaLabel'][entIndex])
-        print("\tRoll1825:", gData['roll1825MetaLabel'][entIndex])
+        for dataSrc in dataSrcs:
+            print("\t{:16}: {}".format(dataSrc[0], gData[dataSrc[1]][entIndex]))
 
 
 
