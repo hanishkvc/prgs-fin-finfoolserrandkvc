@@ -99,6 +99,7 @@ giLabelNameChopLen = 36
 
 gCal = calendar.Calendar()
 gData = {}
+gMeta = {}
 
 
 def setup_paths():
@@ -119,22 +120,23 @@ def setup_gdata(startDate=-1, endDate=-1):
     """
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
     gData.clear()
-    gData['code2index'] = {}
-    gData['index2code'] = {}
+    gMeta.clear()
+    gMeta['code2index'] = {}
+    gMeta['index2code'] = {}
     gData['data'] = numpy.zeros([8192*4, numDates])
-    gData['nextEntIndex'] = 0
-    gData['dateIndex'] = -1
-    gData['names'] = []
-    gData['dates'] = []
-    gData['skipped'] = set()
-    gData['dateRange'] = [-1, -1]
-    gData['plots'] = set()
+    gMeta['nextEntIndex'] = 0
+    gMeta['dataIndex'] = -1
+    gMeta['names'] = []
+    gMeta['dates'] = []
+    gMeta['skipped'] = set()
+    gMeta['dateRange'] = [-1, -1]
+    gMeta['plots'] = set()
     gData['entTypes'] = {}
     gData['entTypesId'] = []
     gData['entTypes2Id'] = {}
-    gData['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
+    gMeta['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
     gData['metas'] = {}
-    gData['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
+    gMeta['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
 
 
 def setup_modules():
@@ -296,7 +298,7 @@ def print_skipped():
         input("{}, press any key...".format(msg))
     else:
         print(msg)
-    for skippedMF in gData['skipped']:
+    for skippedMF in gMeta['skipped']:
         print(skippedMF)
     print("WARN: The above MFs were skipped/filtered out when loading")
 
@@ -308,8 +310,8 @@ def load4date(y, m, d, opts):
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
-    gData['dateIndex'] += 1
-    gData['dates'].append(hlpr.dateint(y,m,d))
+    gMeta['dataIndex'] += 1
+    gMeta['dates'].append(hlpr.dateint(y,m,d))
     indiamf.load4date(y,m,d, opts)
 
 
@@ -424,9 +426,9 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     _loadfilters_load(loadFiltersName)
     load4daterange(startDate, endDate)
     if bOptimizeSize:
-        gData['data'] = gData['data'][:gData['nextEntIndex'],:gData['dateIndex']+1]
-        gData['lastSeen'] = gData['lastSeen'][:gData['nextEntIndex']]
-        gData['typeId'] = gData['typeId'][:gData['nextEntIndex']]
+        gData['data'] = gData['data'][:gMeta['nextEntIndex'],:gMeta['dataIndex']+1]
+        gMeta['lastSeen'] = gMeta['lastSeen'][:gMeta['nextEntIndex']]
+        gMeta['typeId'] = gMeta['typeId'][:gMeta['nextEntIndex']]
 
 
 def enttypes_list():
@@ -443,7 +445,7 @@ def enttypes_members(entType):
     """
     print("INFO:entTypesMembers:", entType)
     for m in gData['entTypes'][entType]:
-        print(m, gData['names'][gData['code2index'][m]])
+        print(m, gMeta['names'][gMeta['code2index'][m]])
 
 
 def _fillin4holidays(mfIndex=-1):
@@ -452,7 +454,7 @@ def _fillin4holidays(mfIndex=-1):
     so fill them with the nav from the prev working day for the corresponding mf.
     """
     lastNav = -1
-    for c in range(gData['dateIndex']+1):
+    for c in range(gMeta['dataIndex']+1):
         if gData['data'][mfIndex,c] == 0:
             if lastNav > 0:
                 gData['data'][mfIndex,c] = lastNav
@@ -465,7 +467,7 @@ def fillin4holidays():
     As there wont be any Nav data for holidays including weekends,
     so fill them with the nav from the prev working day for the corresponding mf.
     """
-    for r in range(gData['nextEntIndex']):
+    for r in range(gMeta['nextEntIndex']):
         _fillin4holidays(r)
 
 
@@ -499,14 +501,14 @@ def findmatchingmf(entNameTmpl, fullMatch=False, partialTokens=False, ignoreCase
 
     NOTE: look at help of _findmatching for the search/matching behaviour.
     """
-    fm, pm = _findmatching(entNameTmpl, gData['names'], fullMatch, partialTokens, ignoreCase)
+    fm, pm = _findmatching(entNameTmpl, gMeta['names'], fullMatch, partialTokens, ignoreCase)
     #breakpoint()
     fmNew = []
     for curName, curIndex in fm:
-        fmNew.append([gData['index2code'][curIndex], curName, curIndex])
+        fmNew.append([gMeta['index2code'][curIndex], curName, curIndex])
     pmNew = []
     for curName, curIndex in pm:
-        pmNew.append([gData['index2code'][curIndex], curName, curIndex])
+        pmNew.append([gMeta['index2code'][curIndex], curName, curIndex])
     return fmNew, pmNew
 
 
@@ -700,15 +702,15 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         gData[dataDstMetaLabel] = []
         #### Op specific things to do before getting into individual records
         if op == 'srel':
-            gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'],3])
+            gData[dataDstMetaData] = numpy.zeros([gMeta['nextEntIndex'],3])
         elif op.startswith("rel"):
-            gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'],3])
+            gData[dataDstMetaData] = numpy.zeros([gMeta['nextEntIndex'],3])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = int(op[4:])
-            gData[dataDstMetaData] = numpy.zeros([gData['nextEntIndex'], 3])
+            gData[dataDstMetaData] = numpy.zeros([gMeta['nextEntIndex'], 3])
         elif op.startswith("block"):
             blockDays = int(op[5:])
             blockTotalDays = endDateIndex - startDateIndex + 1
@@ -716,9 +718,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             dataDstAvgs = "{}Avgs".format(dataDst)
             dataDstStds = "{}Stds".format(dataDst)
             dataDstQntls = "{}Qntls".format(dataDst)
-            gData[dataDstAvgs] = numpy.zeros([gData['nextEntIndex'],blockCnt])
-            gData[dataDstStds] = numpy.zeros([gData['nextEntIndex'],blockCnt])
-            gData[dataDstQntls] = numpy.zeros([gData['nextEntIndex'],blockCnt,5])
+            gData[dataDstAvgs] = numpy.zeros([gMeta['nextEntIndex'],blockCnt])
+            gData[dataDstStds] = numpy.zeros([gMeta['nextEntIndex'],blockCnt])
+            gData[dataDstQntls] = numpy.zeros([gMeta['nextEntIndex'],blockCnt,5])
             tResult = []
         elif op.startswith("reton"):
             retonT, retonType = op.split('_')
@@ -726,13 +728,13 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 retonDateIndex = endDateIndex
             else:
                 retonDate = int(retonT[5:])
-                retonDateIndex = gData['dates'].index(retonDate)
-            gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],gHistoricGaps.shape[0]])*numpy.nan
+                retonDateIndex = gMeta['dates'].index(retonDate)
+            gData[dataDstMetaData] = numpy.ones([gMeta['nextEntIndex'],gHistoricGaps.shape[0]])*numpy.nan
             validHistoric = gHistoricGaps[gHistoricGaps < (retonDateIndex+1)]
             histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
-        for r in range(gData['nextEntIndex']):
+        for r in range(gMeta['nextEntIndex']):
             try:
                 if op == "srel":
                     #breakpoint()
@@ -763,7 +765,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     baseDate = op[3:]
                     if baseDate != '':
                         baseDate = int(baseDate)
-                        baseDateIndex = gData['dates'].index(baseDate)
+                        baseDateIndex = gMeta['dates'].index(baseDate)
                     else:
                         baseDateIndex = startDateIndex
                     baseData = gData[dataSrc][r, baseDateIndex]
@@ -789,7 +791,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
                     inv = int(days/2)
                     tResult[r,:inv] = numpy.nan
-                    tResult[r,gData['dateIndex']-inv:] = numpy.nan
+                    tResult[r,gMeta['dataIndex']-inv:] = numpy.nan
                     if True:
                         try:
                             dataSrcLabel = gData[dataSrcMetaLabel][r]
@@ -886,8 +888,8 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
         print("DBUG:plot_data:{}".format(dataSrc))
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         for entCode in entCodes:
-            index = gData['code2index'][entCode]
-            name = gData['names'][index][:giLabelNameChopLen]
+            index = gMeta['code2index'][entCode]
+            name = gMeta['names'][index][:giLabelNameChopLen]
             try:
                 dataLabel = gData[dataSrcMetaLabel][index]
             except:
@@ -918,7 +920,7 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     """
     if entCodes == None:
         return data
-    indexes = [gData['code2index'][code] for code in entCodes]
+    indexes = [gMeta['code2index'][code] for code in entCodes]
     if entSelectType == 'normal':
         mask = numpy.zeros(data.size, dtype=bool)
         mask[indexes] = True
@@ -1013,14 +1015,14 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     theSaneArray = None
     if opType == 'normal':
         if type(theDate) == type(None):
-            for i in range(-1, -(gData['dateIndex']+1),-1):
+            for i in range(-1, -(gMeta['dataIndex']+1),-1):
                 if bDebug:
                     print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
                 theSaneArray = gData[dataSrc][:,i].copy()
                 theSaneArray[numpy.isinf(theSaneArray)] = iSkip
                 theSaneArray[numpy.isnan(theSaneArray)] = iSkip
                 if not numpy.all(numpy.isinf(theSaneArray) | numpy.isnan(theSaneArray)):
-                    dateIndex = gData['dateIndex']+1+i
+                    dateIndex = gMeta['dataIndex']+1+i
                     print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
                     break
         else:
@@ -1074,7 +1076,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         breakpoint()
     theSaneArray = _forceval_entities(theSaneArray, entCodes, iSkip, 'invert')
     if minEntityLifeDataInYears > 0:
-        dataYearsAvailable = gData['dateIndex']/365
+        dataYearsAvailable = gMeta['dataIndex']/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
             print("ERROR:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
         srelMetaData, srelMetaLabel = datadst_metakeys('srel')
@@ -1082,17 +1084,17 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         if type(theSRelMetaData) == type(None):
             procdata_ex('srel=srel(data)')
         if bDebug:
-            tNames = numpy.array(gData['names'])
+            tNames = numpy.array(gMeta['names'])
             tDroppedNames = tNames[gData[srelMetaData][:,2] < minEntityLifeDataInYears]
             print("INFO:AnalDataSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
         theSaneArray[gData[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
-        oldEntities = numpy.nonzero(gData['lastSeen'] < (gData['dates'][gData['dateIndex']]-7))[0]
+        oldEntities = numpy.nonzero(gMeta['lastSeen'] < (gMeta['dates'][gMeta['dataIndex']]-7))[0]
         if bDebug:
-            #aNames = numpy.array(gData['names'])
+            #aNames = numpy.array(gMeta['names'])
             #print(aNames[oldEntities])
             for index in oldEntities:
-                print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gData['names'][index], gData['lastSeen'][index]))
+                print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gMeta['names'][index], gMeta['lastSeen'][index]))
         theSaneArray[oldEntities] = iSkip
     theRows=numpy.argsort(theSaneArray)[-numEntities:]
     rowsLen = len(theRows)
@@ -1114,7 +1116,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         if (theSaneArray[index] == iSkip) or ((opType == 'block_ranked') and (theSaneArray[index] == 0)):
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
-        curEntry = [gData['index2code'][index], gData['names'][index], theSaneArray[index]]
+        curEntry = [gMeta['index2code'][index], gMeta['names'][index], theSaneArray[index]]
         if opType == "roll_avg":
             curEntry.extend(gData[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
@@ -1155,8 +1157,8 @@ def infoset1_result(entNames=[], entCodes=[]):
     entCodesMore = [ x[0] for x in fm ]
     entCodes = entCodes + entCodesMore
     for entCode in entCodes:
-        entIndex = gData['code2index'][entCode]
-        print("Name:", gData['names'][entIndex])
+        entIndex = gMeta['code2index'][entCode]
+        print("Name:", gMeta['names'][entIndex])
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gData[dataSrc[1]][entIndex]))
 
@@ -1167,8 +1169,8 @@ def infoset1_result(entNames=[], entCodes=[]):
     for dataSrc in dataSrcs:
         print("DataSrc:", dataSrc)
         for entCode in entCodes:
-            entIndex = gData['code2index'][entCode]
-            entName = gData['names'][entIndex][:24]
+            entIndex = gMeta['code2index'][entCode]
+            entName = gMeta['names'][entIndex][:24]
             print("\t{}:{:24}: {}".format(entCode, entName, gData[dataSrc[1]][entIndex]))
 
 
@@ -1183,11 +1185,11 @@ def _date2index(startDate, endDate):
     if startDate == -1:
         startDateIndex = 0
     else:
-        startDateIndex = gData['dates'].index(startDate)
+        startDateIndex = gMeta['dates'].index(startDate)
     if endDate == -1:
-        endDateIndex = gData['dateIndex']
+        endDateIndex = gMeta['dataIndex']
     else:
-        endDateIndex = gData['dates'].index(endDate)
+        endDateIndex = gMeta['dates'].index(endDate)
     return startDateIndex, endDateIndex
 
 
@@ -1196,15 +1198,15 @@ def _daterange_checkfine(startDateIndex, endDateIndex, caller):
     Check the DateRange specified matches previously saved DateRange.
     Else alert user.
     """
-    if gData['dateRange'][0] == -1:
-        gData['dateRange'][0] = startDateIndex
-    if gData['dateRange'][1] == -1:
-        gData['dateRange'][1] = endDateIndex
-    savedStartDateIndex = gData['dateRange'][0]
-    savedEndDateIndex = gData['dateRange'][1]
+    if gMeta['dateRange'][0] == -1:
+        gMeta['dateRange'][0] = startDateIndex
+    if gMeta['dateRange'][1] == -1:
+        gMeta['dateRange'][1] = endDateIndex
+    savedStartDateIndex = gMeta['dateRange'][0]
+    savedEndDateIndex = gMeta['dateRange'][1]
     if (savedStartDateIndex != startDateIndex) or (savedEndDateIndex != endDateIndex):
-        print("WARN:{}:previously used dateRange:{} - {}".format(caller, gData['dates'][savedStartDateIndex], gData['dates'][savedEndDateIndex]))
-        print("WARN:{}:passed dateRange:{} - {}".format(caller, gData['dates'][startDateIndex], gData['dates'][endDateIndex]))
+        print("WARN:{}:previously used dateRange:{} - {}".format(caller, gMeta['dates'][savedStartDateIndex], gMeta['dates'][savedEndDateIndex]))
+        print("WARN:{}:passed dateRange:{} - {}".format(caller, gMeta['dates'][startDateIndex], gMeta['dates'][endDateIndex]))
         print("INFO:{}:call again with matching dateRange OR".format(caller))
         input("INFO:{}:load_data|show_plot will clear saved dateRange, so that you can lookat a new dateRange that you want to".format(caller))
         return False
@@ -1227,8 +1229,8 @@ def lookatents_codes(entCodes, startDate=-1, endDate=-1):
     if not _daterange_checkfine(startDateIndex, endDateIndex, "lookatents_codes"):
         return
     for code in entCodes:
-        index = gData['code2index'][code]
-        name = gData['names'][index]
+        index = gMeta['code2index'][code]
+        name = gMeta['names'][index]
         aRawData = gData['data'][index, startDateIndex:endDateIndex+1]
         aRelData, aMovAvg, aRollingRet, aStart, aEnd, aAbsRetPercent, aRetPA, durYrs = procdata_relative(aRawData, gbDoMovingAvg, gbDoRollingRet)
         aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
@@ -1251,10 +1253,10 @@ def lookatents_codes(entCodes, startDate=-1, endDate=-1):
 
 def _plot_data(entCode, xData, yData, label, typeTag):
     theTag = str([entCode, typeTag])
-    if theTag in gData['plots']:
+    if theTag in gMeta['plots']:
         print("WARN:_plot_data: Skipping", entCode)
         return
-    gData['plots'].add(theTag)
+    gMeta['plots'].add(theTag)
     label = "{}:{}".format(label, typeTag)
     if xData == None:
         plt.plot(yData, label=label)
@@ -1269,12 +1271,12 @@ def _get_daterange_indexes():
     If there is no valid dateRange info stored in gData, then return
     indexes related to the date range of the currently loaded data.
     """
-    iSDate = gData['dateRange'][0]
+    iSDate = gMeta['dateRange'][0]
     if iSDate == -1:
         iSDate = 0
-    iEDate = gData['dateRange'][1]
+    iEDate = gMeta['dateRange'][1]
     if iEDate == -1:
-        iEDate = gData['dateIndex']
+        iEDate = gMeta['dataIndex']
     return iSDate, iEDate
 
 
@@ -1288,7 +1290,7 @@ def _show_plot():
         line.set_linewidth(8)
     plt.grid(True)
     startDateIndex, endDateIndex = _get_daterange_indexes()
-    curDates = gData['dates'][startDateIndex:endDateIndex+1]
+    curDates = gMeta['dates'][startDateIndex:endDateIndex+1]
     numX = len(curDates)
     xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
     xTicks[-1] -= 1
@@ -1305,8 +1307,8 @@ def show_plot(clearGDataDateRangePlus=True):
     """
     _show_plot()
     if clearGDataDateRangePlus:
-        gData['dateRange'] = [-1, -1]
-        gData['plots'] = set()
+        gMeta['dateRange'] = [-1, -1]
+        gMeta['plots'] = set()
 
 
 def lookatents_names(entNames, startDate=-1, endDate=-1):
@@ -1343,13 +1345,13 @@ def lookatents_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
         print("ERRR:look4mfs: Unknown operation:", opType)
         return
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    tData = numpy.zeros([gData['nextEntIndex'], (endDateIndex-startDateIndex+1)])
-    for r in range(gData['nextEntIndex']):
+    tData = numpy.zeros([gMeta['nextEntIndex'], (endDateIndex-startDateIndex+1)])
+    for r in range(gMeta['nextEntIndex']):
         try:
             tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tAbsRetPercent, tRetPA, tDurYrs = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
         except:
             traceback.print_exc()
-            print("WARN:{}:{}".format(r,gData['names'][r]))
+            print("WARN:{}:{}".format(r,gMeta['names'][r]))
     #breakpoint()
     sortedIndex = numpy.argsort(tData[:,-1])
     entCodes = []
@@ -1363,8 +1365,8 @@ def lookatents_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
         delta = 1
     for si in range(startIndex, endIndex, delta):
         i = sortedIndex[si]
-        entName = gData['names'][i]
-        entCode = gData['index2code'][i]
+        entName = gMeta['names'][i]
+        entCode = gMeta['index2code'][i]
         entCodes.append(entCode)
         #print("{}: {}:{}".format(i, entCode, entName))
     lookatents_codes(entCodes, startDate, endDate)

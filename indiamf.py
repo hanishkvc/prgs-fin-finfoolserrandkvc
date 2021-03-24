@@ -145,12 +145,12 @@ def _loaddata(today):
             if (gData['whiteListEntNames'] != None):
                 fm, pm = hlpr.matches_templates(name, gData['whiteListEntNames'])
                 if len(fm) == 0:
-                    gData['skipped'].add(str([code, name]))
+                    gMeta['skipped'].add(str([code, name]))
                     continue
             if (gData['blackListEntNames'] != None):
                 fm, pm = hlpr.matches_templates(name, gData['blackListEntNames'])
                 if len(fm) > 0:
-                    gData['skipped'].add(str([code, name]))
+                    gMeta['skipped'].add(str([code, name]))
                     continue
             hlpr.gdata_add(gData, mfTypesId, curMFType, code, name, nav, date, "IndiaMF:_LoadData")
 

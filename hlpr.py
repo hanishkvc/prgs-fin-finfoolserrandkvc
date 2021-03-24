@@ -179,20 +179,20 @@ def load_pickle(fName):
 
 
 def gdata_add(gData, entTypeId, entType, code, name, nav, date, msgTag):
-    entIndex = gData['code2index'].get(code, None)
+    entIndex = gMeta['code2index'].get(code, None)
     if entIndex == None:
-        entIndex = gData['nextEntIndex']
-        gData['nextEntIndex'] += 1
-        gData['code2index'][code] = entIndex
-        gData['index2code'][entIndex] = code
-        gData['names'].append(name)
+        entIndex = gMeta['nextEntIndex']
+        gMeta['nextEntIndex'] += 1
+        gMeta['code2index'][code] = entIndex
+        gMeta['index2code'][entIndex] = code
+        gMeta['names'].append(name)
         gData['entTypes'][entType].append(code)
-        gData['typeId'][entIndex] = entTypeId
+        gMeta['typeId'][entIndex] = entTypeId
     else:
-        if (name != gData['names'][entIndex]):
-            input("DBUG:{}:Name mismatch?:{} != {}".format(msgTag, name, gData['names'][entIndex]))
-    gData['data'][entIndex,gData['dateIndex']] = nav
-    gData['lastSeen'][entIndex] = date
+        if (name != gMeta['names'][entIndex]):
+            input("DBUG:{}:Name mismatch?:{} != {}".format(msgTag, name, gMeta['names'][entIndex]))
+    gData['data'][entIndex,gMeta['dataIndex']] = nav
+    gMeta['lastSeen'][entIndex] = date
 
 
 def loadfilters_setup(theLoadFilters, loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
