@@ -783,7 +783,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     else:
                         tResult[r,:] = (((retonData/gData[dataSrc][r,:])**(365/histDays))-1)*100
                     gData[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
-                    gData[dataDstMetaLabel].append(hlpr.array_str(gData[dataDstMetaData][r]))
+                    gData[dataDstMetaLabel].append(hlpr.array_str(gData[dataDstMetaData][r], width=7))
                 elif op.startswith("dma"):
                     days = int(op[3:])
                     tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
