@@ -1160,6 +1160,10 @@ def infoset1_result(entNames=[], entCodes=[]):
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gData[dataSrc[1]][entIndex]))
 
+    s1 = analdata_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes))
+
+    entCodes = [ x[0] for x in s1 ]
+
     for dataSrc in dataSrcs:
         print("DataSrc:", dataSrc)
         for entCode in entCodes:
