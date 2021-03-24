@@ -624,25 +624,31 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         "srel": calculate absolute return ratio across the full date range wrt given start date.
                 if the startDate contains a 0 value, then it tries to find a valid non zero value
                 and then use that.
+                It also stores following meta data relative to the endDate
                 MetaData  = AbsoluteReturn, ReturnPerAnnum, durationInYears
                 MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBeginVal, dataSrcEndVal
+
         "rel[<BaseDate>]": calculate absolute return ration across the full date range wrt the
                 val corresponding to the given baseDate.
                 If BaseDate is not given, then startDate will be used as the baseDate.
+                It also stores following meta data relative to the endDate
                 MetaData  = AbsoluteReturn, ReturnPerAnnum, durationInYears
                 MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBaseDateVal, dataSrcEndVal
                     DurationInYears: the duration between endDate and baseDate in years.
-        "reton<_Type>": calculate the absolute returns and returnsPerAnnum as on endDate wrt/relative_to
+
+        "reton<_Type>": calculate the absolute returns or returnsPerAnnum as on endDate wrt/relative_to
                 all the other dates.
                 reton_absret: Calculates the absolute return
                 reton_retpa: calculates the returnPerAnnum
                 MetaData  = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
                 MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+
         "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
                 of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
                 in these locations, so the result wont be proper, so force it to NaN).
                 MetaLabel = dataSrcMetaLabel, validDmaResultBeginVal, validDmaResultEndVal
+
         "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
                 windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
                 cant satisfy the windowsize to calculate the rolling return rate, will be set to
@@ -652,6 +658,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 DAYSInINT: The gap in days over which the return is calculated.
                 MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold
                 MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold
+
         "block<BlockDaysInt>: Divide the given dataSrc content into multiple blocks, where each
                 block corresponds to the BlockDays specified. Inturn for each of the block,
                 calculate the following
@@ -763,9 +770,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     gData[dataDstMetaLabel].append(label)
                     gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 elif op.startswith("reton"):
-                    histType = op.split('_')[1]
+                    retonType = op.split('_')[1]
                     endData = gData[dataSrc][r, endDateIndex]
-                    if histType == 'absret':
+                    if retonType == 'absret':
                         tResult[r,:] = ((endData/gData[dataSrc][r,:])-1)*100
                     else:
                         tResult[r,:] = (((endData/gData[dataSrc][r,:])**(365/histDays))-1)*100
