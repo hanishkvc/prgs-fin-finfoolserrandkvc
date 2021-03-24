@@ -630,11 +630,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 MetaData  = AbsoluteReturn, ReturnPerAnnum, durationInYears
                 MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBaseDateVal, dataSrcEndVal
                     DurationInYears: the duration between endDate and baseDate in years.
-        "historic": calculate the absolute returns and returnsPerAnnum relative to value on endDate.
-                historic_absret
-                historic_retpa
-                MetaData  = AbsRet for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
-                MetaLabel = AbsRet for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+        "reton<_Type>": calculate the absolute returns and returnsPerAnnum as on endDate wrt/relative_to
+                all the other dates.
+                reton_absret: Calculates the absolute return
+                reton_retpa: calculates the returnPerAnnum
+                MetaData  = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+                MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
         "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
                 of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
@@ -707,7 +708,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             gData[dataDstStds] = numpy.zeros([gData['nextEntIndex'],blockCnt])
             gData[dataDstQntls] = numpy.zeros([gData['nextEntIndex'],blockCnt,5])
             tResult = []
-        elif op.startswith("historic"):
+        elif op.startswith("reton"):
             # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
             historic = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
             gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],historic.shape[0]])*numpy.nan
@@ -758,8 +759,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
                     gData[dataDstMetaLabel].append(label)
                     gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
-                elif op.startswith("historic"):
-                    histType = op[9:]
+                elif op.startswith("reton"):
+                    histType = op.split('_')[1]
                     endData = gData[dataSrc][r, endDateIndex]
                     if histType == 'absret':
                         tResult[r,:] = ((endData/gData[dataSrc][r,:])-1)*100
