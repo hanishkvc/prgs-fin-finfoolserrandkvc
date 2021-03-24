@@ -184,7 +184,7 @@ def load_pickle(fName):
     return False, None, None
 
 
-def gdata_add(gData, entTypeId, entType, code, name, nav, date, msgTag):
+def gdata_add(gData, gMeta, entTypeId, entType, code, name, nav, date, msgTag):
     entIndex = gMeta['code2index'].get(code, None)
     if entIndex == None:
         entIndex = gMeta['nextEntIndex']

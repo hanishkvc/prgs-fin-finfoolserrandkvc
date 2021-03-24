@@ -33,7 +33,7 @@ MF_ALLOW_ENTTYPES=[ "equity", "elss", "other", "hybrid", "solution" ]
 MF_ALLOW_ENTNAMES=None
 MF_SKIP_ENTNAMES =[ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
 def setup(basePath, theGData, theGMeta, theLoadFilters):
-    global gData
+    global gData, gMeta
     setup_paths(basePath)
     gData = theGData
     gMeta = theGMeta
@@ -154,7 +154,7 @@ def _loaddata(today):
                 if len(fm) > 0:
                     gMeta['skipped'].add(str([code, name]))
                     continue
-            hlpr.gdata_add(gData, mfTypesId, curMFType, code, name, nav, date, "IndiaMF:_LoadData")
+            hlpr.gdata_add(gData, gMeta, mfTypesId, curMFType, code, name, nav, date, "IndiaMF:_LoadData")
 
 
 def _fetchdata(url, fName):
@@ -206,14 +206,22 @@ def load4date(y, m, d, opts):
     """
     Load data for the given date.
 
+    NOTE: If loading pickled data fails, then it will try
+    to fetch the data corresponding to given date, freshly
+    from the internet/remote server.
+
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    ok,today,tIgnore = hlpr.load_pickle(fName)
-    if ok:
-        _loaddata(today)
-    else:
-        print("WARN:IndiaMF:load4date: No data pickle found for", fName)
+    ok = False
+    for i in range(3):
+        ok,today,tIgnore = hlpr.load_pickle(fName)
+        if ok:
+            break
+        else:
+            print("WARN:IndiaMF:load4date: No data pickle found for", fName)
+            fetch4date(y, m, d, opts={'ForceRemote': True})
+    _loaddata(today)
 
 
