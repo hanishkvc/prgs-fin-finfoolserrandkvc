@@ -1135,6 +1135,25 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
     return theSelected
 
 
+def infoset1_prep():
+    procdata_ex(['srel=srel(data)', 'dma50Srel=dma50(srel)'])
+    procdata_ex(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'])
+    procdata_ex(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'])
+    procdata_ex(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
+
+
+def infoset1_result(entCodes):
+    for entCode in entCodes:
+        entIndex = gData['code2index'][entCode]
+        print("Name:", gData['names'][entIndex])
+        print("\tsrel    :", gData['srelMetaLabel'][entIndex])
+        print("\tabsRet  :", gData['roabsMetaLabel'][entIndex])
+        print("\tRetPA   :", gData['rorpaMetaLabel'][entIndex])
+        print("\tRoll1095:", gData['roll1095MetaLabel'][entIndex])
+        print("\tRoll1825:", gData['roll1825MetaLabel'][entIndex])
+
+
+
 def _date2index(startDate, endDate):
     """
     Get the indexes corresponding to the start and end date

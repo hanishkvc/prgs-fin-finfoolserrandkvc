@@ -13,6 +13,7 @@ L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         "loadfilters_setup", "loadfilters_list",
         "analdata_simple",
         "session_save", "session_restore",
+        "infoset1_prep", "infoset1_result",
         "quit"
         ]
 
