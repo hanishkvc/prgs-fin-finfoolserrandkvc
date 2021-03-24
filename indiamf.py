@@ -9,6 +9,7 @@ import hlpr
 
 
 gData = None
+gMeta = None
 #
 # Fetching and Saving related
 #
@@ -31,10 +32,11 @@ def setup_paths(basePath):
 MF_ALLOW_ENTTYPES=[ "equity", "elss", "other", "hybrid", "solution" ]
 MF_ALLOW_ENTNAMES=None
 MF_SKIP_ENTNAMES =[ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
-def setup(basePath, theGData, theLoadFilters):
+def setup(basePath, theGData, theGMeta, theLoadFilters):
     global gData
     setup_paths(basePath)
     gData = theGData
+    gMeta = theGMeta
     hlpr.loadfilters_setup(theLoadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
     print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
 
@@ -124,10 +126,10 @@ def _loaddata(today):
             else:
                 gData['entTypesId'].append(curMFType)
             gData['entTypes2Id'][curMFType] = mfTypesId
-        if gData['whiteListEntTypes'] == None:
+        if gMeta['whiteListEntTypes'] == None:
             bSkipCurMFType = False
         else:
-            fm,pm = hlpr.matches_templates(curMFType, gData['whiteListEntTypes'])
+            fm,pm = hlpr.matches_templates(curMFType, gMeta['whiteListEntTypes'])
             if len(fm) == 0:
                 bSkipCurMFType = True
             else:
@@ -142,13 +144,13 @@ def _loaddata(today):
             if (mfCode != code) or (typeId != mfTypesId):
                 print("DBUG:IndiaMF:_LoadData: Code[{}]|TypeId[{}] NotMatchExpected [{}]|[{}], skipping".format(code, typeId, mfCode, mfTypesId))
                 continue
-            if (gData['whiteListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['whiteListEntNames'])
+            if (gMeta['whiteListEntNames'] != None):
+                fm, pm = hlpr.matches_templates(name, gMeta['whiteListEntNames'])
                 if len(fm) == 0:
                     gMeta['skipped'].add(str([code, name]))
                     continue
-            if (gData['blackListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gData['blackListEntNames'])
+            if (gMeta['blackListEntNames'] != None):
+                fm, pm = hlpr.matches_templates(name, gMeta['blackListEntNames'])
                 if len(fm) > 0:
                     gMeta['skipped'].add(str([code, name]))
                     continue
@@ -197,7 +199,7 @@ def fetch4date(y, m, d, opts):
         bParseCSV=True
     if bParseCSV:
         today = parse_csv(fName)
-        hlpr.save_pickle(fName, today, "IndiaMF:fetch4Date")
+        hlpr.save_pickle(fName, today, [], "IndiaMF:fetch4Date")
 
 
 def load4date(y, m, d, opts):
@@ -208,7 +210,7 @@ def load4date(y, m, d, opts):
     you will have to call fillin4holidays explicitly.
     """
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    ok,today = hlpr.load_pickle(fName)
+    ok,today,tIgnore = hlpr.load_pickle(fName)
     if ok:
         _loaddata(today)
     else:

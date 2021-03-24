@@ -161,11 +161,14 @@ def pickle_ok(fName, minSize=16e3):
     return False
 
 
-def save_pickle(fName, data, msgTag='SavePickle'):
+gPICKLEVER="ffe.hkvc.v01"
+def save_pickle(fName, data, meta, msgTag='SavePickle'):
     fName = "{}.pickle".format(fName)
     print("INFO:{}:SavePickle:{}".format(msgTag, fName))
     f = open(fName, 'wb+')
+    pickle.dump(gPICKLEVER, f)
     pickle.dump(data, f)
+    pickle.dump(meta, f)
     f.close()
 
 
@@ -173,9 +176,12 @@ def load_pickle(fName):
     fName = "{}.pickle".format(fName)
     if os.path.exists(fName):
         f = open(fName, 'rb')
-        data = pickle.load(f)
-        return True, data
-    return False, None
+        pickleVer = pickle.load(f)
+        if pickleVer == gPICKLEVER:
+            data = pickle.load(f)
+            meta = pickle.load(f)
+            return True, data, meta
+    return False, None, None
 
 
 def gdata_add(gData, entTypeId, entType, code, name, nav, date, msgTag):

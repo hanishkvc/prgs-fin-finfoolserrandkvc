@@ -141,7 +141,8 @@ def setup_gdata(startDate=-1, endDate=-1):
 
 def setup_modules():
     tc.gData = gData
-    indiamf.setup(FINFOOLSERRAND_BASE, gData, gLoadFilters)
+    tc.gMeta = gMeta
+    indiamf.setup(FINFOOLSERRAND_BASE, gData, gMeta, gLoadFilters)
 
 
 def setup():
@@ -352,10 +353,10 @@ def _loadfilters_set(whiteListEntTypes=None, whiteListEntNames=None, blackListEn
     If whiteListEntNames is set, loads only Entities whose name matches any one of the given match templates.
     If blackListEntNames is set, loads only Entities whose names dont match any of the corresponding match templates.
     """
-    global gData
-    gData['whiteListEntTypes'] = whiteListEntTypes
-    gData['whiteListEntNames'] = whiteListEntNames
-    gData['blackListEntNames'] = blackListEntNames
+    global gMeta
+    gMeta['whiteListEntTypes'] = whiteListEntTypes
+    gMeta['whiteListEntNames'] = whiteListEntNames
+    gMeta['blackListEntNames'] = blackListEntNames
     print("LoadFiltersSet:Global Filters:\n\twhiteListEntTypes {}\n\twhiteListEntNames {}\n\tblackListEntNames {}".format(whiteListEntTypes, whiteListEntNames, blackListEntNames))
 
 
@@ -1456,16 +1457,16 @@ def session_save(sessionName):
     Save current gData into a pickle, so that it can be restored fast later.
     """
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    hlpr.save_pickle(fName, gData, "Main:SessionSave")
+    hlpr.save_pickle(fName, gData, gMeta, "Main:SessionSave")
 
 
 def session_restore(sessionName):
     """
     Restore a previously saved gData fast from a pickle.
     """
-    global gData
+    global gData, gMeta
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    ok, gData = hlpr.load_pickle(fName)
+    ok, gData, gMeta = hlpr.load_pickle(fName)
 
 
 def input_multi(prompt="OO>", altPrompt="...", theFile=None):
