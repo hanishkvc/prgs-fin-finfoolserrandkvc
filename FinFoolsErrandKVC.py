@@ -71,6 +71,8 @@ MOVINGAVG_CONVOLVEMODE = 'valid'
 # Rolling returns
 gbDoRollingRet=False
 ROLLINGRET_WINSIZE = 365
+# 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+gHistoricGaps = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
 
 #
 # proc_days related controls
@@ -664,6 +666,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
     NOTE: If no Destination data key is specified, then it is constructed using the template
 
         '<OP>(<DataSrc>[<startDate>:<endDate>])'
+
+    TODO: Currently dont change startDate and endDate from their default, because many operations
+    dont account for them being different from the default.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     if not _daterange_checkfine(startDateIndex, endDateIndex, "procdata_ex"):
@@ -709,10 +714,8 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             gData[dataDstQntls] = numpy.zeros([gData['nextEntIndex'],blockCnt,5])
             tResult = []
         elif op.startswith("reton"):
-            # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
-            historic = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
-            gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],historic.shape[0]])*numpy.nan
-            validHistoric = historic[historic < (endDateIndex+1)]
+            gData[dataDstMetaData] = numpy.ones([gData['nextEntIndex'],gHistoricGaps.shape[0]])*numpy.nan
+            validHistoric = gHistoricGaps[gHistoricGaps < (endDateIndex+1)]
             histDays = numpy.arange(endDateIndex,-1,-1)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op

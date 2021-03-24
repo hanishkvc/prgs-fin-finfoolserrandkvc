@@ -270,6 +270,8 @@ value of the same entity on the starting date (which defaults to start of the da
 of data loaded). If a given entity has no value available for the given start date, then
 the next earliest available non zero value will be used as the base.
 
+NOTE: calculate based on ValueOnEachDay/ValueOnGivenDate
+
 It also stores the following as part of MetaData associated with it
 
    the AbsoluteReturn as well as the ReturnsPerAnnum, as on the last date
@@ -291,6 +293,8 @@ rel - relative to given date
 Calculate the relative percentage difference for all data in the dataset, wrt the
 value of the same entity on the given base date, wrt each entity.
 
+NOTE: calculate based on ValueOnEachDay/ValueOnGivenDate
+
 As part of its associated meta data, it stores the following info calculated btw
 the endDate and baseDate
 
@@ -299,6 +303,15 @@ the endDate and baseDate
    the return per annum
 
    duration in years
+
+
+reton - return on given date
+------------------------------
+
+Calculate the relative percentage difference (appreciation/depreciation) on a given
+date relative to all other dates in the dataset, for each entity.
+
+NOTE: calculate based on ValueOnGivenDate/ValueOnEachDay
 
 
 dma - moving average
