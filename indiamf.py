@@ -206,9 +206,10 @@ def load4date(y, m, d, opts):
     """
     Load data for the given date.
 
-    NOTE: If loading pickled data fails, then it will try
-    to fetch the data corresponding to given date, freshly
-    from the internet/remote server.
+    NOTE: If loading pickled data fails, then it will try to load
+    the data corresponding to given date, from the locally downloaded
+    csv file if possible, else it will try to fetch it freshly from
+    the internet/remote server.
 
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
@@ -220,8 +221,12 @@ def load4date(y, m, d, opts):
         if ok:
             break
         else:
-            print("WARN:IndiaMF:load4date: No data pickle found for", fName)
-            fetch4date(y, m, d, opts={'ForceRemote': True})
+            print("WARN:IndiaMF:load4date:Try={}: No data pickle found for {}".format(i, fName))
+            if i > 0:
+                opts = { 'ForceRemote': True }
+            else:
+                opts = { 'ForceLocal': True }
+            fetch4date(y, m, d, opts)
     _loaddata(today)
 
 

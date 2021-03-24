@@ -157,7 +157,11 @@ def pickle_ok(fName, minSize=16e3):
     fName = "{}.pickle".format(fName)
     if os.path.exists(fName):
         if os.stat(fName).st_size > minSize:
-            return True
+            f = open(fName, 'rb')
+            pickleVer = pickle.load(f)
+            if pickleVer == gPICKLEVER:
+                return True
+    print("WARN:pickle_ok:Failed for", fName)
     return False
 
 
