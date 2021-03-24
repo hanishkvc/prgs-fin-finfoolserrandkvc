@@ -1142,7 +1142,7 @@ def infoset1_prep():
     procdata_ex(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
 
 
-def infoset1_result(entCodes):
+def infoset1_result(entNames=[], entCodes=[]):
     dataSrcs = [
             ['srel', 'srelMetaLabel'],
             ['absRet', 'roabsMetaLabel'],
@@ -1150,6 +1150,10 @@ def infoset1_result(entCodes):
             ['roll1095', 'roll1095MetaLabel'],
             ['roll1825', 'roll1825MetaLabel'],
             ]
+    if len(entNames) > 0:
+        fm,pm = search_data(entNames);
+    entCodesMore = [ x[0] for x in fm ]
+    entCodes = entCodes + entCodesMore
     for entCode in entCodes:
         entIndex = gData['code2index'][entCode]
         print("Name:", gData['names'][entIndex])
