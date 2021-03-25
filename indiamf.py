@@ -137,7 +137,9 @@ def _loaddata(today):
             if (mfCode != code):
                 input("DBUG:IndiaMF:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(code, mfCode))
                 continue
-            if (typeId != mfTypesId):
+            if False and (typeId != mfTypesId):
+                # Csv data files for different dates could have difference in what fund types and funds they have in them
+                # especially wrt working days and holidays. So ignoring this.
                 enttypes.list()
                 print([x[0] for x in today['entTypes']])
                 breakpoint()
