@@ -77,6 +77,8 @@ def parse_csv(sFile):
                 if curMFType not in today['entTypes']:
                     typeId += 1
                     today['entTypes'].append([curMFType,[]])
+                else:
+                    input("DBUG:IndiaMF:_parsecsv:Duplicate entType [{}] in [{}]".format(curMFType, sFile))
             continue
         try:
             la = l.split(';')
@@ -132,9 +134,13 @@ def _loaddata(today):
         for mfCode in mfCodes:
             todayMFIndex = today['code2index'][mfCode]
             code, name, nav, date, typeId = today['mfs'][todayMFIndex]
-            if (mfCode != code) or (typeId != mfTypesId):
-                print("DBUG:IndiaMF:_LoadData: Code[{}]|TypeId[{}] NotMatchExpected [{}]|[{}], skipping".format(code, typeId, mfCode, mfTypesId))
+            if (mfCode != code):
+                input("DBUG:IndiaMF:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(code, mfCode))
                 continue
+            if (typeId != mfTypesId):
+                enttypes.list()
+                print([x[0] for x in today['entTypes']])
+                breakpoint()
             if (gMeta['whiteListEntNames'] != None):
                 fm, pm = hlpr.matches_templates(name, gMeta['whiteListEntNames'])
                 if len(fm) == 0:
