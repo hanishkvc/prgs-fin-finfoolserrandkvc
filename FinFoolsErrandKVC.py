@@ -1137,9 +1137,11 @@ def infoset1_result(entNames=[], entCodes=[]):
     to the user.
 
     NOTE: As 2nd part of the result dump, where it prints data across all specified
-    entities, wrt each data process, it tries to sort them based on the average
-    results of roll1095 (3Y). And entities which are less than 3 years will get
-    collated to the end of the sorted list.
+    entities, wrt each data aspect that was processed during prep, it tries to sort
+    them based on the average meta data info from roll1095 (3Y). And entities which
+    are less than 3 years will get collated to the end of the sorted list, based on
+    the last RetPA from srel operation. If there are entities which get dropped by
+    both the sort operations, then they will get collated to the end.
     """
     dataSrcs = [
             ['srel', 'srelMetaLabel'],
@@ -1160,11 +1162,14 @@ def infoset1_result(entNames=[], entCodes=[]):
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gData[dataSrc[1]][entIndex]))
 
-    anals1 = analdata_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes))
-    analEntCodes = [ x[0] for x in anals1 ]
+    analR1095 = analdata_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes))
+    analR1095EntCodes = [ x[0] for x in analR1095 ]
     s1 = set(entCodes)
-    s2 = set(analEntCodes)
-    entCodes = analEntCodes + list(s1-s2)
+    s2 = set(analR1095EntCodes)
+    otherEntCodes = s1-s2
+    analSrelRPA = analdata_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes))
+    s3 = set(analSrelRPA)
+    entCodes = analR1095EntCodes + analSrelRPA + list(s1-(s2+s3))
 
     for dataSrc in dataSrcs:
         print("DataSrc:", dataSrc)
