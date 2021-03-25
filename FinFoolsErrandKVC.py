@@ -1137,7 +1137,9 @@ def infoset1_result(entNames=[], entCodes=[]):
             ]
     if len(entNames) > 0:
         fm,pm = search_data(entNames);
-    entCodesMore = [ x[0] for x in fm ]
+        entCodesMore = [ x[0] for x in fm ]
+    else:
+        entCodesMore = []
     entCodes = entCodes + entCodesMore
     for entCode in entCodes:
         entIndex = gMeta['code2index'][entCode]
