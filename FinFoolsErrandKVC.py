@@ -74,6 +74,7 @@ gbDoRollingRet=False
 ROLLINGRET_WINSIZE = 365
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 gHistoricGaps = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
+gHistoricGapsHdr = numpy.array(["1D", "5D", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
 
 #
 # proc_days related controls
@@ -1175,7 +1176,7 @@ def infoset1_result(entNames=[], entCodes=[]):
     for dataSrc in dataSrcs:
         print("DataSrc:", dataSrc)
         if dataSrc[0] in [ 'absRet', 'retPA' ]:
-            print("\t{:6}:{:24}: {}".format("code", "name",hlpr.array_str(gHistoricGaps, width=7)));
+            print("\t{:6}:{:24}: {}".format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)));
         for entCode in entCodes:
             entIndex = gMeta['code2index'][entCode]
             entName = gMeta['names'][entIndex][:24]
