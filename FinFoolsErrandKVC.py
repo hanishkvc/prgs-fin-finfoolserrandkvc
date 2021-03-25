@@ -1167,12 +1167,15 @@ def infoset1_result(entNames=[], entCodes=[]):
     s1 = set(entCodes)
     s2 = set(analR1095EntCodes)
     otherEntCodes = s1-s2
-    analSrelRPA = analdata_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes))
-    s3 = set(analSrelRPA)
-    entCodes = analR1095EntCodes + analSrelRPA + list(s1-(s2+s3))
+    analSRelRPA = analdata_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes))
+    analSRelRPAEntCodes = [ x[0] for x in analSRelRPA ]
+    s3 = set(analSRelRPAEntCodes)
+    entCodes = analR1095EntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))
 
     for dataSrc in dataSrcs:
         print("DataSrc:", dataSrc)
+        if dataSrc[0] in [ 'absRet', 'retPA' ]:
+            print("\t{:6}:{:24}: {}".format("code", "name",hlpr.array_str(gHistoricGaps, width=7)));
         for entCode in entCodes:
             entIndex = gMeta['code2index'][entCode]
             entName = gMeta['names'][entIndex][:24]
