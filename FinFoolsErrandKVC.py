@@ -15,6 +15,7 @@ import readline
 import tabcomplete as tc
 import hlpr
 import indiamf
+import enttypes as et
 
 
 """
@@ -120,10 +121,10 @@ def setup_gdata(startDate=-1, endDate=-1):
     """
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
     gData.clear()
+    gData['data'] = numpy.zeros([8192*4, numDates])
     gMeta.clear()
     gMeta['code2index'] = {}
     gMeta['index2code'] = {}
-    gData['data'] = numpy.zeros([8192*4, numDates])
     gMeta['nextEntIndex'] = 0
     gMeta['dataIndex'] = -1
     gMeta['names'] = []
@@ -131,9 +132,7 @@ def setup_gdata(startDate=-1, endDate=-1):
     gMeta['skipped'] = set()
     gMeta['dateRange'] = [-1, -1]
     gMeta['plots'] = set()
-    gMeta['entTypes'] = {}
-    gMeta['entType4Id'] = []
-    gMeta['entType2Id'] = {}
+    et.init(gMeta)
     gMeta['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
     gData['metas'] = {}
     gMeta['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
