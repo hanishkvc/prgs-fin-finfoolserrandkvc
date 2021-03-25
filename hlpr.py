@@ -243,6 +243,7 @@ def array_str(arr, width=5, precision=2):
         firstPrec = precision
     strA = "[ "
     iLast = len(arr)-1
+    typeNumpyStr = type(numpy.str_())
     for i in range(iLast+1):
         if i == iLast:
             precision = lastPrec
@@ -250,7 +251,10 @@ def array_str(arr, width=5, precision=2):
             precision = firstPrec
         else:
             precision = allPrec
-        strA = "{}{:{width}.{precision}f} ".format(strA, arr[i], width=width, precision=precision)
+        if type(arr[i]) == typeNumpyStr:
+            strA = "{}{:>{width}} ".format(strA, arr[i], width=width)
+        else:
+            strA = "{}{:{width}.{precision}f} ".format(strA, arr[i], width=width, precision=precision)
     strA += "]"
     return strA
 
