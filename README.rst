@@ -196,8 +196,6 @@ filter entities based on the corresponding list of filters. If user doesnt speci
 argument, then the program will use the 'default' loadFilter. If user doesnt want to
 filter any of the entities, then pass None wrt loadFiltersName.
 
-NOTE: For MFs EntityType corresponds to Equity, Money market, etc. One can use
-enttypes_list to get the currently known list of entity types.
 
 
 Search
@@ -443,6 +441,28 @@ help(plot_data)
 
 help(show_plot)
 
+
+Entity types
+==============
+
+The entities (MFs/stocks/indexes/...) maintained by the program could belong to different
+categories/types.
+
+enttypes.list()
+-----------------
+
+Will list all the types currently known to the program. Loading of data will set this list.
+
+   for example wrt MFs, it could be
+
+      open ended equity
+      money market
+      hybrid etc
+
+enttypes.members(entType)
+---------------------------
+
+List all the entities belonging to the given entType.
 
 
 

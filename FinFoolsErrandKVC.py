@@ -15,7 +15,7 @@ import readline
 import tabcomplete as tc
 import hlpr
 import indiamf
-import enttypes as et
+import enttypes
 
 
 """
@@ -132,7 +132,7 @@ def setup_gdata(startDate=-1, endDate=-1):
     gMeta['skipped'] = set()
     gMeta['dateRange'] = [-1, -1]
     gMeta['plots'] = set()
-    et.init(gMeta)
+    enttypes.init(gMeta)
     gMeta['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
     gData['metas'] = {}
     gMeta['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
@@ -429,23 +429,6 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
         gData['data'] = gData['data'][:gMeta['nextEntIndex'],:gMeta['dataIndex']+1]
         gMeta['lastSeen'] = gMeta['lastSeen'][:gMeta['nextEntIndex']]
         gMeta['typeId'] = gMeta['typeId'][:gMeta['nextEntIndex']]
-
-
-def enttypes_list():
-    """
-    List entityTypes found in currently loaded data.
-    """
-    for k in gMeta['entTypes']:
-        print(k)
-
-
-def enttypes_members(entType):
-    """
-    List the members of the specified entityType
-    """
-    print("INFO:entTypesMembers:", entType)
-    for m in gMeta['entTypes'][entType]:
-        print(m, gMeta['names'][gMeta['code2index'][m]])
 
 
 def _fillin4holidays(mfIndex=-1):
