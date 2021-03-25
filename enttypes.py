@@ -28,6 +28,24 @@ def _themeta(theMeta):
         return theMeta
 
 
+def add(entType, theCaller="?", theMeta=None):
+    """
+    Add the given entType into meta dictionary, if required.
+
+    Also return the entTypeId for the given entType.
+    """
+    theMeta = _themeta(theMeta)
+    if entType not in theMeta['entTypes']:
+        theMeta['entTypes'][entType] = []
+        checkTypeId = theMeta['entType2Id'].get(entType, -1)
+        if checkTypeId != -1:
+            input("DBUG:EntTypes-{}:add: entType2Id not in sync with entTypes".format(theCaller))
+        else:
+            theMeta['entType4Id'].append(entType)
+        theMeta['entType2Id'][entType] = len(theMeta['entType4Id'])-1
+    return theMeta['entType2Id'][entType]
+
+
 def list(theMeta=None):
     """
     List entityTypes found in currently loaded data.

@@ -6,6 +6,7 @@ import calendar
 import sys
 import datetime
 import hlpr
+import enttypes
 
 
 gData = None
@@ -114,18 +115,8 @@ def _loaddata(today):
     global variables before calling load_data.
     """
     # Handle MFTypes
-    mfTypesId = -1
     for [curMFType, mfCodes] in today['entTypes']:
-        mfTypesId += 1
-        if curMFType not in gMeta['entTypes']:
-            gMeta['entTypes'][curMFType] = []
-            checkTypeId = gMeta['entType2Id'].get(curMFType, -1)
-            if checkTypeId != -1:
-                if checkTypeId != mfTypesId:
-                    input("DBUG:IndiaMF:_LoadData:MFTypesId Mismatch")
-            else:
-                gMeta['entType4Id'].append(curMFType)
-            gMeta['entType2Id'][curMFType] = mfTypesId
+        mfTypesId = enttypes.add(curMFType)
         if gMeta['whiteListEntTypes'] == None:
             bSkipCurMFType = False
         else:
