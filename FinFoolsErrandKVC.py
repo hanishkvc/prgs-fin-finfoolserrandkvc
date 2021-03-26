@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import time
 import traceback
 import readline
+import warnings
 import tabcomplete as tc
 import hlpr
 import indiamf
@@ -1109,12 +1110,14 @@ def infoset1_prep():
     Run a common set of operations, which can be used to get some amount of
     potentially useful info, on the loaded data,
     """
+    warnings.filterwarnings('ignore')
     procdata_ex(['srel=srel(data)', 'dma50Srel=dma50(srel)'])
     procdata_ex(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'])
     procdata_ex(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'])
     procdata_ex(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
     blockDays = int((gMeta['dataIndex']+1)/5)
     procdata_ex(['blockNRoll1095=block{}(roll1095)'.format(blockDays)])
+    warnings.filterwarnings('default')
 
 
 def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
