@@ -1060,9 +1060,9 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         breakpoint()
     theSaneArray = _forceval_entities(theSaneArray, entCodes, iSkip, 'invert')
     if minEntityLifeDataInYears > 0:
-        dataYearsAvailable = gMeta['dataIndex']/365
+        dataYearsAvailable = (gMeta['dataIndex']+1)/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
-            print("ERROR:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
+            print("WARN:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
         srelMetaData, srelMetaLabel = datadst_metakeys('srel')
         theSRelMetaData = gData.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
