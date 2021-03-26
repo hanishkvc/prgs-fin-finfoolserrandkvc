@@ -486,8 +486,8 @@ infoset1_result_entcodes(listOfEntCodes)
    the passed list of entCodes using any mechanism they find suitable and or need.
 
 
-NOTE: If you want to limit the number of entities printed as part of the comparitive prints, then
-pass numEntries argument to infoset1_result.
+NOTE: By default only 20 entities are printed as part of the comparitive prints, if you want to
+change this,  pass numEntries argument to infoset1_result.
 
 
 Others
