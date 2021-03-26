@@ -1195,6 +1195,8 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             plt.scatter(x,y)
             for i,txt in enumerate(c):
                 plt.annotate(txt,(x[i],y[i]))
+            plt.xlabel('RollRet Avg')
+            plt.ylabel('RollRet StD')
             plt.show()
         if bPrompt:
             input("Press any key to continue...")
