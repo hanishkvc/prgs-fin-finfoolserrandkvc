@@ -423,14 +423,48 @@ Some of the operationTypes supported include
 infoset1
 ----------
 
+User needs to first run infoset1_prep, before calling one of the infoset1_result calls.
+This will print processed data, wrt specified entities, based on what was generated during
+infoset1_prep.
+
 infoset1_prep()
 
    process the raw data using a standard set of operations like srel, roll1095, roll1825
    and reton, in order to generate useful info.
 
-infoset1_result(listOfEntityNameMatchTemplates)
+infoset1_result()
 
-   Display info wrt specified entities, based on what was generated during infoset1_prep.
+   Display processed data wrt all entities in the loaded dataset.
+
+infoset1_result(listOfEntityTypeMatchTemplates)
+
+   Display processed data wrt all entities which belong to any of the matching entTypes.
+
+   ex: infoset1_result('elss')
+
+   ex: infoset1_result('open large')
+
+   ex: infoset1_result(['elss', 'open large', 'open flexi', 'open multi'])
+
+infoset1_result([], listOfEntityNameMatchTemplates)
+
+   Display processed data wrt entities, whose name match any of the given entName matching template.
+
+   ex: infoset1_result([], 'axis')
+
+   ex: infoset1_result([], 'pgim direct')
+
+   ex: infoset1_result([], ['nifty direct', 'nasdaq direct'])
+
+infoset1_result(listOfEntityTypeMatchTemplates, listOfEntityNameMatchTemplates)
+
+   Display processed data wrt entities, which belong to one of the matched entTypes and inturn
+   whose name matches any of the passed entNameMatchTemplate.
+
+infoset1_result_entcodes(listOfEntCodes)
+
+   Display processed data for the list of entities specified using their entCode. User can create
+   the passed list of entCodes using any mechanism they find suitable and or need.
 
 
 

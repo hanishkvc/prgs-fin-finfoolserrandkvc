@@ -61,7 +61,7 @@ def list(theMeta=None):
         print(k)
 
 
-def members(entTypeTmpls, entNameTmpls=None, theMeta=None):
+def members(entTypeTmpls, entNameTmpls=[], theMeta=None):
     """
     List the members of the specified entityTypes
 
@@ -71,7 +71,7 @@ def members(entTypeTmpls, entNameTmpls=None, theMeta=None):
     for.
 
     The entities belonging to the selected entTypes will be filtered
-    through the entNameTmpls. If entNameTmpls is None, then all
+    through the entNameTmpls. If entNameTmpls is empty, then all
     members of the selected entTypes will be selected.
     """
     theMeta = _themeta(theMeta)
@@ -87,7 +87,7 @@ def members(entTypeTmpls, entNameTmpls=None, theMeta=None):
         print("INFO:EntType: [{}] members:".format(entType))
         for entCode in gMeta['entTypes'][entType]:
             entName = gMeta['names'][gMeta['code2index'][entCode]]
-            if entNameTmpls == None:
+            if len(entNameTmpls) == 0:
                 bEntSelect = True
             else:
                 fm,pm = hlpr.matches_templates(entName, entNameTmpls)
