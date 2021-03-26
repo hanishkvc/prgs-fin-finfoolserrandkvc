@@ -1175,14 +1175,23 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             print("\t{:6}:{:24}:  AbsRet    RetPA   DurYrs : startVal - endVal".format("code", "name"))
         elif dataSrc[0].startswith('roll'):
             print("\t{:6}:{:24}:   Avg   Std [Below4%]".format("code", "name"))
+            x = []
+            y = []
+            dataSrcMetaData = dataSrc[1].replace('Label','Data')
         entCount = 0
         for entCode in entCodes:
             entIndex = gMeta['code2index'][entCode]
             entName = gMeta['names'][entIndex][:24]
+            if dataSrc[0].startswith('roll'):
+                x.append(gData[dataSrcMetaData][entIndex,0])
+                y.append(gData[dataSrcMetaData][entIndex,1])
             print("\t{}:{:24}: {}".format(entCode, entName, gData[dataSrc[1]][entIndex]))
             entCount += 1
             if (numEntries > 0) and (entCount > numEntries):
                 break
+        if dataSrc[0].startswith('roll'):
+            plt.scatter(x,y)
+            plt.show()
         if bPrompt:
             input("Press any key to continue...")
 
