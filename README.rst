@@ -440,7 +440,7 @@ each entity individually as well as for each type of data, it will provide compa
 Wrt these comparative prints, it tries to order the entities, based on the average of the
 3 year rolling rets. However if a entity has not been active for 3 years, then such entities
 will get bundled to the end of the ordered list, based on the last return per annum data
-available for such entities.
+available for such entities (wrt its start date).
 
 User needs to first run infoset1_prep, before calling one of the infoset1_result calls.
 This will print processed data, wrt specified entities, based on what was generated during
@@ -485,6 +485,9 @@ infoset1_result_entcodes(listOfEntCodes)
    Display processed data for the list of entities specified using their entCode. User can create
    the passed list of entCodes using any mechanism they find suitable and or need.
 
+
+NOTE: If you want to limit the number of entities printed as part of the comparitive prints, then
+pass numEntries argument to infoset1_result.
 
 
 Others
