@@ -1160,7 +1160,11 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
     for dataSrc in dataSrcs:
         print("DataSrc:", dataSrc)
         if dataSrc[0] in [ 'absRet', 'retPA' ]:
-            print("\t{:6}:{:24}: {}".format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)));
+            print("\t{:6}:{:24}: {}".format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)))
+        elif dataSrc[0] == 'srel':
+            print("\t{:6}:{:24}:  AbsRet    RetPA   DurYrs : startVal - endVal".format("code", "name"))
+        elif dataSrc[0].startswith('roll'):
+            print("\t{:6}:{:24}:   Avg   Std [Below4%]".format("code", "name"))
         entCount = 0
         for entCode in entCodes:
             entIndex = gMeta['code2index'][entCode]
