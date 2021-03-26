@@ -96,6 +96,14 @@ NOTE: When comparing entities, if they have been active for different amount of 
 within the current date range that has been loaded and looked at, then the results
 may not give the full picture, depending on how one looks at things.
 
+A sample session could involve
+
+   fetch_data(2013, 2021)
+   load_data(2013, 2021)
+   infoset1_prep()
+   infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
+   infoset1_result(['open equity elss', 'open hybrid aggressive'], ['direct'])
+
 
 Fetching
 ==========
@@ -169,6 +177,10 @@ load_data(YYYY[MM[DD]])
 load_data(YYYY[MM[DD]], YYYY[MM[DD]])
 
 load_data(YYYY[MM[DD]], YYYY[MM[DD]], loadFiltersName=theLoadFiltersName)
+
+NOTE: load_data will try and fetch the data, if its not already fetched. However if you
+want to force a redownload etc, then you have to call fetch_data directly with appropraite
+arguments.
 
 
 LoadFilters

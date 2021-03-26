@@ -19,38 +19,21 @@ import enttypes
 
 
 """
-
 Usage scenario
-
-Old/Low level:
-    fetch4daterange(2015, 202102)
-    load4daterange(2015, 2020)
-    Older:
-        #fillin4holidays()
-        f,p = findmatchingmf("token1 token2")
-        [print(x) for x in f]
-        plt.plot(gData['data'][mfIndex])
-        plt.show()
-    InBetween:
-        lookatents_names("mf name parts")
-        lookatents_names("mf name parts 1; mf name parts 2; mf name parts 3")
-        lookatents_names(["mf name parts 1", "mf name parts 2"])
-        look4mfs()
-        look4mfs("TOP", 20150101, 20210228)
-Newer:
     fetch_data(2010, 202103)
     load_data(2013, 20190105)
-    lookat_data("OP:TOP")
-    lookat_data(["us direct", "hybrid direct abc"])
-    show_plot()
-    lookat_data(["another mf or mfs", "related mfs"], dataProcs=[ "raw", "rel", "dma"])
+    # explore option 1
+    infoset1_prep()
+    infoset1_result(['open elss'], ['direct'])
+    infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
+    # explore option 2
+    procdata_ex(['srel=srel(data)', 'roll3Y=roll1095(data)'])
+    search_data(['match name tokens1', 'match name tokens2'])
+    analdata_simple('srel', 'top', 'srel_retpa')
+    analdata_simple('roll3Y', 'top', 'roll_avg')
+    plot_data('srel', [ entCode1, entCode2 ])
     show_plot()
     quit()
-TODO:
-    20 day, 50 day line, 10 week line, 200 day (Moving averages(simple, exponential))
-    52 week high/low,
-    Extract fund type from Nav data file
-    Negative tokens while matching
 """
 
 gbDEBUG = False
