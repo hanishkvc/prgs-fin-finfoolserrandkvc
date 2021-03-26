@@ -2,6 +2,8 @@
 # Handle entity types as part of FinFoolsErrand
 # HanishKVC, 2021
 
+import hlpr
+
 
 gMeta = None
 def init(theMeta, bClearFields=True):
@@ -59,13 +61,30 @@ def list(theMeta=None):
         print(k)
 
 
-def members(entType, theMeta=None):
+def members(entTypeTmpls, theMeta=None):
     """
-    List the members of the specified entityType
+    List the members of the specified entityTypes
+
+    entTypeTmpls could either be a string or a list of strings.
+    Each of these strings will be treated as a matching template
+    to help identify the entity types one should get the members
+    for.
+
     """
     theMeta = _themeta(theMeta)
-    print("INFO:EntTypes: [{}] members:".format(entType))
-    for m in gMeta['entTypes'][entType]:
-        print(m, gMeta['names'][gMeta['code2index'][m]])
+    if type(entTypeTmpls) == str:
+        entTypeTmpls = [ entTypeTmpls ]
+    entTypesList = []
+    for entType in gMeta['entTypes']:
+        fm,pm = hlpr.matches_templates(entType, entTypeTmpls)
+        if len(fm) > 0:
+            entTypesList.append(entType)
+    entCodes = []
+    for entType in entTypesList:
+        print("INFO:EntType: [{}] members:".format(entType))
+        for m in gMeta['entTypes'][entType]:
+            print("\t", m, gMeta['names'][gMeta['code2index'][m]])
+            entCodes.append(m)
+    return entCodes
 
 
