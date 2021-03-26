@@ -189,16 +189,22 @@ def fetch4date(y, m, d, opts):
     bParseCSV=False
     if opts == None:
         opts = {}
-    if opts.get('ForceRemote', False):
+    bForceRemote = opts.get('ForceRemote', False)
+    bForceLocal = opts.get('ForceLocal', False)
+    if bForceRemote:
         _fetchdata(url, fName)
         bParseCSV=True
     elif not hlpr.pickle_ok(fName):
-        if not opts.get('ForceLocal', False):
+        if not bForceLocal:
             _fetchdata(url, fName)
         bParseCSV=True
     if bParseCSV:
-        today = parse_csv(fName)
-        hlpr.save_pickle(fName, today, [], "IndiaMF:fetch4Date")
+        try:
+            today = parse_csv(fName)
+            hlpr.save_pickle(fName, today, [], "IndiaMF:fetch4Date")
+        except:
+            print("ERRR:IndiaMF:fetch4date:{}:ForceRemote[{}], ForceLocal[{}]".format(fname, bForceRemote, bForceLocal))
+            print(sys.exc_info())
 
 
 def load4date(y, m, d, opts):
