@@ -80,6 +80,8 @@ def matches_templates(theString, matchTemplates, fullMatch=False, partialTokens=
     matchTmplPartMatch = []
     tmplIndex = -1
     #breakpoint()
+    if type(matchTemplates) == str:
+        matchTemplates = [ matchTemplates ]
     for matchTmpl in matchTemplates:
         matchTmplRaw = matchTmpl
         if ignoreCase:
