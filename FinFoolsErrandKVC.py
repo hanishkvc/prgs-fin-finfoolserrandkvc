@@ -1113,6 +1113,8 @@ def infoset1_prep():
     procdata_ex(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'])
     procdata_ex(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'])
     procdata_ex(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
+    blockDays = int((gMeta['dataIndex']+1)/5)
+    procdata_ex(['blockNRoll1095=block{}(roll1095)'.format(blockDays)])
 
 
 def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
@@ -1156,6 +1158,8 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
     analSRelRPAEntCodes = [ x[0] for x in analSRelRPA ]
     s3 = set(analSRelRPAEntCodes)
     entCodes = analR1095EntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))
+
+    analdata_simple('blockNRoll1095', 'top', 'block_ranked', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration)
 
     for dataSrc in dataSrcs:
         print("DataSrc:", dataSrc)
