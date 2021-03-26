@@ -2,7 +2,7 @@
 Try look at MF/Indexes/... Nav data
 ####################################
 Author: HanishKVC
-Version: v20210317IST1234
+Version: v20210326IST2019
 License: GPL
 Status: Partly OUT OF SYNC with PROGRAM
 
@@ -423,6 +423,13 @@ Some of the operationTypes supported include
 infoset1
 ----------
 
+Print some possibly useful info about the entities in the loaded set. It prints data about
+each entity individually as well as for each type of data, it will provide comparative prints.
+Wrt these comparative prints, it tries to order the entities, based on the average of the
+3 year rolling rets. However if a entity has not been active for 3 years, then such entities
+will get bundled to the end of the ordered list, based on the last return per annum data
+available for such entities.
+
 User needs to first run infoset1_prep, before calling one of the infoset1_result calls.
 This will print processed data, wrt specified entities, based on what was generated during
 infoset1_prep.
@@ -493,10 +500,11 @@ Will list all the types currently known to the program. Loading of data will set
       money market
       hybrid etc
 
-enttypes.members(entType)
----------------------------
+enttypes.members(entTypeTmpls, entNameTmpls)
+------------------------------------------------
 
-List all the entities belonging to the given entType.
+List all the entities belonging to the given entTypes. If entNameTmpls is also provided,
+then only list those entities, whose name matches one of the passed entName match template.
 
 
 
