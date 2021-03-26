@@ -30,7 +30,7 @@ def setup_paths(basePath):
     print("INFO:IndiaMF:setup_paths:", MFS_FNAMECSV_TMPL)
 
 
-MF_ALLOW_ENTTYPES=[ "equity", "elss", "other", "hybrid", "solution" ]
+MF_ALLOW_ENTTYPES=[ "open equity", "open elss", "open other", "open hybrid", "open solution" ]
 MF_ALLOW_ENTNAMES=None
 MF_SKIP_ENTNAMES =[ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
 def setup(basePath, theGData, theGMeta, theLoadFilters):
