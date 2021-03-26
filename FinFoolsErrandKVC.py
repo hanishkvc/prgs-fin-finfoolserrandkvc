@@ -1157,12 +1157,16 @@ def infoset1_result_entcodes(entCodes):
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gData[dataSrc[1]][entIndex]))
 
-    analR1095 = analdata_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes))
+    dateDuration = (gMeta['dataIndex']+1)/365
+    if dateDuration > 1.5:
+        dateDuration = 1.5
+    print("INFO:dateDuration:", dateDuration)
+    analR1095 = analdata_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration)
     analR1095EntCodes = [ x[0] for x in analR1095 ]
     s1 = set(entCodes)
     s2 = set(analR1095EntCodes)
     otherEntCodes = s1-s2
-    analSRelRPA = analdata_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes))
+    analSRelRPA = analdata_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minEntityLifeDataInYears=dateDuration)
     analSRelRPAEntCodes = [ x[0] for x in analSRelRPA ]
     s3 = set(analSRelRPAEntCodes)
     entCodes = analR1095EntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))

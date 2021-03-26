@@ -203,7 +203,7 @@ def fetch4date(y, m, d, opts):
             today = parse_csv(fName)
             hlpr.save_pickle(fName, today, [], "IndiaMF:fetch4Date")
         except:
-            print("ERRR:IndiaMF:fetch4date:{}:ForceRemote[{}], ForceLocal[{}]".format(fname, bForceRemote, bForceLocal))
+            print("ERRR:IndiaMF:fetch4date:{}:ForceRemote[{}], ForceLocal[{}]".format(fName, bForceRemote, bForceLocal))
             print(sys.exc_info())
 
 
