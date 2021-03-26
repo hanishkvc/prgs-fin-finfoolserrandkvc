@@ -1164,8 +1164,11 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
 
     analdata_simple('blockNRoll1095', 'top', 'block_ranked', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration)
 
+    totalEntries = len(entCodes)
+    if numEntries > totalEntries:
+        numEntries = totalEntries
     for dataSrc in dataSrcs:
-        print("DataSrc:{}: >>showing {} entries only<<".format(dataSrc, numEntries))
+        print("DataSrc:{}: >>showing {} of {} entries<<".format(dataSrc, numEntries, totalEntries))
         if dataSrc[0] in [ 'absRet', 'retPA' ]:
             print("\t{:6}:{:24}: {}".format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)))
         elif dataSrc[0] == 'srel':
