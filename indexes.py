@@ -180,13 +180,14 @@ def fetch_data(startDate, endDate, opts=None):
         NOTE: ForceRemote takes precedence over ForceLocal.
     """
     sY,sM,sD = hlpr.dateintparts(startDate)
-    eY,eM,eD = hlpr.dateintparts(endDate)
+    eY,eM,eD = hlpr.dateintparts(endDate, False)
     for y in range(sY, eY+1):
         for m in range(1, 12+1):
             if (y == sY) and (m < sM):
                 continue
             if (y == eY) and (m > eM):
                 break
+            print("DBUG:Indexes:FetchData:",y,m)
             fetch_data4month(y,m)
 
 

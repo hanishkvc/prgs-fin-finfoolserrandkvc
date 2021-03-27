@@ -276,7 +276,7 @@ def fetch_data(startDate, endDate=None, opts=None):
     if endDate == None:
         endDate = startDate
     for cb in gCB['fetch_data']:
-        cb(startDate, endDate)
+        cb(startDate, endDate, opts)
     return fetch4daterange(startDate, endDate, opts)
 
 

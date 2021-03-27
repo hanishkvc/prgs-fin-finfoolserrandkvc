@@ -151,10 +151,21 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
-def dateintparts(theDate):
+def dateintparts(theDate, bStart=True):
     """
     Convert the full date YYYYMMDD int to its constituent parts i.e year, month and day.
     """
+    if theDate < 9999:
+        if bStart:
+            m,d = 1,1
+        else:
+            m,d = 12,31
+        theDate = dateint(theDate,m,d)
+    elif theDate < 999999:
+        if bStart:
+            theDate = theDate*100+1
+        else:
+            theDate = theDate*100+31
     y = int(theDate/10000)
     t = theDate%10000
     m = int(t/100)
