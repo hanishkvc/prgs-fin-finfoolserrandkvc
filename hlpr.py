@@ -171,8 +171,8 @@ def dateintparts(theDate, bStart=True):
         if bStart:
             theDate = theDate*100+1
         else:
-            y = int(theDate/10000)
-            m = theDate%10000
+            y = int(theDate/100)
+            m = theDate%100
             theDate = theDate*100+calendar.monthlen(y,m)
     y = int(theDate/10000)
     t = theDate%10000
