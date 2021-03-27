@@ -186,6 +186,9 @@ def fetch4date(y, m, d, opts):
             of the local data pickle file is ok or not.
         NOTE: ForceRemote takes precedence over ForceLocal.
     """
+    if (y < 2006) or ((y == 2006) and (m < 4)):
+        print("WARN:IndiaMF:fetch4date:AMFI data starts from 200604, so skipping for {:04}{:02}...".format(y,m))
+        return
     url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
     fName = MFS_FNAMECSV_TMPL.format(y,m,d)
     bParseCSV=False
