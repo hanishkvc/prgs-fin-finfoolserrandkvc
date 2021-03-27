@@ -36,11 +36,10 @@ def setup_paths(basePath):
 
 
 def setup(basePath, theGData, theGMeta, theCB, theLoadFilters):
-    global gData, gMeta, ENTTYPEID
+    global gData, gMeta
     setup_paths(basePath)
     gData = theGData
     gMeta = theGMeta
-    ENTTYPEID = enttypes.add(ENTTYPE)
     theCB['fetch_data'].append(fetch_data)
     theCB['load_data'].append(load_data)
     theCB['load4date'].append(load4date)
@@ -156,11 +155,12 @@ def fetch_data(startDate, endDate, opts=None):
 lastLoadedYear = -1
 lastLoadedMonth = -1
 gToday = None
-def load_data(startDate, endDate, opts):
-    global lastLoadedYear, lastLoadedMonth, gToday
+def load_data(startDate, endDate, opts=None):
+    global lastLoadedYear, lastLoadedMonth, gToday, ENTTYPEID
     lastLoadedYear = -1
     lastLoadedMonth = -1
     gToday = None
+    ENTTYPEID = enttypes.add(ENTTYPE)
 
 
 

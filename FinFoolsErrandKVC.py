@@ -417,6 +417,8 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     if bClearData:
         setup_gdata(startDate, endDate)
     _loadfilters_load(loadFiltersName)
+    for cb in gCB['load_data']:
+        cb(startDate, endDate)
     load4daterange(startDate, endDate)
     if bOptimizeSize:
         gData['data'] = gData['data'][:gMeta['nextEntIndex'],:gMeta['dataIndex']+1]
