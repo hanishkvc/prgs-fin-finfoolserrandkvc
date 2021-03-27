@@ -206,7 +206,7 @@ def load4date(y, m, d, opts):
     """
     load_data4month(y,m,opts)
     if gToday != None:
-        date = dateint(y,m,d)
+        date = hlpr.dateint(y,m,d)
         val = gToday[ENTNAME][date]
         hlpr.gdata_add(gData, gMeta, ENTTYPEID, ENTTYPE, ENTCODE, ENTNAME, val, date, "Indexes:Load4Date")
 
