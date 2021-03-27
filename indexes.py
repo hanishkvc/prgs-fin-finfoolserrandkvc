@@ -36,11 +36,14 @@ def setup_paths(basePath):
 
 
 def setup(basePath, theGData, theGMeta, theCB, theLoadFilters):
-    global gData, gMeta
+    global gData, gMeta, ENTTYPEID
     setup_paths(basePath)
     gData = theGData
     gMeta = theGMeta
+    ENTTYPEID = enttypes.add(ENTTYPE)
     theCB['fetch_data'].append(fetch_data)
+    theCB['load_data'].append(load_data)
+    theCB['load4date'].append(load4date)
     print("INFO:Indexes:Setup done")
 
 
@@ -145,9 +148,18 @@ def fetch_data(startDate, endDate, opts=None):
             fetch_data4month(y,m,opts)
 
 
+
 lastLoadedYear = -1
 lastLoadedMonth = -1
 gToday = None
+def load_data(startDate, endDate, opts):
+    global lastLoadedYear, lastLoadedMonth, gToday
+    lastLoadedYear = -1
+    lastLoadedMonth = -1
+    gToday = None
+
+
+
 def load_data4month(y, m, opts):
     """
     Parse the specified data csv file and load it into global data dictionary.
