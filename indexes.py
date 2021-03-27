@@ -7,6 +7,7 @@ import sys
 import datetime
 import hlpr
 import enttypes
+import time
 
 
 gData = None
@@ -41,58 +42,24 @@ def setup(basePath, theGData, theGMeta, theCB, theLoadFilters):
 
 def parse_csv(sFile):
     """
-    Parse the specified data csv file and load it into global data dictionary.
-
-    NOTE: It uses the white and black lists wrt MFTypes and MFNames, if any
-    specified in gData, to decide whether a given MF should be added to the
-    dataset or not. User can control this in the normal usage flow by either
-    passing these lists explicitly to load_data and or by setting related
-    global variables before calling load_data.
+    Parse the specified data csv file and load it into a local data dictionary.
     """
     tFile = open(sFile)
-    curMFType = ""
     today = {
-                'entTypes': [],
-                'code2index': {},
-                'mfs': []
+                'bsesensex': {}
             }
-    typeId = -1
-    mfIndex = -1
     for l in tFile:
         l = l.strip()
         if l == '':
             continue
-        if l[0].isalpha():
-            if l[-1] == ')':
-                curMFType = l
-                if curMFType not in today['entTypes']:
-                    typeId += 1
-                    today['entTypes'].append([curMFType,[]])
-                else:
-                    input("DBUG:Indexes:_parsecsv:Duplicate entType [{}] in [{}]".format(curMFType, sFile))
+        if l.startswith('Date,Open'):
             continue
-        try:
-            la = l.split(';')
-            code = int(la[0])
-            name = hlpr.string_cleanup(la[1], gNameCleanupMap)
-            try:
-                nav  = float(la[4])
-            except:
-                nav = 0
-            date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
-            date = hlpr.dateint(date.year,date.month,date.day)
-            #print(code, name, nav, date)
-            checkMFIndex = today['code2index'].get(code, None)
-            if checkMFIndex == None:
-                mfIndex += 1
-                today['code2index'][code] = mfIndex
-                today['mfs'].append([code, name, nav, date, typeId])
-                today['entTypes'][typeId][1].append(code)
-            else:
-                input("WARN:Indexes:parse_csv:Duplicate MF {}:{}=={}".format(code, name, today['mfs'][checkMFIndex][1]))
-        except:
-            print("ERRR:Indexes:parse_csv:{}".format(l))
-            print(sys.exc_info())
+        la = l.split(',')
+        sDate = la[0]
+        val = float(la[4])
+        date = time.strptime(sDate, "%d-%B-%Y")
+        date = hlpr.dateint(date.tm_year, date.tm_mon, date.tm_mday)
+        today['bsesensex'][date] = val
     tFile.close()
     return today
 
