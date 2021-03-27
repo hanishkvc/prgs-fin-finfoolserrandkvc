@@ -241,6 +241,10 @@ def load4date(y, m, d, opts):
             else:
                 opts = { 'ForceLocal': True }
             fetch4date(y, m, d, opts)
-    _loaddata(today)
+    if ok:
+        _loaddata(today)
+    else:
+        print("WARN:IndiaMF:load4date:No data wrt {}, so skipping".format(fName))
+
 
 
