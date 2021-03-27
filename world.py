@@ -3,6 +3,8 @@
 # HanishKVC, 2021
 # GPL
 #
+# NOTE: This is a initial skeleton for testing only
+#
 
 import sys
 import time

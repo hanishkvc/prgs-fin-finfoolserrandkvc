@@ -41,7 +41,7 @@ def setup(basePath, theGData, theGMeta, theCB, theLoadFilters):
     theCB['fetch4date'].append(fetch4date)
     theCB['load4date'].append(load4date)
     hlpr.loadfilters_setup(theLoadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
-    print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
+    print("INFO:IndiaMF:setup:gNameCleanupMap:", gNameCleanupMap)
 
 
 gNameCleanupMap = [
@@ -167,7 +167,7 @@ def _fetchdata(url, fName):
     f = open(fName)
     l = f.readline()
     if not l.startswith("Scheme Code"):
-        print("ERRR:fetch4date:Not a valid nav file, removing it")
+        print("ERRR:IndiaMF:fetchdata:Not a valid nav file, removing it")
         os.remove(fName)
     f.close()
 
@@ -196,7 +196,7 @@ def fetch4date(y, m, d, opts):
     if bForceRemote:
         _fetchdata(url, fName)
         bParseCSV=True
-    elif not hlpr.pickle_ok(fName):
+    elif not hlpr.pickle_ok(fName,4e3):
         if not bForceLocal:
             _fetchdata(url, fName)
         bParseCSV=True
