@@ -207,7 +207,7 @@ def fetch4date(y, m, d, opts):
         month should be one of 1 to 12
         day (month day) should be one of 1 to 31, as appropriate for month specified.
     """
-    print(y,m,d)
+    #print(y,m,d)
     for cb in gCB['fetch4date']:
         cb(y, m, d, opts)
 

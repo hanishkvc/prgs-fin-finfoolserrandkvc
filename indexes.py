@@ -97,6 +97,9 @@ def fetch_data4month(y, m, opts=None):
         'ForceRemote': If true, then the logic will try to fetch
             the data file again from the internet, irrespective
             of the local data pickle file is ok or not.
+        'ForcePickle': If true, pickle file is recreated, even if
+            the pickle file appears ok for the simple pickle check
+            logic.
         NOTE: ForceRemote takes precedence over ForceLocal.
     """
     url = INDEX_BSESENSEX_BASEURL.format(1,m,y,calendar.monthlen(y,m),m,y)
@@ -106,6 +109,7 @@ def fetch_data4month(y, m, opts=None):
         opts = {}
     bForceRemote = opts.get('ForceRemote', False)
     bForceLocal = opts.get('ForceLocal', False)
+    bForcePickle = opts.get('ForcePickle', False)
     if bForceRemote:
         _fetch_datafile(url, fName)
         bParseCSV=True
@@ -113,7 +117,7 @@ def fetch_data4month(y, m, opts=None):
         if not bForceLocal:
             _fetch_datafile(url, fName)
         bParseCSV=True
-    if bParseCSV:
+    if bParseCSV or bForcePickle:
         try:
             today = parse_csv(fName)
             hlpr.save_pickle(fName, today, [], "Indexes:fetch_data4month")
