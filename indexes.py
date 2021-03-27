@@ -152,7 +152,7 @@ def fetch_data4month(y, m, opts=None):
     if bForceRemote:
         _fetch_datafile(url, fName)
         bParseCSV=True
-    elif not hlpr.pickle_ok(fName):
+    elif not hlpr.pickle_ok(fName,128):
         if not bForceLocal:
             _fetch_datafile(url, fName)
         bParseCSV=True
