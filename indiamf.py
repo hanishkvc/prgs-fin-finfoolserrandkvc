@@ -33,11 +33,13 @@ def setup_paths(basePath):
 MF_ALLOW_ENTTYPES=[ "open equity", "open elss", "open other", "open hybrid", "open solution" ]
 MF_ALLOW_ENTNAMES=None
 MF_SKIP_ENTNAMES =[ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
-def setup(basePath, theGData, theGMeta, theLoadFilters):
+def setup(basePath, theGData, theGMeta, theCB, theLoadFilters):
     global gData, gMeta
     setup_paths(basePath)
     gData = theGData
     gMeta = theGMeta
+    theCB['fetch4date'].append(fetch4date)
+    theCB['load4date'].append(load4date)
     hlpr.loadfilters_setup(theLoadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
     print("INFO:setup:gNameCleanupMap:", gNameCleanupMap)
 

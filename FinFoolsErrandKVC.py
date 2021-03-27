@@ -71,12 +71,6 @@ gbSkipWeekEnds = False
 gbDataRelIgnoreBeginingNonData = True
 
 #
-# DATA URLs TOCHECK
-#
-## Index historic data
-INDEX_BSESENSEX_URL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2011&dtToDate=05/03/2021"
-
-#
 # Misc
 #
 giLabelNameChopLen = 36
@@ -86,6 +80,13 @@ giLabelNameChopLen = 36
 gCal = calendar.Calendar()
 gData = {}
 gMeta = {}
+gCB = {
+        'fetch_data':[],
+        'fetch4date':[],
+        'load_data' :[],
+        'load4date' :[],
+    }
+
 
 
 def setup_paths():
@@ -126,7 +127,7 @@ def setup_gdata(startDate=-1, endDate=-1):
 def setup_modules():
     tc.gData = gData
     tc.gMeta = gMeta
-    indiamf.setup(FINFOOLSERRAND_BASE, gData, gMeta, gLoadFilters)
+    indiamf.setup(FINFOOLSERRAND_BASE, gData, gMeta, gCB, gLoadFilters)
 
 
 def setup():
@@ -205,7 +206,8 @@ def fetch4date(y, m, d, opts):
         day (month day) should be one of 1 to 31, as appropriate for month specified.
     """
     print(y,m,d)
-    indiamf.fetch4date(y, m, d, opts)
+    for cb in gCB['fetch4date']:
+        cb(y, m, d, opts)
 
 
 def date2datedict(date, fallBackMonth=1):
@@ -271,6 +273,8 @@ def fetch_data(startDate, endDate=None, opts=None):
     """
     if endDate == None:
         endDate = startDate
+    for cb in gCB['fetch_data']:
+        cb(startDate, endDate)
     return fetch4daterange(startDate, endDate, opts)
 
 
@@ -297,7 +301,9 @@ def load4date(y, m, d, opts):
     """
     gMeta['dataIndex'] += 1
     gMeta['dates'].append(hlpr.dateint(y,m,d))
-    indiamf.load4date(y,m,d, opts)
+    for cb in gCB['load4date']:
+        cb(y, m, d, opts)
+
 
 
 def load4daterange(startDate, endDate, opts=None):
