@@ -155,9 +155,9 @@ def _fetchdata(url, fName):
     hlpr.wget_better(url, fName)
     f = open(fName)
     l = f.readline()
-    if not l.startswith("Scheme Code"):
-        print("ERRR:fetch4date:Not a valid nav file, removing it")
-        #os.remove(fName)
+    if not l.startswith("Date,Open,High"):
+        print("ERRR:fetch4date:Not a valid index file, removing it")
+        os.remove(fName)
     f.close()
 
 
