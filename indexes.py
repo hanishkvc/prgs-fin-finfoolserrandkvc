@@ -142,7 +142,7 @@ def fetch_data4month(y, m, opts=None):
             of the local data pickle file is ok or not.
         NOTE: ForceRemote takes precedence over ForceLocal.
     """
-    url = INDEX_BSESENSEX_BASEURL.format(1,m,y,31,m,y)
+    url = INDEX_BSESENSEX_BASEURL.format(1,m,y,calendar.monthlen(y,m),m,y)
     fName = FNAMECSV_TMPL.format(y,m)
     bParseCSV=False
     if opts == None:

@@ -7,6 +7,7 @@ import os
 import re
 import pickle
 import numpy
+import calendar
 
 
 def wget_better(url, localFName):
@@ -154,6 +155,11 @@ def dateint(y, m, d):
 def dateintparts(theDate, bStart=True):
     """
     Convert the full date YYYYMMDD int to its constituent parts i.e year, month and day.
+
+    NOTE: This logic cant handle situation where the date is before year 1000, because
+    there wont be 4 digits to year part.
+    TODO: May allow theDate to be passed as a string, so that we can have 0 prefixed as
+    part of the years smaller than 1000, as required.
     """
     if theDate < 9999:
         if bStart:
@@ -165,7 +171,9 @@ def dateintparts(theDate, bStart=True):
         if bStart:
             theDate = theDate*100+1
         else:
-            theDate = theDate*100+31
+            y = int(theDate/10000)
+            m = theDate%10000
+            theDate = theDate*100+calendar.monthlen(y,m)
     y = int(theDate/10000)
     t = theDate%10000
     m = int(t/100)
