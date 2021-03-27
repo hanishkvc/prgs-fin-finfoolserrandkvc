@@ -10,6 +10,10 @@ import enttypes
 import time
 
 
+ENTTYPE='Indexes'
+ENTTYPEID=99
+ENTNAME='BSE Index Sensex'
+ENTCODE=999901
 gData = None
 gMeta = None
 #
@@ -46,7 +50,7 @@ def parse_csv(sFile):
     """
     tFile = open(sFile)
     today = {
-                'bsesensex': {}
+                ENTNAME: {}
             }
     for l in tFile:
         l = l.strip()
@@ -59,59 +63,9 @@ def parse_csv(sFile):
         val = float(la[4])
         date = time.strptime(sDate, "%d-%B-%Y")
         date = hlpr.dateint(date.tm_year, date.tm_mon, date.tm_mday)
-        today['bsesensex'][date] = val
+        today[ENTNAME][date] = val
     tFile.close()
     return today
-
-
-def _loaddata(today):
-    """
-    Parse the specified data csv file and load it into global data dictionary.
-
-    NOTE: It uses the white and black lists wrt MFTypes and MFNames, if any
-    specified in gData, to decide whether a given MF should be added to the
-    dataset or not. User can control this in the normal usage flow by either
-    passing these lists explicitly to load_data and or by setting related
-    global variables before calling load_data.
-    """
-    # Handle MFTypes
-    for [curMFType, mfCodes] in today['entTypes']:
-        mfTypesId = enttypes.add(curMFType)
-        if gMeta['whiteListEntTypes'] == None:
-            bSkipCurMFType = False
-        else:
-            fm,pm = hlpr.matches_templates(curMFType, gMeta['whiteListEntTypes'])
-            if len(fm) == 0:
-                bSkipCurMFType = True
-            else:
-                bSkipCurMFType = False
-        if bSkipCurMFType:
-            continue
-
-        # Handle MFs
-        for mfCode in mfCodes:
-            todayMFIndex = today['code2index'][mfCode]
-            code, name, nav, date, typeId = today['mfs'][todayMFIndex]
-            if (mfCode != code):
-                input("DBUG:Indexes:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(code, mfCode))
-                continue
-            if False and (typeId != mfTypesId):
-                # Csv data files for different dates could have difference in what fund types and funds they have in them
-                # especially wrt working days and holidays. So ignoring this.
-                enttypes.list()
-                print([x[0] for x in today['entTypes']])
-                breakpoint()
-            if (gMeta['whiteListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gMeta['whiteListEntNames'])
-                if len(fm) == 0:
-                    gMeta['skipped'].add(str([code, name]))
-                    continue
-            if (gMeta['blackListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gMeta['blackListEntNames'])
-                if len(fm) > 0:
-                    gMeta['skipped'].add(str([code, name]))
-                    continue
-            hlpr.gdata_add(gData, gMeta, mfTypesId, curMFType, code, name, nav, date, "Indexes:_LoadData")
 
 
 def _fetch_datafile(url, fName):
@@ -188,7 +142,41 @@ def fetch_data(startDate, endDate, opts=None):
             if (y == eY) and (m > eM):
                 break
             print("DBUG:Indexes:FetchData:",y,m)
-            fetch_data4month(y,m)
+            fetch_data4month(y,m,opts)
+
+
+lastLoadedYear = -1
+lastLoadedMonth = -1
+gToday = None
+def load_data4month(y, m, opts):
+    """
+    Parse the specified data csv file and load it into global data dictionary.
+
+    NOTE: It uses the white and black lists wrt MFTypes and MFNames, if any
+    specified in gData, to decide whether a given MF should be added to the
+    dataset or not. User can control this in the normal usage flow by either
+    passing these lists explicitly to load_data and or by setting related
+    global variables before calling load_data.
+    """
+    global lastLoadedYear, lastLoadedMonth
+    global gToday
+    if (lastLoadedYear == y) and (lastLoadedMonth == m):
+        return
+    fName = FNAMECSV_TMPL.format(y,m)
+    ok = False
+    for i in range(3):
+        ok,gToday,tIgnore = hlpr.load_pickle(fName)
+        if ok:
+            lastLoadedYear = y
+            lastLoadedMonth = m
+            break
+        else:
+            print("WARN:Indexes:load_data4month:Try={}: No data pickle found for {}".format(i, fName))
+            if i > 0:
+                opts = { 'ForceRemote': True }
+            else:
+                opts = { 'ForceLocal': True }
+            fetch_data4month(y,m,opts)
 
 
 
@@ -204,19 +192,11 @@ def load4date(y, m, d, opts):
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
-    fName = FNAMECSV_TMPL.format(y,m,d)
-    ok = False
-    for i in range(3):
-        ok,today,tIgnore = hlpr.load_pickle(fName)
-        if ok:
-            break
-        else:
-            print("WARN:Indexes:load4date:Try={}: No data pickle found for {}".format(i, fName))
-            if i > 0:
-                opts = { 'ForceRemote': True }
-            else:
-                opts = { 'ForceLocal': True }
-            fetch4date(y, m, d, opts)
-    _loaddata(today)
+    load_data4month(y,m,opts)
+    if gToday != None:
+        date = dateint(y,m,d)
+        val = gToday[ENTNAME][date]
+        hlpr.gdata_add(gData, gMeta, ENTTYPEID, ENTTYPE, ENTCODE, ENTNAME, val, date, "Indexes:Load4Date")
+
 
 
