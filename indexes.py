@@ -1,4 +1,4 @@
-# Module to help work with Indian MFs
+# Module to help work with Indexes
 # HanishKVC, 2021
 
 import os
@@ -14,10 +14,10 @@ gMeta = None
 #
 # Fetching and Saving related
 #
-MFS_FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
-#https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
-#http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
-MFS_BaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
+FNAMECSV_TMPL = "data/BSESENSEX-{:04}{:02}{:02}.csv"
+## Index historic data
+#INDEX_BSESENSEX_URL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2011&dtToDate=05/03/2021"
+INDEX_BSESENSEX_BASEURL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2000&dtToDate={:02}/{:02}/{:04}"
 
 
 
@@ -25,31 +25,20 @@ def setup_paths(basePath):
     """
     Setup the basepath for data files, based on path passed by main logic
     """
-    global MFS_FNAMECSV_TMPL
-    MFS_FNAMECSV_TMPL = os.path.expanduser(os.path.join(basePath, MFS_FNAMECSV_TMPL))
-    print("INFO:IndiaMF:setup_paths:", MFS_FNAMECSV_TMPL)
+    global FNAMECSV_TMPL
+    FNAMECSV_TMPL = os.path.expanduser(os.path.join(basePath, FNAMECSV_TMPL))
+    print("INFO:Indexes:setup_paths:", FNAMECSV_TMPL)
 
 
-MF_ALLOW_ENTTYPES=[ "open equity", "open elss", "open other", "open hybrid", "open solution" ]
-MF_ALLOW_ENTNAMES=None
-MF_SKIP_ENTNAMES =[ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
 def setup(basePath, theGData, theGMeta, theCB, theLoadFilters):
     global gData, gMeta
     setup_paths(basePath)
     gData = theGData
     gMeta = theGMeta
-    theCB['fetch4date'].append(fetch4date)
-    theCB['load4date'].append(load4date)
-    hlpr.loadfilters_setup(theLoadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
-    print("INFO:IndiaMF:setup:gNameCleanupMap:", gNameCleanupMap)
+    theCB['fetch_data'].append(fetch_data)
+    print("INFO:Indexes:Setup done")
 
 
-gNameCleanupMap = [
-        ['-', ' '],
-        ['Divided', 'Dividend'],
-        ['Diviend', 'Dividend'],
-        ['Divdend', 'Dividend'],
-        ]
 def parse_csv(sFile):
     """
     Parse the specified data csv file and load it into global data dictionary.
@@ -80,7 +69,7 @@ def parse_csv(sFile):
                     typeId += 1
                     today['entTypes'].append([curMFType,[]])
                 else:
-                    input("DBUG:IndiaMF:_parsecsv:Duplicate entType [{}] in [{}]".format(curMFType, sFile))
+                    input("DBUG:Indexes:_parsecsv:Duplicate entType [{}] in [{}]".format(curMFType, sFile))
             continue
         try:
             la = l.split(';')
@@ -100,9 +89,9 @@ def parse_csv(sFile):
                 today['mfs'].append([code, name, nav, date, typeId])
                 today['entTypes'][typeId][1].append(code)
             else:
-                input("WARN:IndiaMF:parse_csv:Duplicate MF {}:{}=={}".format(code, name, today['mfs'][checkMFIndex][1]))
+                input("WARN:Indexes:parse_csv:Duplicate MF {}:{}=={}".format(code, name, today['mfs'][checkMFIndex][1]))
         except:
-            print("ERRR:IndiaMF:parse_csv:{}".format(l))
+            print("ERRR:Indexes:parse_csv:{}".format(l))
             print(sys.exc_info())
     tFile.close()
     return today
@@ -137,7 +126,7 @@ def _loaddata(today):
             todayMFIndex = today['code2index'][mfCode]
             code, name, nav, date, typeId = today['mfs'][todayMFIndex]
             if (mfCode != code):
-                input("DBUG:IndiaMF:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(code, mfCode))
+                input("DBUG:Indexes:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(code, mfCode))
                 continue
             if False and (typeId != mfTypesId):
                 # Csv data files for different dates could have difference in what fund types and funds they have in them
@@ -155,7 +144,7 @@ def _loaddata(today):
                 if len(fm) > 0:
                     gMeta['skipped'].add(str([code, name]))
                     continue
-            hlpr.gdata_add(gData, gMeta, mfTypesId, curMFType, code, name, nav, date, "IndiaMF:_LoadData")
+            hlpr.gdata_add(gData, gMeta, mfTypesId, curMFType, code, name, nav, date, "Indexes:_LoadData")
 
 
 def _fetchdata(url, fName):
@@ -167,14 +156,14 @@ def _fetchdata(url, fName):
     f = open(fName)
     l = f.readline()
     if not l.startswith("Scheme Code"):
-        print("ERRR:IndiaMF:fetchdata:Not a valid nav file, removing it")
-        os.remove(fName)
+        print("ERRR:fetch4date:Not a valid nav file, removing it")
+        #os.remove(fName)
     f.close()
 
 
-def fetch4date(y, m, d, opts):
+def fetch_data(startDate, endDate, opts=None):
     """
-    Fetch data for the given date.
+    Fetch data for the given date range.
 
     opts: a list of options supported by this logic
         'ForceLocal': When the logic decides that it has to fetch
@@ -186,8 +175,9 @@ def fetch4date(y, m, d, opts):
             of the local data pickle file is ok or not.
         NOTE: ForceRemote takes precedence over ForceLocal.
     """
-    url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
-    fName = MFS_FNAMECSV_TMPL.format(y,m,d)
+    y,m,d = hlpr.dateintparts(endDate)
+    url = INDEX_BSESENSEX_BASEURL.format(d,m,y)
+    fName = FNAMECSV_TMPL.format(y,m,d)
     bParseCSV=False
     if opts == None:
         opts = {}
@@ -196,16 +186,16 @@ def fetch4date(y, m, d, opts):
     if bForceRemote:
         _fetchdata(url, fName)
         bParseCSV=True
-    elif not hlpr.pickle_ok(fName,4e3):
+    elif not hlpr.pickle_ok(fName):
         if not bForceLocal:
             _fetchdata(url, fName)
         bParseCSV=True
     if bParseCSV:
         try:
             today = parse_csv(fName)
-            hlpr.save_pickle(fName, today, [], "IndiaMF:fetch4Date")
+            hlpr.save_pickle(fName, today, [], "Indexes:fetch4Date")
         except:
-            print("ERRR:IndiaMF:fetch4date:{}:ForceRemote[{}], ForceLocal[{}]".format(fName, bForceRemote, bForceLocal))
+            print("ERRR:Indexes:fetch4date:{}:ForceRemote[{}], ForceLocal[{}]".format(fName, bForceRemote, bForceLocal))
             print(sys.exc_info())
 
 
@@ -221,14 +211,14 @@ def load4date(y, m, d, opts):
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
-    fName = MFS_FNAMECSV_TMPL.format(y,m,d)
+    fName = FNAMECSV_TMPL.format(y,m,d)
     ok = False
     for i in range(3):
         ok,today,tIgnore = hlpr.load_pickle(fName)
         if ok:
             break
         else:
-            print("WARN:IndiaMF:load4date:Try={}: No data pickle found for {}".format(i, fName))
+            print("WARN:Indexes:load4date:Try={}: No data pickle found for {}".format(i, fName))
             if i > 0:
                 opts = { 'ForceRemote': True }
             else:

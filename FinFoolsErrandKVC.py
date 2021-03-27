@@ -17,6 +17,7 @@ import tabcomplete as tc
 import hlpr
 import indiamf
 import enttypes
+import indexes
 
 
 """
@@ -128,6 +129,7 @@ def setup_modules():
     tc.gData = gData
     tc.gMeta = gMeta
     indiamf.setup(FINFOOLSERRAND_BASE, gData, gMeta, gCB, gLoadFilters)
+    indexes.setup(FINFOOLSERRAND_BASE, gData, gMeta, gCB, gLoadFilters)
 
 
 def setup():

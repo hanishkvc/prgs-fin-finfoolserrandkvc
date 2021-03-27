@@ -151,6 +151,17 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
+def dateintparts(theDate):
+    """
+    Convert the full date YYYYMMDD int to its constituent parts i.e year, month and day.
+    """
+    y = int(theDate/10000)
+    t = theDate%10000
+    m = int(t/100)
+    d = t%100
+    return y,m,d
+
+
 def pickle_ok(fName, minSize=16e3):
     """
     Check that a associated pickle file exists and that it has a safe
