@@ -15,10 +15,10 @@ gMeta = None
 #
 # Fetching and Saving related
 #
-FNAMECSV_TMPL = "data/BSESENSEX-{:04}{:02}{:02}.csv"
+FNAMECSV_TMPL = "data/BSESENSEX-{:04}{:02}.csv"
 ## Index historic data
 #INDEX_BSESENSEX_URL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2011&dtToDate=05/03/2021"
-INDEX_BSESENSEX_BASEURL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2000&dtToDate={:02}/{:02}/{:04}"
+INDEX_BSESENSEX_BASEURL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate={:02}/{:02}/{:04}&dtToDate={:02}/{:02}/{:04}"
 
 
 
@@ -114,7 +114,7 @@ def _loaddata(today):
             hlpr.gdata_add(gData, gMeta, mfTypesId, curMFType, code, name, nav, date, "Indexes:_LoadData")
 
 
-def _fetchdata(url, fName):
+def _fetch_datafile(url, fName):
     """
     Fetch give url to specified file, and check its valid.
     """
@@ -126,6 +126,43 @@ def _fetchdata(url, fName):
         print("ERRR:fetch4date:Not a valid index file, removing it")
         os.remove(fName)
     f.close()
+
+
+def fetch_data4month(y, m, opts=None):
+    """
+    Fetch data for the given year and month.
+
+    opts: a list of options supported by this logic
+        'ForceLocal': When the logic decides that it has to fetch
+            data file from the internet, it will cross check, if
+            ForceLocal is True. If True, then the logic wont try
+            to redownload
+        'ForceRemote': If true, then the logic will try to fetch
+            the data file again from the internet, irrespective
+            of the local data pickle file is ok or not.
+        NOTE: ForceRemote takes precedence over ForceLocal.
+    """
+    url = INDEX_BSESENSEX_BASEURL.format(1,m,y,31,m,y)
+    fName = FNAMECSV_TMPL.format(y,m)
+    bParseCSV=False
+    if opts == None:
+        opts = {}
+    bForceRemote = opts.get('ForceRemote', False)
+    bForceLocal = opts.get('ForceLocal', False)
+    if bForceRemote:
+        _fetch_datafile(url, fName)
+        bParseCSV=True
+    elif not hlpr.pickle_ok(fName):
+        if not bForceLocal:
+            _fetch_datafile(url, fName)
+        bParseCSV=True
+    if bParseCSV:
+        try:
+            today = parse_csv(fName)
+            hlpr.save_pickle(fName, today, [], "Indexes:fetch_data4month")
+        except:
+            print("ERRR:Indexes:fetch_data4month:{}:ForceRemote[{}], ForceLocal[{}]".format(fName, bForceRemote, bForceLocal))
+            print(sys.exc_info())
 
 
 def fetch_data(startDate, endDate, opts=None):
@@ -142,28 +179,16 @@ def fetch_data(startDate, endDate, opts=None):
             of the local data pickle file is ok or not.
         NOTE: ForceRemote takes precedence over ForceLocal.
     """
-    y,m,d = hlpr.dateintparts(endDate)
-    url = INDEX_BSESENSEX_BASEURL.format(d,m,y)
-    fName = FNAMECSV_TMPL.format(y,m,d)
-    bParseCSV=False
-    if opts == None:
-        opts = {}
-    bForceRemote = opts.get('ForceRemote', False)
-    bForceLocal = opts.get('ForceLocal', False)
-    if bForceRemote:
-        _fetchdata(url, fName)
-        bParseCSV=True
-    elif not hlpr.pickle_ok(fName):
-        if not bForceLocal:
-            _fetchdata(url, fName)
-        bParseCSV=True
-    if bParseCSV:
-        try:
-            today = parse_csv(fName)
-            hlpr.save_pickle(fName, today, [], "Indexes:fetch4Date")
-        except:
-            print("ERRR:Indexes:fetch4date:{}:ForceRemote[{}], ForceLocal[{}]".format(fName, bForceRemote, bForceLocal))
-            print(sys.exc_info())
+    sY,sM,sD = hlpr.dateintparts(startDate)
+    eY,eM,eD = hlpr.dateintparts(endDate)
+    for y in range(sY, eY+1):
+        for m in range(1, 12+1):
+            if (y == sY) and (m < sM):
+                continue
+            if (y == eY) and (m > eM):
+                break
+            fetch_data4month(y,m)
+
 
 
 def load4date(y, m, d, opts):
