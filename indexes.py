@@ -163,17 +163,19 @@ def fetch_data(startDate, endDate, opts=None):
 
 lastLoadedYear = -1
 lastLoadedMonth = -1
-gToday = None
+gToday = {}
 def load_data(startDate, endDate, opts=None):
     global lastLoadedYear, lastLoadedMonth, gToday, ENTTYPEID
     lastLoadedYear = -1
     lastLoadedMonth = -1
-    gToday = None
+    gToday = {}
+    for indexSrc in gIndexes:
+        gToday[indexSrc] = {}
     ENTTYPEID = enttypes.add(ENTTYPE)
 
 
 
-def load_data4month(y, m, opts):
+def load_data4month(indexSrc, index, y, m, opts):
     """
     Parse the specified data csv file and load it into global data dictionary.
 
@@ -187,10 +189,10 @@ def load_data4month(y, m, opts):
     global gToday
     if (lastLoadedYear == y) and (lastLoadedMonth == m):
         return
-    fName = FNAMECSV_TMPL.format(y,m)
+    fName = FNAMECSV_TMPL.format(indexSrc, index, y, m)
     ok = False
     for i in range(3):
-        ok,gToday,tIgnore = hlpr.load_pickle(fName)
+        ok,gToday[indexSrc][index],tIgnore = hlpr.load_pickle(fName)
         if ok:
             lastLoadedYear = y
             lastLoadedMonth = m
@@ -201,7 +203,7 @@ def load_data4month(y, m, opts):
                 opts = { 'ForceRemote': True }
             else:
                 opts = { 'ForceLocal': True }
-            fetch_data4month(y,m,opts)
+            fetch_data4month(indexSrc, index, y, m, opts)
 
 
 
@@ -217,14 +219,16 @@ def load4date(y, m, d, opts):
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
-    load_data4month(y,m,opts)
-    if gToday != None:
-        date = hlpr.dateint(y,m,d)
-        try:
-            val = gToday[ENTNAME][date]
-        except:
-            val = 0
-        hlpr.gdata_add(gData, gMeta, ENTTYPEID, ENTTYPE, ENTCODE, ENTNAME, val, date, "Indexes:Load4Date")
+    for indexSrc in gIndexes:
+        for index in gIndexes[indexSrc]['id']:
+            load_data4month(indexSrc, index, y,m,opts)
+            if gToday != None:
+                date = hlpr.dateint(y,m,d)
+                try:
+                    val = gToday[ENTNAME][date]
+                except:
+                    val = 0
+                hlpr.gdata_add(gData, gMeta, ENTTYPEID, ENTTYPE, ENTCODE, ENTNAME, val, date, "Indexes:Load4Date")
 
 
 
