@@ -1546,7 +1546,7 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
 
 def session_save(sessionName):
     """
-    Save current gData into a pickle, so that it can be restored fast later.
+    Save current gData-gMeta into a pickle, so that it can be restored fast later.
     """
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     hlpr.save_pickle(fName, gData, gMeta, "Main:SessionSave")
@@ -1554,11 +1554,13 @@ def session_save(sessionName):
 
 def session_restore(sessionName):
     """
-    Restore a previously saved gData fast from a pickle.
+    Restore a previously saved gData-gMeta fast from a pickle.
+    Also setup the modules used by the main logic.
     """
     global gData, gMeta
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     ok, gData, gMeta = hlpr.load_pickle(fName)
+    setup_modules()
 
 
 def input_multi(prompt="OO>", altPrompt="...", theFile=None):

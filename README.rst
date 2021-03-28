@@ -542,12 +542,28 @@ then only list those entities, whose name matches one of the passed entName matc
 Saving and Restoring Session
 ==============================
 
-One can use session_save to save the gData corresponding to the currently loaded data, into
-disk. ANd inturn one can use session_load to restore a previously saved session back into
-runtime memory. This can help with avoiding the need to go through the individual data files
-and build the in memory data, which can save lot of time. This is not a full save and restore
-of the runtime session of the program, so one needs to understand the program flow and its
-implications, before using it.
+One can use session_save to save gData-gMeta combo corresponding to the currently loaded data,
+into disk. Inturn one can use session_restore to restore a previously saved session back into
+runtime memory.
+
+This can help with avoiding the need to go through the individual data files and build the in
+memory data, which can save lot of time. This is not a full save and restore of the runtime
+session of the program, so one needs to understand the program flow and its implications,
+before using it. But it can help speed up working with datasets across multiple runtime
+sessions in a relatively fast way. Note that this also saves and restores any of the
+processed data sets and not just the initial raw data set.
+
+./FinFoolsErrandKVC.py
+OO>load_data(2013,2021)
+OO>infoset1_prep()
+OO>infoset1_result('elss')
+OO>session_save('mysave1869')
+OO>quit()
+
+./FinFoolsErrandKVC.py
+OO>session_restore('mysave1869')
+OO>infoset1_result('indexes')
+
 
 
 Older logic, Not yet updated, wrt new logics/flows (i.e if reqd)
