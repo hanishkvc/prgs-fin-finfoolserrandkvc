@@ -1560,7 +1560,7 @@ def session_restore(sessionName):
     global gData, gMeta
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     ok, gData, gMeta = hlpr.load_pickle(fName)
-    enttypes.init(gMeta)
+    enttypes.init(gMeta, False)
     setup_modules()
 
 
