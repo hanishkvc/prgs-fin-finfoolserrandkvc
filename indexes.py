@@ -159,16 +159,16 @@ def fetch_data(startDate, endDate, opts=None):
 
 
 
-lastLoadedYear = -1
-lastLoadedMonth = -1
 gToday = {}
 def load_data(startDate, endDate, opts=None):
-    global lastLoadedYear, lastLoadedMonth, gToday, ENTTYPEID
-    lastLoadedYear = -1
-    lastLoadedMonth = -1
+    global gToday, ENTTYPEID
     gToday = {}
     for indexSrc in gIndexes:
         gToday[indexSrc] = {}
+        for index in gIndexes[indexSrc]['id']:
+            gToday[indexSrc][index] = {}
+            gToday[indexSrc][index]['lastLoadedYear'] = -1
+            gToday[indexSrc][index]['lastLoadedMonth'] = -1
     ENTTYPEID = enttypes.add(ENTTYPE)
 
 
@@ -183,17 +183,16 @@ def load_data4month(indexSrc, index, y, m, opts):
     passing these lists explicitly to load_data and or by setting related
     global variables before calling load_data.
     """
-    global lastLoadedYear, lastLoadedMonth
     global gToday
-    if (lastLoadedYear == y) and (lastLoadedMonth == m):
+    if (gToday[indexSrc][index]['lastLoadedYear'] == y) and (gToday[indexSrc][index]['lastLoadedMonth'] == m):
         return
     fName = FNAMECSV_TMPL.format(indexSrc, index, y, m)
     ok = False
     for i in range(3):
-        ok,gToday[indexSrc][index],tIgnore = hlpr.load_pickle(fName)
+        ok,gToday[indexSrc][index]['data'],tIgnore = hlpr.load_pickle(fName)
         if ok:
-            lastLoadedYear = y
-            lastLoadedMonth = m
+            gToday[indexSrc][index]['lastLoadedYear'] = y
+            gToday[indexSrc][index]['lastLoadedMonth'] = m
             break
         else:
             print("WARN:Indexes:load_data4month:Try={}: No data pickle found for {}".format(i, fName))
@@ -228,7 +227,7 @@ def load4date(y, m, d, opts):
             if gToday[indexSrc][index] != None:
                 date = hlpr.dateint(y,m,d)
                 try:
-                    val = gToday[indexSrc][index][date]
+                    val = gToday[indexSrc][index]['data'][date]
                 except:
                     val = 0
                 entCode = 999900+iIS*10+iI
