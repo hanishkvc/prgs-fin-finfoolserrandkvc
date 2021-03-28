@@ -231,7 +231,7 @@ def load4date(y, m, d, opts):
                 except:
                     val = 0
                 entCode = 999900+iIS*10+iI
-                entName = "{} {}".format(index, name)
+                entName = "{} {} {}".format(indexSrc, index, name)
                 hlpr.gdata_add(gData, gMeta, ENTTYPEID, ENTTYPE, entCode, entName, val, date, "Indexes:Load4Date")
 
 
