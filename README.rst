@@ -365,6 +365,10 @@ It also stores the following additional meta data:
 
    Percentage of times, when the return was below a predefined minimum value like 4% (the default).
 
+   Adjusted Average of Rolling return (wrt MinThreshold) divided by StdDev of Rolling return
+   [ MaShaMT = (Avg-MinT)/Std ]
+
+
 
 block - avg,std wrt each block
 -------------------------------
@@ -607,7 +611,7 @@ into this document.
 Changes
 ----------
 
-This notes only some of the changes, look at git log for all changes.
+This notes only some of the changes, once in a bluemoon, look at git log for all changes.
 
 
 20210325IST0104
@@ -618,4 +622,9 @@ due to the restructuring involving splitting of gData into gData and gMeta.
 In case this doesnt seem to work for you, you can always force things by calling
 fetch_data and passing ForceRemote=True opts to it.
 
+20210328IST1722
+
+Some Indexes added to the mix. Or one could always look at index funds in the worst case.
+
+MaShaMinT added to ProcDataEx RollingRet meta data/label.
 

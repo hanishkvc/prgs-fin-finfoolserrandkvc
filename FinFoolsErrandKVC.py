@@ -636,8 +636,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 If _abs is specified, it calculates absolute return.
                     If Not (i.e by default) it calculates the ReturnPerAnnum.
                 DAYSInINT: The gap in days over which the return is calculated.
-                MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold
-                MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold
+                MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT
+                MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT
+                NOTE: MaSharpeMinT = (RollRetAvg-MinThreshold)/RollRetStd
 
         "block<BlockDaysInt>: Divide the given dataSrc content into multiple blocks, where each
                 block corresponds to the BlockDays specified. Inturn for each of the block,
@@ -688,7 +689,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = int(op[4:])
-            gData[dataDstMetaData] = numpy.zeros([gMeta['nextEntIndex'], 3])
+            gData[dataDstMetaData] = numpy.zeros([gMeta['nextEntIndex'], 4])
         elif op.startswith("block"):
             blockDays = int(op[5:])
             blockTotalDays = endDateIndex - startDateIndex + 1
@@ -807,13 +808,15 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
                         trAvg = numpy.mean(trValidResult)
                         trStd = numpy.std(trValidResult)
+                        trMaSharpeMinT = (trAvg-gfRollingRetPAMinThreshold)/trStd
                     else:
                         trBelowMinThreshold = numpy.nan
                         trBelowMinThresholdLabel = "[--NA--<]"
                         trAvg = numpy.nan
                         trStd = numpy.nan
-                    gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold]
-                    label = "{:5.2f} {:5.2f} {}".format(trAvg, trStd, trBelowMinThresholdLabel)
+                        trMaSharpeMinT = numpy.nan
+                    gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
+                    label = "{:5.2f} {:5.2f} {} {:5.2f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT)
                     gData[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
                     # Calc the Avgs
@@ -1184,7 +1187,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
         elif dataSrc[0] == 'srel':
             print("\t{:6}:{:24}:  AbsRet    RetPA   DurYrs : startVal - endVal".format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print("\t{:6}:{:24}:   Avg   Std [Below4%]".format("code", "name"))
+            print("\t{:6}:{:24}:   Avg   Std [Below{}%] MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
             x = []
             y = []
             c = []
