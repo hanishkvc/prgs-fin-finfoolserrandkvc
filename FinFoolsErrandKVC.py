@@ -912,10 +912,11 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     return data
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, entCodes=None,
+def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEntities=10, entCodes=None,
                         minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64):
     """
-    Find the top/bottom N entities, [wrt the given date,] from the given dataSrc.
+    Find the top/bottom N entities, [wrt the given date or index,]
+    from the given dataSrc.
 
     op: could be either 'top' or 'bottom'
 
@@ -942,18 +943,25 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         the sub date periods to calculate the rank for full date
         Range. Use this final rank to decide on entities ranking.
 
-    theDate:
-        If None, then the logic will try to find a date
+    theDate and theIndex:
+        If both are None, then the logic will try to find a date
         which contains atleast some valid data, starting from the
         lastDate and moving towards startDate wrt given dataSrc.
 
         NOTE: ValidData: Any Non Zero, Non NaN, Non Inf data
 
-        If -1, then the lastDate wrt the currently loaded dataset,
-        is used as the date from which values should be used to
-        identify the entities.
+        If theDate is a date, then values in dataSrc corresponding
+        to this date will be used for sorting.
 
-        A date in YYYYMMDD format.
+        If theDate is -1, then the lastDate wrt the currently
+        loaded dataset, is used as the date from which values
+        should be used to identify the entities.
+
+        If theIndex is set and theDate is None, then the values
+        in dataSrc corresponding to given index, is used for
+        sorting.
+
+        NOTE: date follows YYYYMMDD format.
 
     entCodes: One can restrict the logic to look at data belonging to
         the specified list of entities. If None, then all entities
@@ -995,7 +1003,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
         iSkip = numpy.inf
     theSaneArray = None
     if opType == 'normal':
-        if type(theDate) == type(None):
+        if (type(theDate) == type(None)) and (type(theIndex) == type(None)):
             for i in range(-1, -(gMeta['dataIndex']+1),-1):
                 if bDebug:
                     print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
@@ -1007,9 +1015,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, numEntities=10, 
                     print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
                     break
         else:
-            startDateIndex, dateIndex = _date2index(theDate, theDate)
-            print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
-            theSaneArray = gData[dataSrc][:,dateIndex].copy()
+            if (type(theIndex) == type(None)) and (type(theDate) != type(None)):
+                startDateIndex, theIndex = _date2index(theDate, theDate)
+            print("INFO:AnalDataSimple:{}:theIndex:{}".format(op, theIndex))
+            theSaneArray = gData[dataSrc][:,theIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif opType.startswith("srel"):
@@ -1187,7 +1196,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
         elif dataSrc[0] == 'srel':
             print("\t{:6}:{:24}:  AbsRet    RetPA   DurYrs : startVal - endVal".format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print("\t{:6}:{:24}:   Avg   Std [Below{}%] MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
+            print("\t{:6}:{:24}:   Avg   Std [Blo{}%] MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
             x = []
             y = []
             c = []

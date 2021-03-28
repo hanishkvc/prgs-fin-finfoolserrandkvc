@@ -368,6 +368,9 @@ It also stores the following additional meta data:
    Adjusted Average of Rolling return (wrt MinThreshold) divided by StdDev of Rolling return
    [ MaShaMT = (Avg-MinT)/Std ]
 
+NOTE: If comparing entities which have been active for different amounts of time, then the
+results may not be directly comparable, do remember that, as they all wouldn't have gone through
+the same cycle of events.
 
 
 block - avg,std wrt each block
@@ -410,8 +413,8 @@ Sort/Rank the entities in the dataset based on the criteria (op + opType) given
 
 Some of the operationTypes supported include
 
-   normal: Depending on the value in the given dataSrc on the given date, decide how
-   to rank the entities.
+   normal: Depending on the value in the given dataSrc on the given date or index, decide
+   how to rank the entities.
 
    srel_absret: The dataSrc should be one generated using srel procdata_ex operation.
    Look at the associated absoluteReturn value for each of the specified entities, and
