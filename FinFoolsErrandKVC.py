@@ -688,7 +688,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
-            rollDays = int(op[4:])
+            rollDays = int(op[4:].split('_')[0])
             gData[dataDstMetaData] = numpy.zeros([gMeta['nextEntIndex'], 4])
         elif op.startswith("block"):
             blockDays = int(op[5:])
@@ -1196,7 +1196,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
         elif dataSrc[0] == 'srel':
             print("\t{:6}:{:24}:  AbsRet    RetPA   DurYrs : startVal - endVal".format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print("\t{:6}:{:24}:   Avg   Std [Blo{}%] MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
+            print("\t{:6}:{:24}:   Avg   Std [ <{}% ] MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
             x = []
             y = []
             c = []
