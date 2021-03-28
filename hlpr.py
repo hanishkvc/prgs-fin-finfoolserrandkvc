@@ -11,6 +11,9 @@ import calendar
 import time
 
 
+wgetLastTime = 0
+wgetMinTimeGap = 3
+wgetForcedDelay = 3
 def wget_better(url, localFName):
     """
     If the file on the server is bigger than the local file,
@@ -18,6 +21,11 @@ def wget_better(url, localFName):
     as chances are the local file was not a partial download, but
     rather a older version of the file with different data.
     """
+    global wgetLastTime
+    if (time.time()-wgetLastTime) < wgetMinTimeGap:
+        print("INFO:WgetBetter:Sleeping for {} to avoid overloading web...".format(wgetForcedDelay))
+        time.sleep(wgetForcedDelay)
+    wgetLastTime = time.time()
     #cmd = "curl {} --remote-time --time-cond {} --output {}".format(url,fName,fName)
     if os.path.exists(localFName):
         mtimePrev = os.stat(localFName).st_mtime

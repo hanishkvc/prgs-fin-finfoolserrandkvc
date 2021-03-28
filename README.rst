@@ -33,7 +33,13 @@ rating/ranking (not sorted order) is missing for some of the entities. So also
 I wanted to have a stupid look across entities (MFs/indexes/...) in stupid/silly
 ways.
 
-This fetches the Indian MFs nav data from the AMFI website.
+This tries to fetch the Indian MFs nav data from the AMFI website and Index data
+from bse website. As one can look at this data from their website for personal use,
+so I am assuming that it should be fine to fetch the data again for personal use,
+but if you plan to access the data from these sources for any other use, do cross
+check with the data sources once, before fetching and using the data from them.
+Also avoid overloading their servers when trying to fetch, by fetching spread over
+a long time and not at once.
 
 NOTE: Rating/Ranking provided by independent 3rd parties will be based on collating
 a score over multiple parameters and or some more additional validation/crosscheck.
@@ -108,7 +114,7 @@ A sample session could involve
 Fetching
 ==========
 
-One can use fetch_data to fetch historical nav data.
+One can use fetch_data to fetch historical data.
 
 fetch_data(YYYY[MM[DD]])
 
@@ -164,6 +170,9 @@ THIS PROGRAM for any decisions or inferences or ...
    Rather one requires to remove the data pickle files for the new logic to try and
    recheck with the internet for previously downloaded data. May add a force argument
    to fetch or so in future.
+
+NOTE: Program checks for and then if required introduces a minimum gap in time between
+successive downloads during fetching, so that one doesnt overload internet and or servers.
 
 
 Loading
