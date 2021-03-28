@@ -58,9 +58,7 @@ def parse_csv(sFile):
     Parse the specified data csv file and load it into a local data dictionary.
     """
     tFile = open(sFile)
-    today = {
-                ENTNAME: {}
-            }
+    today = { }
     for l in tFile:
         l = l.strip()
         if l == '':
@@ -72,7 +70,7 @@ def parse_csv(sFile):
         val = float(la[4])
         date = time.strptime(sDate, "%d-%B-%Y")
         date = hlpr.dateint(date.tm_year, date.tm_mon, date.tm_mday)
-        today[ENTNAME][date] = val
+        today[date] = val
     tFile.close()
     return today
 
@@ -219,16 +217,23 @@ def load4date(y, m, d, opts):
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
+    iIS = -1
     for indexSrc in gIndexes:
+        iIS += 1
+        iI = -1
         for index in gIndexes[indexSrc]['id']:
+            iI += 1
+            name = gIndexes[indexSrc]['name'][iI]
             load_data4month(indexSrc, index, y,m,opts)
-            if gToday != None:
+            if gToday[indexSrc][index] != None:
                 date = hlpr.dateint(y,m,d)
                 try:
-                    val = gToday[ENTNAME][date]
+                    val = gToday[indexSrc][index][date]
                 except:
                     val = 0
-                hlpr.gdata_add(gData, gMeta, ENTTYPEID, ENTTYPE, ENTCODE, ENTNAME, val, date, "Indexes:Load4Date")
+                entCode = 999900+iIS*10+iI
+                entName = "{} {}".format(index, name)
+                hlpr.gdata_add(gData, gMeta, ENTTYPEID, ENTTYPE, entCode, entName, val, date, "Indexes:Load4Date")
 
 
 
