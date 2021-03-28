@@ -19,11 +19,18 @@ gMeta = None
 #
 # Fetching and Saving related
 #
-FNAMECSV_TMPL = "data/BSESENSEX-{:04}{:02}.csv"
+FNAMECSV_TMPL = "data/INDEX_{}_{}_{:04}{:02}.csv"
 ## Index historic data
 #INDEX_BSESENSEX_URL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate=01/01/2011&dtToDate=05/03/2021"
-INDEX_BSESENSEX_BASEURL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex=SENSEX&dtFromDate={:02}/{:02}/{:04}&dtToDate={:02}/{:02}/{:04}"
+INDEX_BSE_BASEURL = "https://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex={}&dtFromDate={:02}/{:02}/{:04}&dtToDate={:02}/{:02}/{:04}"
 
+gIndexes = {
+        'BSE': {
+            'url': INDEX_BSE_BASEURL,
+            'id': [ 'SENSEX', 'SI0800', 'SIBANK', 'BSESML', 'BSEMID' ],
+            'name': [ 'Sensex', 'Healthcare', 'Bank', 'SmallCap', 'MidCap' ]
+        }
+    }
 
 
 def setup_paths(basePath):
@@ -84,7 +91,7 @@ def _fetch_datafile(url, fName):
     f.close()
 
 
-def fetch_data4month(y, m, opts=None):
+def fetch_data4month(indexSrc, index, y, m, opts=None):
     """
     Fetch data for the given year and month.
 
@@ -101,8 +108,8 @@ def fetch_data4month(y, m, opts=None):
             logic.
         NOTE: ForceRemote takes precedence over ForceLocal.
     """
-    url = INDEX_BSESENSEX_BASEURL.format(1,m,y,calendar.monthlen(y,m),m,y)
-    fName = FNAMECSV_TMPL.format(y,m)
+    url = gIndexes[indexSrc]['url'].format(index,1,m,y,calendar.monthlen(y,m),m,y)
+    fName = FNAMECSV_TMPL.format(indexSrc,index,y,m)
     bParseCSV=False
     if opts == None:
         opts = {}
@@ -148,7 +155,9 @@ def fetch_data(startDate, endDate, opts=None):
             if (y == eY) and (m > eM):
                 break
             print("DBUG:Indexes:FetchData:",y,m)
-            fetch_data4month(y,m,opts)
+            for indexSrc in gIndexes:
+                for index in gIndexes[indexSrc]['id']:
+                    fetch_data4month(indexSrc, index, y, m, opts)
 
 
 
