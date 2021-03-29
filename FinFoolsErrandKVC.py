@@ -891,6 +891,24 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
             plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
+def _procdata_mabeta(dataSrc, refCode, entCodes):
+    """
+    Get the slope of the entCodes wrt refCode.
+    When the passed dataSrc is rollingRet, this is also called MaBeta.
+    """
+    refIndex = gMeta['code2index'][refCode]
+    refValid = gData[dataSrc][refIndex][numpy.isfinite(gData[dataSrc][refIndex])]
+    refAvg = numpy.mean(refValid)
+    maBeta = []
+    for entCode in entCodes:
+        entIndex = gMeta['code2index'][entCode]
+        entValid = gData[dataSrc][entIndex][numpy.isfinite(gData[dataSrc][entIndex])]
+        entAvg = numpy.mean(entValid)
+        entMaBeta = numpy.sum((entValid-entAvg)*(refValid-refAvg))/numpy.sum((refValid-refAvg)**2)
+        maBeta.append(entMaBeta)
+    return maBeta
+
+
 def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     """
     Set the specified locations in the data, to the given forcedValue.
