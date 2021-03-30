@@ -211,6 +211,7 @@ def pickle_ok(fName, minSize=16e3):
         if os.stat(fName).st_size > minSize:
             f = open(fName, 'rb')
             pickleVer = pickle.load(f)
+            f.close()
             if pickleVer == gPICKLEVER:
                 return True
     print("WARN:pickle_ok:Failed for", fName)
@@ -236,7 +237,9 @@ def load_pickle(fName):
         if pickleVer == gPICKLEVER:
             data = pickle.load(f)
             meta = pickle.load(f)
+            f.close()
             return True, data, meta
+        f.close()
     return False, None, None
 
 

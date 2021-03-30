@@ -506,6 +506,32 @@ NOTE: By default only 20 entities are printed as part of the comparitive prints,
 change this,  pass numEntries argument to infoset1_result.
 
 
+Processed Datas
+-----------------
+
+Absolute Return
+
+Return per annum
+
+Moving average
+
+Rolling Return
+
+Standard Deviation
+
+MaSharpeMT
+
+   A ratio between the adjusted average (wrt a predefined value) of a given set of values
+   to their standard deviation.
+
+MaBeta
+
+   A measure of how similar or not is the changes in values of a given entity wrt changes
+   in value of another entity.
+
+Quantile
+
+
 Others
 --------
 
@@ -646,4 +672,9 @@ fetch_data and passing ForceRemote=True opts to it.
 Some Indexes added to the mix. Or one could always look at index funds in the worst case.
 
 MaShaMinT added to ProcDataEx RollingRet meta data/label.
+
+20210331IST0404
+
+MaBeta added as a additional procdata function.
+
 

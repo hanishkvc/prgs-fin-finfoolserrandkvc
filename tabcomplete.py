@@ -9,7 +9,7 @@ gMeta = None
 L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
         "show_plot",
         "enttypes.list", "enttypes.members",
-        "procdata_ex", "plot_data",
+        "procdata_ex", "plot_data", "procdata_mabeta",
         "loadfilters_setup", "loadfilters_list",
         "analdata_simple",
         "session_save", "session_restore",

@@ -909,6 +909,22 @@ def _procdata_mabeta(dataSrc, refCode, entCodes):
     return maBeta
 
 
+def procdata_mabeta(dataSrc, refCode, entCodes):
+    '''
+    Calculate a measure of how similar or dissimilar is the change/movement in
+    the value of given entities in entCodes list wrt changes in value of the
+    given refCode entity.
+    Value of 1 means - Value of both entities change/move in same way.
+    Value below 1 - Both entities move in similar ways, but then
+        the given entity moves less compared to ref entity.
+    Value above 1 - Both entities move in similar ways, but then
+        the given entity moves more compared to the ref entity.
+    Value lower than 0 - Both entities move in dissimilar/oppositive manner.
+    '''
+    procdata_ex('roll1Abs=roll1_abs({})'.format(dataSrc))
+    return _procdata_mabeta('roll1Abs', refCode, entCodes)
+
+
 def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     """
     Set the specified locations in the data, to the given forcedValue.
