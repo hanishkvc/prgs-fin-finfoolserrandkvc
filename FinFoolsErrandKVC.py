@@ -791,7 +791,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 elif op.startswith("roll"):
                     durationForPA = rollDays/365
                     if '_' in op:
-                        op,opType = op.split('_')
+                        opType = op.split('_')[1]
                         if opType == 'abs':
                             durationForPA = 1
                     if gbRelDataPlusFloat:
