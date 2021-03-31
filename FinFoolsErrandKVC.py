@@ -259,7 +259,7 @@ def fetch4daterange(startDate, endDate, opts):
     proc_days(start, end, fetch4date, opts, gbNotBeyondYesterday)
 
 
-def fetch_data(startDate, endDate=None, opts=None):
+def fetch_data(startDate, endDate=None, opts={'ForceRemote': True}):
     """
     Fetch data for a given date or range of dates
 
@@ -272,6 +272,11 @@ def fetch_data(startDate, endDate=None, opts=None):
     NOTE: Fetch may look for two possible options ForceLocal and ForceRemote.
     Based on these options and health of data pickle file, it may decide how
     to handle the fetch.
+
+    NOTE: By default fetch_data gives priority to fetching data from remote
+    server. While fetch data triggered by load_data, will give priority to
+    fetching data from local cached file, before falling back to remote server
+    based fetch.
     """
     if endDate == None:
         endDate = startDate
