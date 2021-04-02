@@ -50,8 +50,8 @@ class DataSrc:
         """
         self.loadFilters = loadFilters
         self.nameCleanupMap = nameCleanupMap
-        if (pathTmpl != None) and (basePath != None):
-            self.pathTmpl = os.path.expanduser(os.path.join(basePath, pathTmpl))
+        if (self.pathTmpl != None) and (basePath != None):
+            self.pathTmpl = os.path.expanduser(os.path.join(basePath, self.pathTmpl))
         print("INFO:{}:pathTmpl:{}".format(self.tag, self.pathTmpl))
 
 
@@ -126,11 +126,11 @@ class DataSrc:
         bForceRemote = opts.get('ForceRemote', False)
         bForceLocal = opts.get('ForceLocal', False)
         if bForceRemote:
-            _fetch_remote(url, fName)
+            self._fetch_remote(url, fName)
             bParseFile=True
         elif not self._valid_picklefile(fName):
             if not bForceLocal:
-                _fetch_remote(url, fName)
+                self._fetch_remote(url, fName)
             bParseFile=True
         if bParseFile:
             try:

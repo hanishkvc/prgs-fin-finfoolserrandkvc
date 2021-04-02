@@ -1,12 +1,9 @@
 # Module to get Indian MFs data
 # HanishKVC, 2021
 
-import os
-import calendar
 import sys
-import datetime
+import time
 import hlpr
-import enttypes
 import datasrc
 
 
@@ -74,7 +71,7 @@ class IndiaMFDS(datasrc.DataSrc):
                     nav  = float(la[4])
                 except:
                     nav = 0
-                date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
+                date = time.strptime(la[7], "%d-%b-%Y")
                 date = hlpr.dateint(date.year,date.month,date.day)
                 #print(code, name, nav, date)
                 todayfile.add_ent(today, code, name, nav, curMFType, date)
