@@ -13,18 +13,44 @@ def init(date, dataKeys):
     Initialise a today dictionary.
     """
     today = {
-                'marker': TODAY_MARKER, 
-                'date': date,
-                'bUpToDate': False,
-                'entTypes': [],
-                'dataKeys': dataKeys,
-                'codeD': {},
-                'data': []
-            }
+        'marker': TODAY_MARKER,
+        'date': date,
+        'bUpToDate': True,
+        'entTypes': {},
+        'dataKeys': dataKeys,
+        'codeD': {},
+        'data': []
+        }
     return today
 
 
-def load(today, edb, loadFilters, caller="TodayFile"):
+def add_enttype(today, typeName):
+    """
+    Add the index corresponding to the specified typeName, wrt today dictionary.
+    NOTE: If the passed typeName is not already present, then it will be added.
+    """
+    lMembers = today['entTypes'].get(typeName, None)
+    if lMembers == None:
+        lMembers = []
+        today['entTypes'][typeName] = lMembers
+    return lMembers
+
+
+def add_ent(today, entCode, entName, entValues, entType, date):
+    """
+    Add given entity and its entityType to today.
+    It also updates the bUpToDate flag in today.
+    """
+    typeMembers = add_enttype(today, entType)
+    typeMembers.append(entCode)
+    entIndex = len(today['data'])
+    today['data'].append([entCode, entName, entValues])
+    today['codeD'][entCode] = entIndex
+    if today['date'] > date:
+        today['bUpToDate'] = False
+
+
+def load2edb(today, edb, loadFilters, caller="TodayFile"):
     """
     Load data in today dictionary into the given entities db (edb).
 
@@ -36,24 +62,26 @@ def load(today, edb, loadFilters, caller="TodayFile"):
         'marker': TODAY_MARKER
         'date': YYYYMMDD
         'bUpToDate': True/False
-        'entTypes': [ [typeName1, [entCode1A, entCode1B, ...]],
-                      [typeName2, [entCode2A, entCode2B, ...]],
-                      ....
-                    ]
+        'entTypes': {
+            typeName1: [entCode1A, entCode1B, ...],
+            typeName2: [entCode2A, entCode2B, ...],
+            ....
+            }
         'dataKeys': [ key1, key2, ...]
         'codeD': { ent1Code: ent1Index, ent2Code: ent2Index, ... }
         'data': [
-                    [ent1Code, ent1Name, [ent1Val1, ent1Val2, ...] ],
-                    [ent2Code, ent2Name, [ent2Val1, ent2Val2, ...] ],
-                    ...
-                ]
+            [ent1Code, ent1Name, [ent1Val1, ent1Val2, ...] ],
+            [ent2Code, ent2Name, [ent2Val1, ent2Val2, ...] ],
+            ...
+            ]
     TOTHINK: Should I maintain entDate within today['data'] for each ent.
         Can give finer entity level info has to data is uptodate or not.
         But as currently I am not using it, so ignoring for now.
     """
     # Handle entTypes and their entities
-    for [curEntType, entCodes] in today['entTypes']:
-        curEntTypeId = edb.add(curEntType)
+    for curEntType in today['entTypes']:
+        entCodes = today['entTypes'][curEntType]
+        curEntTypeId = edb.add_type(curEntType)
         if loadFilters['whiteListEntTypes'] == None:
             bSkipCurType = False
         else:
