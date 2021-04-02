@@ -45,7 +45,7 @@ class Entities:
         for dataKey in dataKeys:
             self.data[dataKey] = numpy.zeros([entCnt, dateCnt])
         self.meta['name'] = numpy.empty(entCnt, dtype=object)
-        self.meta['codeL'] = numpy.zeros(entCnt)
+        self.meta['codeL'] = numpy.empty(entCnt, dtype=object)
         self.meta['codeD'] = {}
         self.meta['typeId'] = numpy.empty(entCnt, dtype=object)
         self.meta['firstSeen'] = numpy.zeros(entCnt)
