@@ -44,14 +44,15 @@ class Entities:
         self.dates = numpy.zeros(dateCnt)
 
 
-    def _init_ents(self, dataKey, entCnt, dateCnt):
+    def _init_ents(self, dataKeys, entCnt, dateCnt):
         """
-        Create the members required to handle the data related to the entities.
+        Create the members required to handle the data(s) related to the entities.
         """
         self.nxtEntIndex = 0
         self.data = {}
         self.meta = {}
-        self.data[dataKey] = numpy.zeros([entCnt, dateCnt])
+        for dataKey in dataKeys:
+            self.data[dataKey] = numpy.zeros([entCnt, dateCnt])
         self.meta['name'] = numpy.empty(entCnt, dtype=object)
         self.meta['codeL'] = numpy.zeros(entCnt)
         self.meta['codeD'] = {}
@@ -60,14 +61,23 @@ class Entities:
         self.meta['lastSeen'] = numpy.zeros(entCnt)
 
 
-    def __init__(self, dataKey, entCnt, dateCnt):
+    def __init__(self, dataKeys, entCnt, dateCnt):
         """
         Initialise a entities object.
+
+        dataKeys: specifies a list of dataKeys' that will be used
+        to store different kinds of data associated with each entity
+        in this entities db.
+        entCnt: The number of entities one expects to store in this.
+        dateCnt: The number of dates for which we expect to store
+        data in this entities db.
         """
-        self.dataKey = dataKey
+        if type(dataKeys) != list:
+            dataKeys = [ dataKeys ]
+        self.dataKey = dataKeys[0]
         self._init_types()
         self._init_dates(dateCnt)
-        self._init_ents(dataKey, entCnt, dateCnt)
+        self._init_ents(dataKeys, entCnt, dateCnt)
 
 
     def add_type(typeName):
@@ -144,6 +154,8 @@ class Entities:
         entCode: Specifies a unique code associated with the entity
         entData: is either a single value or a dictionary of dataValues
             with their dataKeys.
+            If its a single value, then its assumed to correspond to
+            the first data key specified during init.
         entName: is the name of the entity whose data is being added.
         entTypeId: the typeId to which this entity belongs.
 
