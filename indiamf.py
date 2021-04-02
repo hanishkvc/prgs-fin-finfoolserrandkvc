@@ -32,15 +32,15 @@ gNameCleanupMap = [
 class IndiaMFDS(datasrc.DataSrc):
 
     urlTmpl = MFS_BASEURL
-    fileTmpl = MFS_FNAMECSV_TMPL
+    pathTmpl = MFS_FNAMECSV_TMPL
+    dataKeys = [ 'data' ]
     tag = "IndiaMFDS"
 
     def __init__(self, basePath="~/", loadFilters=None, nameCleanupMap=None):
         if nameCleanupMap == None:
             nameCleanupMap = gNameCleanupMap
         super().__init__(basePath, loadFilters, nameCleanupMap)
-        if loadFilters != None:
-            hlpr.loadfilters_setup(loadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
+        hlpr.loadfilters_setup(loadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
 
 
     def _valid_remotefile(self, fName):

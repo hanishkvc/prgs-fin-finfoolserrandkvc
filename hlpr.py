@@ -244,11 +244,23 @@ def load_pickle(fName):
 
 
 def loadfilters_setup(theLoadFilters, loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
+    if theLoadFilters == None:
+        return
     theLoadFilters[loadFiltersName] = {
             'whiteListEntTypes': whiteListEntTypes,
             'whiteListEntNames': whiteListEntNames,
             'blackListEntNames': blackListEntNames
         }
+
+
+def loadfilters_get(theLoadFilters, loadFiltersName):
+    if theLoadFilters == None:
+        loadFilters = None
+    else:
+        loadFilters = theLoadFilters.get(loadFiltersName, None)
+    if loadFilters == None:
+        loadFilters = { 'whiteListEntTypes': None, 'whiteListEntNames': None, 'blackListEntNames': None }
+    return loadFilters
 
 
 def sane_array(theArray, skip):

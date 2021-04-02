@@ -41,7 +41,12 @@ class DataSrc:
     def __init__(self, basePath, loadFilters, nameCleanupMap):
         """
         Initialise a data source instance.
-        TODO: Have to handle loadFilters appropriatly, current thing is wrong.
+
+        basePath: is used to setup the local file path, wrt fetched files.
+        loadFilters: a DataSrc can define/suggest its own set of load filters.
+            The same can be selected by end user, if they want to, by copying
+            the same as the 'active' set.
+        nameCleanupMap: will be used to cleanup the entity names.
         """
         self.loadFilters = loadFilters
         self.nameCleanupMap = nameCleanupMap
@@ -165,7 +170,7 @@ class DataSrc:
                 opts = { 'ForceLocal': True }
             self.fetch4date(y, m, d, opts)
         if ok:
-            todayfile.load2edb(today, edb, self.loadFilters, self.nameCleanupMap, self.tag)
+            todayfile.load2edb(today, edb, self.loadFilters, self.nameCleanupMap, 'active', self.tag)
         else:
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 

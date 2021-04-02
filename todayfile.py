@@ -60,12 +60,14 @@ def valid_today(today):
     return bMarker, today['bUpToDate']
 
 
-def load2edb(today, edb, loadFilters, nameCleanupMap, caller="TodayFile"):
+def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None, caller="TodayFile"):
     """
     Load data in today dictionary into the given entities db (edb).
 
-    Apply the filters if any wrt entType or entName. Inturn the
+    Apply the specified filters if any wrt entType or entName. Inturn the
     filtered data which passes the check will only be loaded into edb.
+
+    Name of entities will be cleaned up using nameCleanupMap, if any.
 
     today dictionary contains
 
@@ -88,6 +90,7 @@ def load2edb(today, edb, loadFilters, nameCleanupMap, caller="TodayFile"):
         Can give finer entity level info has to data is uptodate or not.
         But as currently I am not using it, so ignoring for now.
     """
+    loadFilters = hlpr.loadFilters_get(loadFilters, filterName)
     # Handle entTypes and their entities
     for curEntType in today['entTypes']:
         entCodes = today['entTypes'][curEntType]
@@ -106,7 +109,8 @@ def load2edb(today, edb, loadFilters, nameCleanupMap, caller="TodayFile"):
         for entCode in entCodes:
             entIndex = today['codeD'][entCode]
             code, name, values = today['data'][entIndex]
-            name = hlpr.string_cleanup(name, nameCleanupMap)
+            if nameCleanupMap != None:
+                name = hlpr.string_cleanup(name, nameCleanupMap)
             if (entCode != code):
                 input("DBUG:{}:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(caller, code, entCode))
                 continue
