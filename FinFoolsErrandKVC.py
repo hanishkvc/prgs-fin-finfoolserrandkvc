@@ -1150,7 +1150,7 @@ def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=
             entCodesMore = []
         entCodes = entCodes + entCodesMore
     else:
-        entCodes = enttypes.members(entTypeTmpls, entNameTmpls)
+        entCodes = enttypes.members(gEnts, entTypeTmpls, entNameTmpls)
     infoset1_result_entcodes(entCodes, bPrompt, numEntries)
 
 
@@ -1215,7 +1215,7 @@ def session_restore(sessionName):
     global gEnts
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     ok, gEnts.data, gEnts.meta = hlpr.load_pickle(fName)
-    enttypes.init(gEnts.meta, False)
+    enttypes.init(gEnts)
     setup_modules()
 
 
