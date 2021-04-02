@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Get and work with data about MFs, indexes, stocks, etc, in a blind and stupid way
+# Work with sequences of data belonging to related groups of entities
 # HanishKVC, 2021
 # GPL
 #
@@ -20,23 +20,68 @@ import enttypes
 import indexes
 
 
-"""
-Usage scenario
-    fetch_data(2010, 202103)
-    load_data(2013, 20190105)
-    # explore option 1
-    infoset1_prep()
-    infoset1_result(['open elss'], ['direct'])
-    infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
-    # explore option 2
-    procdata_ex(['srel=srel(data)', 'roll3Y=roll1095(data)'])
-    search_data(['match name tokens1', 'match name tokens2'])
-    analdata_simple('srel', 'top', 'srel_retpa')
-    analdata_simple('roll3Y', 'top', 'roll_avg')
-    plot_data('srel', [ entCode1, entCode2 ])
-    show_plot()
-    quit()
-"""
+
+class Entities:
+
+
+    def _init_types(self):
+        """
+        Create the types db related members.
+        typesD: Allows identify the typeIndex/typeId associated with given typeName
+        typesL: Allows one to get the typeName from a given typeId
+        """
+        self.nxtTypeIndex = 0
+        self.typesD = {}
+        self.typesL = []
+
+
+    def _init_dates(self, dateCnt):
+        """
+        Create things related to dates.
+        """
+        self.nxtDateIndex = 0
+        self.dates = numpy.zeros(dateCnt)
+
+
+    def _init_ents(self, dataKey, entCnt):
+        """
+        Create the members required to handle the data related to the entities.
+        """
+        self.nxtEntIndex = 0
+        self.data = {}
+        self.meta = {}
+        self.data[dataKey] = numpy.zeros(entCnt)
+        self.meta['name'] = numpy.empty(entCnt, dtype=object)
+        self.meta['codeL'] = numpy.zeros(entCnt)
+        self.meta['codeD'] = {}
+        self.meta['typeId'] = numpy.empty(entCnt, dtype=object)
+        self.meta['firstSeen'] = numpy.zeros(entCnt)
+        self.meta['lastSeen'] = numpy.zeros(entCnt)
+
+
+    def __init__(self, dataKey, entCnt, dateCnt):
+        """
+        Initialise a entities object.
+        """
+        self._init_types()
+        self._init_dates(dateCnt)
+        self._init_ents(dataKey, entCnt)
+
+
+    def add_type(typeName):
+        """
+        Add a type (typeName) into types db, if not already present.
+        Return the typeId.
+        """
+        if typeName not in self.types:
+            self.typesD[typeName]=self.nxtTypeIn
+            self.typesL.append(typeName)
+            self.nxtTypeIn += 1
+        return self.typesD[typeName]
+
+
+    def
+
 
 gbDEBUG = False
 FINFOOLSERRAND_BASE = None
