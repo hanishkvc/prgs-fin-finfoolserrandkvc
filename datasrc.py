@@ -8,7 +8,7 @@ import hlpr
 import todayfile
 
 
-class DataSource:
+class DataSrc:
     """
     Work with data available from a remote server, in a efficient manner.
     Provides logics to
@@ -41,6 +41,7 @@ class DataSource:
     def __init__(self, basePath, loadFilters, nameCleanupMap):
         """
         Initialise a data source instance.
+        TODO: Have to handle loadFilters appropriatly, current thing is wrong.
         """
         self.loadFilters = loadFilters
         self.nameCleanupMap = nameCleanupMap
@@ -164,7 +165,7 @@ class DataSource:
                 opts = { 'ForceLocal': True }
             self.fetch4date(y, m, d, opts)
         if ok:
-            todayfile.load2edb(today, edb, self.loadFilters, self.tag)
+            todayfile.load2edb(today, edb, self.loadFilters, self.nameCleanupMap, self.tag)
         else:
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 

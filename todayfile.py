@@ -60,7 +60,7 @@ def valid_today(today):
     return bMarker, today['bUpToDate']
 
 
-def load2edb(today, edb, loadFilters, caller="TodayFile"):
+def load2edb(today, edb, loadFilters, nameCleanupMap, caller="TodayFile"):
     """
     Load data in today dictionary into the given entities db (edb).
 
@@ -106,6 +106,7 @@ def load2edb(today, edb, loadFilters, caller="TodayFile"):
         for entCode in entCodes:
             entIndex = today['codeD'][entCode]
             code, name, values = today['data'][entIndex]
+            name = hlpr.string_cleanup(name, nameCleanupMap)
             if (entCode != code):
                 input("DBUG:{}:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(caller, code, entCode))
                 continue
