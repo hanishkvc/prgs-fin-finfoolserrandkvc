@@ -5,19 +5,12 @@
 #
 
 import sys
-import calendar
 import os
 import numpy
-import matplotlib.pyplot as plt
 import time
 import traceback
-import readline
-import warnings
-import tabcomplete as tc
 import hlpr
-import indiamf
 import enttypes
-import indexes
 
 
 
@@ -77,7 +70,7 @@ class Entities:
         self._init_ents(dataKeys, entCnt, dateCnt)
 
 
-    def add_type(typeName):
+    def add_type(self, typeName):
         """
         Add a type (typeName) into types db, if not already present.
         Return the typeId.
@@ -85,14 +78,14 @@ class Entities:
         return enttypes.add(self, typeName)
 
 
-    def add_type_member(entTypeId, entCode):
+    def add_type_member(self, entTypeId, entCode):
         """
         Add a entity to the members list associated with its entityType.
         """
         enttypes.add_member(self, entTypeId, entCode)
 
 
-    def add_date(dateInt):
+    def add_date(self, dateInt):
         """
         It is assumed that the date is added in chronological sequence.
         dateInt: should be in YYYYMMDD format.
@@ -102,7 +95,7 @@ class Entities:
         self.nxtDateIndex += 1
 
 
-    def add_ent(entCode, entName, entTypeId):
+    def add_ent(self, entCode, entName, entTypeId):
         """
         Add a entity to the entities db, if required, and return its index.
 
@@ -121,7 +114,7 @@ class Entities:
         return entIndex
 
 
-    def get_entindex(entCode, entName=None, entTypeId=None):
+    def get_entindex(self, entCode, entName=None, entTypeId=None):
         """
         Get the index associated with a given entity code,
         adding the entity into the entities db, if required.
@@ -132,7 +125,7 @@ class Entities:
         is already there in entities db, and a warning generated
         if there is  mismatch.
         """
-        entIndex = add_ent(entCode, entName, entTypeId)
+        entIndex = self.add_ent(entCode, entName, entTypeId)
         if entName != None:
             nameInRecord = self.meta['name'][entIndex]
             if nameInRecord != entName:
@@ -140,7 +133,7 @@ class Entities:
         return entIndex
 
 
-    def add_data(entCode, entData, entName=None, entTypeId=None):
+    def add_data(self, entCode, entData, entName=None, entTypeId=None):
         """
         Add one or more data beloning to a entity.
         entCode: Specifies a unique code associated with the entity

@@ -37,7 +37,7 @@ def list(self):
         print(k)
 
 
-def add_member(self, entTypeId, entCode)
+def add_member(self, entTypeId, entCode):
     """
     Add a entity to the members list associated with its entityType.
     """
