@@ -3,6 +3,7 @@
 
 import sys
 import time
+import zipfile
 import hlpr
 import datasrc
 import todayfile
@@ -87,7 +88,7 @@ class IndiaMFDS(datasrc.DataSrc):
 # Work with Indian Stocks
 #
 
-STK_FNAMECSV_TMPL = "data/ISTK_%Y%m%d.csv"
+STK_FNAMECSV_TMPL = "data/ISTK_%Y%m%d.zip"
 #https://archives.nseindia.com/archives/equities/bhavcopy/pr/PR010321.zip
 STK_BASEURL = "https://archives.nseindia.com/archives/equities/bhavcopy/pr/PR%d%m%y.zip"
 STK_FILEINZIP = "Pr%d%m%y.csv"
@@ -107,8 +108,9 @@ class IndiaSTKDS(datasrc.DataSrc):
 
 
     def _valid_remotefile(self, fName):
-        z = zipfile.Zipfile(fName)
-        f = z.open(fName[-12:].replace('R','r'))
+        z = zipfile.ZipFile(fName)
+        csvFile = "Pr"+fName[-10:-4]+".csv"
+        f = z.open(csvFile)
         l = f.readline()
         l = l.decode()
         f.close()
@@ -121,8 +123,9 @@ class IndiaSTKDS(datasrc.DataSrc):
         """
         Parse the specified data csv file and load it into passed today dictionary.
         """
-        z = zipfile.Zipfile(sFile)
-        tFile = z.open(sFile[-12:].replace('R','r'))
+        z = zipfile.ZipFile(sFile)
+        csvFile = "Pr"+fName[-10:-4]+".csv"
+        tFile = z.open(csvFile)
         tFile.readline()
         for l in tFile:
             l = l.strip()

@@ -95,6 +95,7 @@ def setup_gdata(startDate=-1, endDate=-1):
 
 def setup_modules():
     gDS.append(indiamf.IndiaMFDS(FINFOOLSERRAND_BASE, gLoadFilters))
+    gDS.append(indiamf.IndiaSTKDS(FINFOOLSERRAND_BASE, gLoadFilters))
 
 
 def setup():
