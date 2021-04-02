@@ -20,6 +20,8 @@ L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
 
 def matching_list(curPart, text):
     match = []
+    if gMeta == None:
+        gMeta = {'entTypes':[]}
     for x in gMeta['entTypes']:
         if x.startswith(curPart):
             match.append(text+x[len(curPart):])
