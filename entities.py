@@ -166,8 +166,8 @@ class Entities:
         Reduce the arrays used to fit the currently loaded set of data.
         """
         for dataKey in dataKeys:
-            self.data[dataKey] = self.data[dataKey][:self.meta['nxtEntIndex'],:self.meta['nxtDateIndex']]
+            self.data[dataKey] = self.data[dataKey][:self.nxtEntIndex,:self.meta['nxtDateIndex']]
         for key in [ 'firstSeen', 'lastSeen', 'name', 'codeL', 'typeId' ]:
-            self.meta[key] = self.meta[key][:self.meta['nxtEntIndex']]
+            self.meta[key] = self.meta[key][:self.nxtEntIndex]
 
 

@@ -358,7 +358,7 @@ def fillin4holidays():
     As there may not be any data for holidays including weekends,
     so fill them with the data from the prev working day for the corresponding entity.
     """
-    for r in range(gEnts.meta['nxtEntIndex']):
+    for r in range(gEnts.nxtEntIndex):
         _fillin4holidays(r)
 
 
@@ -550,15 +550,15 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         gEnts.data[dataDstMetaLabel] = []
         #### Op specific things to do before getting into individual records
         if op == 'srel':
-            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.meta['nxtEntIndex'],3])
+            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.nxtEntIndex,3])
         elif op.startswith("rel"):
-            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.meta['nxtEntIndex'],3])
+            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.nxtEntIndex,3])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = int(op[4:].split('_')[0])
-            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.meta['nxtEntIndex'], 4])
+            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.nxtEntIndex, 4])
         elif op.startswith("block"):
             blockDays = int(op[5:])
             blockTotalDays = endDateIndex - startDateIndex + 1
@@ -566,9 +566,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             dataDstAvgs = "{}Avgs".format(dataDst)
             dataDstStds = "{}Stds".format(dataDst)
             dataDstQntls = "{}Qntls".format(dataDst)
-            gEnts.data[dataDstAvgs] = numpy.zeros([gEnts.meta['nxtEntIndex'],blockCnt])
-            gEnts.data[dataDstStds] = numpy.zeros([gEnts.meta['nxtEntIndex'],blockCnt])
-            gEnts.data[dataDstQntls] = numpy.zeros([gEnts.meta['nxtEntIndex'],blockCnt,5])
+            gEnts.data[dataDstAvgs] = numpy.zeros([gEnts.nxtEntIndex,blockCnt])
+            gEnts.data[dataDstStds] = numpy.zeros([gEnts.nxtEntIndex,blockCnt])
+            gEnts.data[dataDstQntls] = numpy.zeros([gEnts.nxtEntIndex,blockCnt,5])
             tResult = []
         elif op.startswith("reton"):
             retonT, retonType = op.split('_')
@@ -577,12 +577,12 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             else:
                 retonDate = int(retonT[5:])
                 retonDateIndex = gEnts.meta['dates'].index(retonDate)
-            gEnts.data[dataDstMetaData] = numpy.ones([gEnts.meta['nxtEntIndex'],gHistoricGaps.shape[0]])*numpy.nan
+            gEnts.data[dataDstMetaData] = numpy.ones([gEnts.nxtEntIndex,gHistoricGaps.shape[0]])*numpy.nan
             validHistoric = gHistoricGaps[gHistoricGaps < (retonDateIndex+1)]
             histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
-        for r in range(gEnts.meta['nxtEntIndex']):
+        for r in range(gEnts.nxtEntIndex):
             try:
                 if op == "srel":
                     #breakpoint()
