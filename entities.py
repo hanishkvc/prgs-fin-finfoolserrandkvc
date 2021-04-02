@@ -44,14 +44,14 @@ class Entities:
         self.dates = numpy.zeros(dateCnt)
 
 
-    def _init_ents(self, dataKey, entCnt):
+    def _init_ents(self, dataKey, entCnt, dateCnt):
         """
         Create the members required to handle the data related to the entities.
         """
         self.nxtEntIndex = 0
         self.data = {}
         self.meta = {}
-        self.data[dataKey] = numpy.zeros(entCnt)
+        self.data[dataKey] = numpy.zeros([entCnt, dateCnt])
         self.meta['name'] = numpy.empty(entCnt, dtype=object)
         self.meta['codeL'] = numpy.zeros(entCnt)
         self.meta['codeD'] = {}
@@ -64,9 +64,10 @@ class Entities:
         """
         Initialise a entities object.
         """
+        self.dataKey = dataKey
         self._init_types()
         self._init_dates(dateCnt)
-        self._init_ents(dataKey, entCnt)
+        self._init_ents(dataKey, entCnt, dateCnt)
 
 
     def add_type(typeName):
@@ -82,7 +83,51 @@ class Entities:
         return self.typesD[typeName]
 
 
-    def
+    def add_date(dateInt):
+        """
+        It is assumed that the date is added in chronological sequence.
+        dateInt: should be in YYYYMMDD format.
+        """
+        self.dates[self.nxtDateIndex] = dateInt
+        self.lastAddedDate = dateInt
+        self.nxtDateIndex += 1
+
+
+    def add_ent(entCode, entName, entTypeId):
+        entIndex = self.meta['codeD'].get(entCode, -1)
+        if entIndex == -1:
+            entIndex = self.nxtEntIndex
+            self.nxtEntIndex += 1
+            self.meta['name'][entIndex] = entName
+            self.meta['codeL'].append(entCode)
+            self.meta['codeD'][entCode] = entIndex
+            self.meta['typeId'][entIndex] = entTypeId
+        return entIndex
+
+
+    def add_data(entCode, entName, entData, entTypeId):
+        """
+        Add entity data.
+        entCode: Specifies a unique code associated with the entity
+        entName: is the name of the entity whose data is being added.
+        entData: is either a single value or a dictionary of dataValues
+            with their dataKeys.
+        entTypeId: the typeId to which this entity belongs.
+        """
+        if type(entData) != dict:
+            entData = { self.dataKey: entData }
+        entIndex = self.add_ent(entCode, entName, entTypeId)
+        if self.nxtDateIndex == 0:
+            input("DBUG:Entities:AddData: Trying to add entity data, before date is specified")
+            return
+        if self.meta['firstSeen'][entIndex] == 0:
+            #self.meta['firstSeen'][entIndex] = self.dates[self.nxtDateIndex-1]
+            self.meta['firstSeen'][entIndex] = self.lastAddedDate
+        self.meta['lastSeen'][entIndex] = self.lastAddedDate
+        for dataKey in entData:
+            self.data[dataKey][entIndex,self.nxtDateIndex-1] = entData[dataKey]
+
+
 
 
 gbDEBUG = False
