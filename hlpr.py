@@ -263,6 +263,26 @@ def loadfilters_get(theLoadFilters, loadFiltersName):
     return loadFilters
 
 
+def loadfilters_list(theLoadFilters, caller="Main"):
+    print("INFO:{}:LoadFilters".format(caller))
+    for lfName in theLoadFilters:
+        print("    {}".format(lfName))
+        for t in theLoadFilters[lfName]:
+            print("        {} : {}".format(t, gLoadFilters[lfName][t]))
+
+
+def loadfilters_activate(theLoadFilters, loadFiltersName=None):
+    """
+    Helper function to activate a previously defined set of loadfilters.
+    If None is passed, then loadfilters will be cleared.
+    """
+    if loadFiltersName != None:
+        group = gLoadFilters[loadFiltersName]
+    else:
+        group = None
+    theLoadFilters['active'] = group
+
+
 def sane_array(theArray, skip):
     theSaneArray = theArray.copy()
     theSaneArray[numpy.isinf(theSaneArray)] = skip

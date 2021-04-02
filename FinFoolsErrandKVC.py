@@ -79,8 +79,8 @@ giLabelNameChopLen = 36
 
 
 gCal = calendar.Calendar()
-gData = {}
-gMeta = {}
+gEnts = None
+gDS = []
 gCB = {
         'fetch_data':[],
         'fetch4date':[],
@@ -106,30 +106,13 @@ def setup_gdata(startDate=-1, endDate=-1):
     NumOfRows (corresponding to MFs) is set to a fixed value.
     NumOfCols (corresponding to Dates) is set based on date range.
     """
+    global gEnts
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
-    gData.clear()
-    gData['data'] = numpy.zeros([8192*4, numDates])
-    gMeta.clear()
-    gMeta['code2index'] = {}
-    gMeta['index2code'] = {}
-    gMeta['nextEntIndex'] = 0
-    gMeta['dataIndex'] = -1
-    gMeta['names'] = []
-    gMeta['dates'] = []
-    gMeta['skipped'] = set()
-    gMeta['dateRange'] = [-1, -1]
-    gMeta['plots'] = set()
-    enttypes.init(gMeta)
-    gMeta['typeId'] = numpy.ones(8192*4, dtype=numpy.int32)
-    gData['metas'] = {}
-    gMeta['lastSeen'] = numpy.zeros(8192*4, dtype=numpy.int32)
+    gEnts = entities.Entities(['data'], 8192*4, numDates)
 
 
 def setup_modules():
-    tc.gData = gData
-    tc.gMeta = gMeta
-    indiamf.setup(FINFOOLSERRAND_BASE, gData, gMeta, gCB, gLoadFilters)
-    indexes.setup(FINFOOLSERRAND_BASE, gData, gMeta, gCB, gLoadFilters)
+    gDS.append(indiamf.IndiaMFDS(FINFOOLSERRAND_BASE, gLoadFilters))
 
 
 def setup():
@@ -208,8 +191,9 @@ def fetch4date(y, m, d, opts):
         day (month day) should be one of 1 to 31, as appropriate for month specified.
     """
     #print(y,m,d)
-    for cb in gCB['fetch4date']:
-        cb(y, m, d, opts)
+    for ds in gDS:
+        if 'fetch4date' in dir(ds):
+            ds.fetch4date(y, m, d, opts)
 
 
 def date2datedict(date, fallBackMonth=1):
@@ -280,23 +264,7 @@ def fetch_data(startDate, endDate=None, opts={'ForceRemote': True}):
     """
     if endDate == None:
         endDate = startDate
-    for cb in gCB['fetch_data']:
-        cb(startDate, endDate, opts)
     return fetch4daterange(startDate, endDate, opts)
-
-
-def print_skipped():
-    """
-    Print the skipped list of MFs, so that user can cross verify, things are fine.
-    """
-    msg = "WARN: About to print the list of SKIPPED/Filtered out MFs"
-    if gbDEBUG:
-        input("{}, press any key...".format(msg))
-    else:
-        print(msg)
-    for skippedMF in gMeta['skipped']:
-        print(skippedMF)
-    print("WARN: The above MFs were skipped/filtered out when loading")
 
 
 def load4date(y, m, d, opts):
@@ -306,11 +274,10 @@ def load4date(y, m, d, opts):
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
-    gMeta['dataIndex'] += 1
-    gMeta['dates'].append(hlpr.dateint(y,m,d))
-    for cb in gCB['load4date']:
-        cb(y, m, d, opts)
-
+    gEnts.add_date(hlpr.dateint(y,m,d))
+    for ds in gDS:
+        if 'load4date' in dir(ds):
+            ds.load4date(y, m, d, opts)
 
 
 def load4daterange(startDate, endDate, opts=None):
@@ -333,48 +300,14 @@ def load4daterange(startDate, endDate, opts=None):
         excInfo = sys.exc_info()
         print(excInfo)
     fillin4holidays()
-    if gbDEBUG:
-        print_skipped()
 
 
-gWhiteListEntTypes = None
-gWhiteListEntNames = None
-gBlackListEntNames = None
-
-
-def _loadfilters_set(whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
+def loadfilters_activate(loadFiltersName=None):
     """
-    Setup global filters used by load logic.
-
-    If whiteListEntTypes is set, loads only Entities which belong to a EntityType which matches one of the given EntityType templates.
-    If whiteListEntNames is set, loads only Entities whose name matches any one of the given match templates.
-    If blackListEntNames is set, loads only Entities whose names dont match any of the corresponding match templates.
-    """
-    global gMeta
-    gMeta['whiteListEntTypes'] = whiteListEntTypes
-    gMeta['whiteListEntNames'] = whiteListEntNames
-    gMeta['blackListEntNames'] = blackListEntNames
-    print("LoadFiltersSet:Global Filters:\n\twhiteListEntTypes {}\n\twhiteListEntNames {}\n\tblackListEntNames {}".format(whiteListEntTypes, whiteListEntNames, blackListEntNames))
-
-
-def _loadfilters_clear():
-    """
-    Clear any global white/blacklist filters setup wrt load operation.
-    """
-    loadfilters_set(None, None, None)
-
-
-def _loadfilters_load(loadFiltersName=None):
-    """
-    Helper function to load from a previously defined set of loadfilters wrt different data sources/users preferences.
-
+    Helper function to activate a previously defined set of loadfilters wrt different data sources/users preferences.
     If None is passed, then loadfilters will be cleared.
     """
-    if loadFiltersName != None:
-        group = gLoadFilters[loadFiltersName]
-        _loadfilters_set(group['whiteListEntTypes'], group['whiteListEntNames'], group['blackListEntNames'])
-    else:
-        _loadfilters_clear()
+    hlpr.loadfilters_activate(gLoadFilters, loadFiltersName)
 
 
 def loadfilters_setup(loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
@@ -385,11 +318,7 @@ def loadfilters_setup(loadFiltersName, whiteListEntTypes=None, whiteListEntNames
 
 
 def loadfilters_list():
-    print("INFO:MAIN:LoadFilters")
-    for lf in gLoadFilters:
-        print("    {}".format(lf))
-        for t in gLoadFilters[lf]:
-            print("        {} : {}".format(t, gLoadFilters[lf][t]))
+    hlpr.loadfilters_list(gLoadFilters)
 
 
 def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, loadFiltersName='default'):
@@ -421,9 +350,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
         endDate = startDate
     if bClearData:
         setup_gdata(startDate, endDate)
-    _loadfilters_load(loadFiltersName)
-    for cb in gCB['load_data']:
-        cb(startDate, endDate)
+    loadfilters_activate(loadFiltersName)
     load4daterange(startDate, endDate)
     if bOptimizeSize:
         gData['data'] = gData['data'][:gMeta['nextEntIndex'],:gMeta['dataIndex']+1]
