@@ -69,7 +69,7 @@ def members(self, entTypeTmpls, entNameTmpls=[]):
         print("INFO:EntType: [{}] members:".format(entType))
         for entCode in self.typeMembers[entType]:
             entIndex = self.meta['codeD'][entCode]
-            entName = self.meta['names'][entIndex]
+            entName = self.meta['name'][entIndex]
             if len(entNameTmpls) == 0:
                 bEntSelect = True
             else:

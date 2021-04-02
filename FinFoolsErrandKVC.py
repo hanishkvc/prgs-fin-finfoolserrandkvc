@@ -392,7 +392,7 @@ def findmatchingmf(entNameTmpl, fullMatch=False, partialTokens=False, ignoreCase
 
     NOTE: look at help of _findmatching for the search/matching behaviour.
     """
-    fm, pm = _findmatching(entNameTmpl, gEnts.meta['names'], fullMatch, partialTokens, ignoreCase)
+    fm, pm = _findmatching(entNameTmpl, gEnts.meta['name'], fullMatch, partialTokens, ignoreCase)
     #breakpoint()
     fmNew = []
     for curName, curIndex in fm:
@@ -739,7 +739,7 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         for entCode in entCodes:
             index = gEnts.meta['codeD'][entCode]
-            name = gEnts.meta['names'][index][:giLabelNameChopLen]
+            name = gEnts.meta['name'][index][:giLabelNameChopLen]
             try:
                 dataLabel = gEnts.data[dataSrcMetaLabel][index]
             except:
@@ -977,17 +977,17 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
         if type(theSRelMetaData) == type(None):
             procdata_ex('srel=srel(data)')
         if bDebug:
-            tNames = numpy.array(gEnts.meta['names'])
+            tNames = numpy.array(gEnts.meta['name'])
             tDroppedNames = tNames[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears]
             print("INFO:AnalDataSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
         theSaneArray[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(gEnts.meta['lastSeen'] < (gEnts.meta['dates'][gEnts.nxtDateIndex-1]-7))[0]
         if bDebug:
-            #aNames = numpy.array(gEnts.meta['names'])
+            #aNames = numpy.array(gEnts.meta['name'])
             #print(aNames[oldEntities])
             for index in oldEntities:
-                print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gEnts.meta['names'][index], gEnts.meta['lastSeen'][index]))
+                print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gEnts.meta['name'][index], gEnts.meta['lastSeen'][index]))
         theSaneArray[oldEntities] = iSkip
     theRows=numpy.argsort(theSaneArray)[-numEntities:]
     rowsLen = len(theRows)
@@ -1009,7 +1009,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
         if (theSaneArray[index] == iSkip) or ((opType == 'block_ranked') and (theSaneArray[index] == 0)):
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
-        curEntry = [gEnts.meta['codeL'][index], gEnts.meta['names'][index], theSaneArray[index]]
+        curEntry = [gEnts.meta['codeL'][index], gEnts.meta['name'][index], theSaneArray[index]]
         if opType == "roll_avg":
             curEntry.extend(gEnts.data[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
@@ -1069,7 +1069,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             ]
     for entCode in entCodes:
         entIndex = gEnts.meta['codeD'][entCode]
-        print("Name:", gEnts.meta['names'][entIndex])
+        print("Name:", gEnts.meta['name'][entIndex])
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gEnts.data[dataSrc[1]][entIndex]))
 
@@ -1107,7 +1107,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
         entCount = 0
         for entCode in entCodes:
             entIndex = gEnts.meta['codeD'][entCode]
-            entName = gEnts.meta['names'][entIndex][:24]
+            entName = gEnts.meta['name'][entIndex][:24]
             if dataSrc[0].startswith('roll'):
                 x.append(gEnts.data[dataSrcMetaData][entIndex,0])
                 y.append(gEnts.data[dataSrcMetaData][entIndex,1])
