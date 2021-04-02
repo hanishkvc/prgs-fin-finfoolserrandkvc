@@ -345,7 +345,7 @@ def _fillin4holidays(entIndex=-1):
     """
     for key in gDataKeys:
         lastData = -1
-        for c in range(gEnts.meta['nxtDateIndex']):
+        for c in range(gEnts.nxtDateIndex):
             if gEnts.data[key][entIndex,c] == 0:
                 if lastData > 0:
                     gEnts.data[key][entIndex,c] = lastData
@@ -639,7 +639,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     tResult[r,:] = numpy.convolve(gEnts.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
                     inv = int(days/2)
                     tResult[r,:inv] = numpy.nan
-                    tResult[r,gEnts.meta['dataIndex']-inv:] = numpy.nan
+                    tResult[r,gEnts.nxtDateIndex-inv:] = numpy.nan
                     if True:
                         try:
                             dataSrcLabel = gEnts.data[dataSrcMetaLabel][r]
@@ -907,14 +907,14 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
     theSaneArray = None
     if opType == 'normal':
         if (type(theDate) == type(None)) and (type(theIndex) == type(None)):
-            for i in range(-1, -(gEnts.meta['dataIndex']+1),-1):
+            for i in range(-1, -gEnts.nxtDateIndex, -1):
                 if bDebug:
                     print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
                 theSaneArray = gEnts.data[dataSrc][:,i].copy()
                 theSaneArray[numpy.isinf(theSaneArray)] = iSkip
                 theSaneArray[numpy.isnan(theSaneArray)] = iSkip
                 if not numpy.all(numpy.isinf(theSaneArray) | numpy.isnan(theSaneArray)):
-                    dateIndex = gEnts.meta['dataIndex']+1+i
+                    dateIndex = gEnts.nxtDateIndex+i
                     print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
                     break
         else:
@@ -969,7 +969,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
         breakpoint()
     theSaneArray = _forceval_entities(theSaneArray, entCodes, iSkip, 'invert')
     if minEntityLifeDataInYears > 0:
-        dataYearsAvailable = (gEnts.meta['dataIndex']+1)/365
+        dataYearsAvailable = gEnts.nxtDateIndex/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
             print("WARN:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
         srelMetaData, srelMetaLabel = datadst_metakeys('srel')
@@ -982,7 +982,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             print("INFO:AnalDataSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
         theSaneArray[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
-        oldEntities = numpy.nonzero(gEnts.meta['lastSeen'] < (gEnts.meta['dates'][gEnts.meta['dataIndex']]-7))[0]
+        oldEntities = numpy.nonzero(gEnts.meta['lastSeen'] < (gEnts.meta['dates'][gEnts.nxtDateIndex-1]-7))[0]
         if bDebug:
             #aNames = numpy.array(gEnts.meta['names'])
             #print(aNames[oldEntities])
@@ -1040,7 +1040,7 @@ def infoset1_prep():
     procdata_ex(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'])
     procdata_ex(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'])
     procdata_ex(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
-    blockDays = int((gEnts.meta['dataIndex']+1)/5)
+    blockDays = int(gEnts.nxtDateIndex/5)
     procdata_ex(['blockNRoll1095=block{}(roll1095)'.format(blockDays)])
     warnings.filterwarnings('default')
 
@@ -1073,7 +1073,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gEnts.data[dataSrc[1]][entIndex]))
 
-    dateDuration = (gEnts.meta['dataIndex']+1)/365
+    dateDuration = gEnts.nxtDateIndex/365
     if dateDuration > 1.5:
         dateDuration = 1.5
     print("INFO:dateDuration:", dateDuration)
@@ -1183,7 +1183,7 @@ def _date2index(startDate, endDate):
     else:
         startDateIndex = gEnts.meta['dates'].index(startDate)
     if endDate == -1:
-        endDateIndex = gEnts.meta['dataIndex']
+        endDateIndex = gEnts.nxtDateIndex-1
     else:
         endDateIndex = gEnts.meta['dates'].index(endDate)
     return startDateIndex, endDateIndex
