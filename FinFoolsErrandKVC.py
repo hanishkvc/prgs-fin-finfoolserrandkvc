@@ -80,6 +80,7 @@ giLabelNameChopLen = 36
 
 gCal = calendar.Calendar()
 gEnts = None
+gDataKeys = ['data']
 gDS = []
 gCB = {
         'fetch_data':[],
@@ -108,7 +109,7 @@ def setup_gdata(startDate=-1, endDate=-1):
     """
     global gEnts
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
-    gEnts = entities.Entities(['data'], 8192*4, numDates)
+    gEnts = entities.Entities(gDataKeys, 8192*4, numDates)
 
 
 def setup_modules():
@@ -353,29 +354,30 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     loadfilters_activate(loadFiltersName)
     load4daterange(startDate, endDate)
     if bOptimizeSize:
-        gEnts.optimise_size()
+        gEnts.optimise_size(gDataKeys)
 
 
-def _fillin4holidays(mfIndex=-1):
+def _fillin4holidays(entIndex=-1):
     """
-    As there wont be any Nav data for holidays including weekends,
-    so fill them with the nav from the prev working day for the corresponding mf.
+    As there may not be any data for holidays including weekends,
+    so fill them with the data from the prev working day for the corresponding entity.
     """
-    lastNav = -1
-    for c in range(gMeta['dataIndex']+1):
-        if gData['data'][mfIndex,c] == 0:
-            if lastNav > 0:
-                gData['data'][mfIndex,c] = lastNav
-        else:
-            lastNav = gData['data'][mfIndex,c]
+    for key in gDataKeys:
+        lastData = -1
+        for c in range(self.meta['nxtDateIndex']):
+            if self.data[key][entIndex,c] == 0:
+                if lastData > 0:
+                    self.data[key][entIndex,c] = lastData
+            else:
+                lastData = self.data[key][entIndex,c]
 
 
 def fillin4holidays():
     """
-    As there wont be any Nav data for holidays including weekends,
-    so fill them with the nav from the prev working day for the corresponding mf.
+    As there may not be any data for holidays including weekends,
+    so fill them with the data from the prev working day for the corresponding entity.
     """
-    for r in range(gMeta['nextEntIndex']):
+    for r in range(self.meta['nxtEntIndex']):
         _fillin4holidays(r)
 
 
