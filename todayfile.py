@@ -46,8 +46,18 @@ def add_ent(today, entCode, entName, entValues, entType, date):
     entIndex = len(today['data'])
     today['data'].append([entCode, entName, entValues])
     today['codeD'][entCode] = entIndex
-    if today['date'] > date:
+    #if today['date'] > date:
+    if today['date'] != date:
         today['bUpToDate'] = False
+
+
+def valid_today(today):
+    """
+    Check passed today dictionary contains a valid marker.
+    Also give the UpToDate status stored in it.
+    """
+    bMarker = (today['marker'] == TODAY_MARKER)
+    return bMarker, today['bUpToDate']
 
 
 def load2edb(today, edb, loadFilters, caller="TodayFile"):

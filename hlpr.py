@@ -243,23 +243,6 @@ def load_pickle(fName):
     return False, None, None
 
 
-def gdata_add(gData, gMeta, entTypeId, entType, code, name, nav, date, msgTag):
-    entIndex = gMeta['code2index'].get(code, None)
-    if entIndex == None:
-        entIndex = gMeta['nextEntIndex']
-        gMeta['nextEntIndex'] += 1
-        gMeta['code2index'][code] = entIndex
-        gMeta['index2code'][entIndex] = code
-        gMeta['names'].append(name)
-        gMeta['entTypes'][entType].append(code)
-        gMeta['typeId'][entIndex] = entTypeId
-    else:
-        if (name != gMeta['names'][entIndex]):
-            input("DBUG:{}:Name mismatch?:{} != {}".format(msgTag, name, gMeta['names'][entIndex]))
-    gData['data'][entIndex,gMeta['dataIndex']] = nav
-    gMeta['lastSeen'][entIndex] = date
-
-
 def loadfilters_setup(theLoadFilters, loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
     theLoadFilters[loadFiltersName] = {
             'whiteListEntTypes': whiteListEntTypes,

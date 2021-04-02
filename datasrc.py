@@ -7,12 +7,36 @@ import sys
 import datetime
 import hlpr
 import enttypes
+import todayfile
 
 
 class DataSource:
+    """
+    Work with data available from a remote server, in a efficient manner.
+    Provides logics to
+        Fetch and save a local pickled copy of the fetched data.
+        Load the pickled data into Entities DB. In turn if a local copy
+            is not available, then fetch from remote server.
+
+    Expects the following templates to be defined by the child class for creating
+    suitable url and local file path (including file name).
+    These are passed through strftime, so user can use suitable format specifiers
+    to generate strings with required date components in it.
+    urlTmpl: template used to create the url to fetch.
+    pathTmpl: template used to create local filename for saving fetched data.
 
 
+    The child class should also provide valid implementation of the following
+    functions.
+
+        _valid_remotefile
+        _parse_file
+        _valid_picklefile [This is optional]
+    """
+
+    urlTmpl = None
     pathTmpl = None
+    dataKeys = None
     tag = "DSBase"
 
 
@@ -27,15 +51,16 @@ class DataSource:
         print("INFO:{}:pathTmpl:{}".format(self.tag, self.pathTmpl))
 
 
-    def _valid_remotefile(fName):
+    def _valid_remotefile(self, fName):
         """
-        Check if the given file is a valid data file or not.
+        Check if the given file is a valid data file containing fetched data from
+        the remote server or not.
         NOTE: Child classes need to provide a valid implementation of this.
         """
         return False
 
 
-    def _fetch_remote(url, fName):
+    def _fetch_remote(self, url, fName):
         """
         Fetch give url to specified file, and check its valid.
         """
@@ -46,48 +71,71 @@ class DataSource:
             os.remove(fName)
 
 
-fetchPreDateErrCnt = 0
-def fetch4date(y, m, d, opts):
-    """
-    Fetch data for the given date.
+    def _parse_file(self, fName, today):
+        """
+        Parse the given file and load its data into the today dictionary.
+        NOTE: Child classes need to provide a valid implementation of this.
+        """
+        today['bUpToDate'] = False
+        return today
 
-    opts: a list of options supported by this logic
-        'ForceLocal': When the logic decides that it has to fetch
-            data file from the internet, it will cross check, if
-            ForceLocal is True. If True, then the logic wont try
-            to redownload
-        'ForceRemote': If true, then the logic will try to fetch
-            the data file again from the internet, irrespective
-            of the local data pickle file is ok or not.
-        NOTE: ForceRemote takes precedence over ForceLocal.
-    """
-    global fetchPreDateErrCnt
-    if (y < 2006) or ((y == 2006) and (m < 4)):
-        if (fetchPreDateErrCnt % 20) == 0:
-            print("WARN:IndiaMF:fetch4date:AMFI data starts from 200604, so skipping for {:04}{:02}...".format(y,m))
-        fetchPreDateErrCnt += 1
-        return
-    url = MFS_BaseURL.format(d,calendar.month_name[m][:3],y)
-    fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    bParseCSV=False
-    if opts == None:
-        opts = {}
-    bForceRemote = opts.get('ForceRemote', False)
-    bForceLocal = opts.get('ForceLocal', False)
-    if bForceRemote:
-        _fetchdata(url, fName)
-        bParseCSV=True
-    elif not hlpr.pickle_ok(fName,4e3):
-        if not bForceLocal:
-            _fetchdata(url, fName)
-        bParseCSV=True
-    if bParseCSV:
-        try:
-            today = parse_csv(fName)
-            hlpr.save_pickle(fName, today, [], "IndiaMF:fetch4Date")
-        except:
-            print("ERRR:IndiaMF:fetch4date:{}:ForceRemote[{}], ForceLocal[{}]".format(fName, bForceRemote, bForceLocal))
-            print(sys.exc_info())
+
+    def _valid_picklefile(self, fName):
+        """
+        Verify that the passed local file is a pickle file containing potentially
+        valid data in it.
+        NOTE: Child classes can optionally provide a better implementation of this.
+        TOTHINK: Should I also check for bUpToDate and return false, if its false.
+            This could potentially force a attempt at fetching data from remote
+            server again.
+        """
+        if hlpr.pickle_ok(fName, 64):
+            bOk, today, temp = hlpr.load_pickle(fName)
+            if bOk:
+                bMarker, bUpToDate = todayfile.valid_today(today)
+                if bMarker:
+                    return True
+        return False
+
+
+    def fetch4date(self, y, m, d, opts):
+        """
+        Fetch data for the given date.
+
+        opts: a list of options supported by this logic
+            'ForceLocal': When the logic decides that it has to fetch
+                data file from the internet, it will cross check, if
+                ForceLocal is True. If True, then the logic wont try
+                to redownload
+            'ForceRemote': If true, then the logic will try to fetch
+                the data file again from the internet, irrespective
+                of the local data pickle file is ok or not.
+            NOTE: ForceRemote takes precedence over ForceLocal.
+        """
+        timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
+        dateInt = hlpr.dateint(y,m,d)
+        url = time.strftime(self.urlTmpl, timeTuple)
+        fName = time.strftime(self.pathTmpl, timeTuple)
+        bParseFile=False
+        if opts == None:
+            opts = {}
+        bForceRemote = opts.get('ForceRemote', False)
+        bForceLocal = opts.get('ForceLocal', False)
+        if bForceRemote:
+            _fetch_remote(url, fName)
+            bParseFile=True
+        elif not self._valid_picklefile(fName):
+            if not bForceLocal:
+                _fetch_remote(url, fName)
+            bParseFile=True
+        if bParseFile:
+            try:
+                today = todayfile.init(dateInt, self.dataKeys)
+                self._parse_file(fName, today)
+                hlpr.save_pickle(fName, today, [], "{}:Fetch4Date".format(self.tag))
+            except:
+                print("ERRR:{}:Fetch4Date:{}:ForceRemote[{}], ForceLocal[{}]".format(self.tag, fName, bForceRemote, bForceLocal))
+                print(sys.exc_info())
 
 
 def load4date(y, m, d, opts):
