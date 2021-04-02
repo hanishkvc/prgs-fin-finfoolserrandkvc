@@ -1204,7 +1204,7 @@ def session_save(sessionName):
     Save current gEnts.data-gEnts.meta into a pickle, so that it can be restored fast later.
     """
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    hlpr.save_pickle(fName, gEnts.data, gEnts.meta, "Main:SessionSave")
+    hlpr.save_pickle(fName, gEnts, None, "Main:SessionSave")
 
 
 def session_restore(sessionName):
@@ -1214,7 +1214,7 @@ def session_restore(sessionName):
     """
     global gEnts
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    ok, gEnts.data, gEnts.meta = hlpr.load_pickle(fName)
+    ok, gEnts, tIgnore = hlpr.load_pickle(fName)
     enttypes.init(gEnts)
     setup_modules()
 
