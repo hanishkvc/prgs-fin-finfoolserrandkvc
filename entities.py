@@ -32,6 +32,7 @@ class Entities:
         """
         self.nxtDateIndex = 0
         self.dates = numpy.zeros(dateCnt)
+        self.datesD = {}
 
 
     def _init_ents(self, dataKeys, entCnt, dateCnt):
@@ -91,6 +92,7 @@ class Entities:
         dateInt: should be in YYYYMMDD format.
         """
         self.dates[self.nxtDateIndex] = dateInt
+        self.datesD[dateInt] = self.nxtDateIndex
         self.lastAddedDate = dateInt
         self.nxtDateIndex += 1
 

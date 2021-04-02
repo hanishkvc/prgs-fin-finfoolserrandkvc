@@ -570,7 +570,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                 retonDateIndex = endDateIndex
             else:
                 retonDate = int(retonT[5:])
-                retonDateIndex = gEnts.meta['dates'].index(retonDate)
+                retonDateIndex = gEnts.datesD[retonDate]
             gEnts.data[dataDstMetaData] = numpy.ones([gEnts.nxtEntIndex,gHistoricGaps.shape[0]])*numpy.nan
             validHistoric = gHistoricGaps[gHistoricGaps < (retonDateIndex+1)]
             histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
@@ -607,7 +607,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     baseDate = op[3:]
                     if baseDate != '':
                         baseDate = int(baseDate)
-                        baseDateIndex = gEnts.meta['dates'].index(baseDate)
+                        baseDateIndex = gEnts.datesD[baseDate]
                     else:
                         baseDateIndex = startDateIndex
                     baseData = gEnts.data[dataSrc][r, baseDateIndex]
@@ -966,7 +966,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             print("INFO:AnalDataSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
         theSaneArray[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
-        oldEntities = numpy.nonzero(gEnts.meta['lastSeen'] < (gEnts.meta['dates'][gEnts.nxtDateIndex-1]-7))[0]
+        oldEntities = numpy.nonzero(gEnts.meta['lastSeen'] < (gEnts.dates[gEnts.nxtDateIndex-1]-7))[0]
         if bDebug:
             #aNames = numpy.array(gEnts.meta['name'])
             #print(aNames[oldEntities])
@@ -1165,11 +1165,11 @@ def _date2index(startDate, endDate):
     if startDate == -1:
         startDateIndex = 0
     else:
-        startDateIndex = gEnts.meta['dates'].index(startDate)
+        startDateIndex = gEnts.datesD[startDate]
     if endDate == -1:
         endDateIndex = gEnts.nxtDateIndex-1
     else:
-        endDateIndex = gEnts.meta['dates'].index(endDate)
+        endDateIndex = gEnts.datesD[endDate]
     return startDateIndex, endDateIndex
 
 
@@ -1183,7 +1183,7 @@ def _show_plot():
         line.set_linewidth(8)
     plt.grid(True)
     startDateIndex, endDateIndex = _date2index(-1,-1)
-    curDates = gEnts.meta['dates'][startDateIndex:endDateIndex+1]
+    curDates = gEnts.dates[startDateIndex:endDateIndex+1]
     numX = len(curDates)
     xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
     xTicks[-1] -= 1
