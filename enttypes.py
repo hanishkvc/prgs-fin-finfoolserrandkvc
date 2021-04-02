@@ -1,69 +1,52 @@
 #!/usr/bin/env python3
-# Handle entity types as part of FinFoolsErrand
+# Handle entity types related members of Entities class.
 # HanishKVC, 2021
 
 import hlpr
 
 
-gMeta = None
-def init(theMeta, bClearFields=True):
+def init(self):
     """
-    Initialise the entity types module wrt the currently active meta dictionary.
-
-    bClearField: Also clear the entity type related fields in the given Meta dictionary.
-
-    NOTE: THe passed meta dictionary will be used implicitly if required in future operations,
-    if the user doesnt pass any new meta dictionary explicitly.
+    Initialise the entity types related members of passed self.
     """
-    global gMeta
-    if bClearFields:
-        theMeta['entTypes'] = {}
-        theMeta['entType4Id'] = []
-        theMeta['entType2Id'] = {}
-    gMeta = theMeta
+    self.nxtTypeIndex = 0
+    self.typesD = {}
+    self.typesL = []
+    self.typeMembers = {}
 
 
-def _themeta(theMeta):
-    if theMeta == None:
-        return gMeta
-    else:
-        return theMeta
-
-
-def add(entType, theCaller="?", theMeta=None):
+def add(self, typeName):
     """
-    Add the given entType into meta dictionary, if required.
+    Add the given typeName into entities db, if required.
 
-    Also return the entTypeId for the given entType.
+    Also return the typeId associated with the given typeName.
     """
-    theMeta = _themeta(theMeta)
-    if entType not in theMeta['entTypes']:
-        theMeta['entTypes'][entType] = []
-        checkTypeId = theMeta['entType2Id'].get(entType, -1)
-        if checkTypeId != -1:
-            input("DBUG:EntTypes-{}:add: entType2Id not in sync with entTypes".format(theCaller))
-        else:
-            theMeta['entType4Id'].append(entType)
-        theMeta['entType2Id'][entType] = len(theMeta['entType4Id'])-1
-    return theMeta['entType2Id'][entType]
+    if typeName not in self.types:
+        self.typesD[typeName]=self.nxtTypeIndex
+        self.typesL.append(typeName)
+        self.typeMembers[typeName] = []
+        self.nxtTypeIndex += 1
+    return self.typesD[typeName]
 
 
-def list(theMeta=None):
+def list(self):
     """
-    List entityTypes found in currently loaded data.
-
-    theMeta: the meta dictionary to use to get the details of entTypes available.
-        However if None, then meta dictionary which was initialised the last time,
-        will be used automatically.
+    List entity types found in the passed entities db.
     """
-    theMeta = _themeta(theMeta)
-    for k in theMeta['entTypes']:
+    for k in self.typesD:
         print(k)
 
 
-def members(entTypeTmpls, entNameTmpls=[], theMeta=None):
+def add_member(self, entTypeId, entCode)
     """
-    List the members of the specified entityTypes
+    Add a entity to the members list associated with its entityType.
+    """
+    self.typeMembers[self.typesL[entTypeId]].append(entCode)
+
+
+def members(self, entTypeTmpls, entNameTmpls=[]):
+    """
+    List the members of the specified entity types
 
     entTypeTmpls could either be a string or a list of strings.
     Each of these strings will be treated as a matching template
@@ -74,19 +57,19 @@ def members(entTypeTmpls, entNameTmpls=[], theMeta=None):
     through the entNameTmpls. If entNameTmpls is empty, then all
     members of the selected entTypes will be selected.
     """
-    theMeta = _themeta(theMeta)
     if type(entTypeTmpls) == str:
         entTypeTmpls = [ entTypeTmpls ]
     entTypesList = []
-    for entType in gMeta['entTypes']:
+    for entType in self.typesD:
         fm,pm = hlpr.matches_templates(entType, entTypeTmpls)
         if len(fm) > 0:
             entTypesList.append(entType)
     entCodes = []
     for entType in entTypesList:
         print("INFO:EntType: [{}] members:".format(entType))
-        for entCode in gMeta['entTypes'][entType]:
-            entName = gMeta['names'][gMeta['code2index'][entCode]]
+        for entCode in self.typeMembers[entType]:
+            entIndex = self.meta['codeD'][entCode]
+            entName = self.meta['names'][entIndex]
             if len(entNameTmpls) == 0:
                 bEntSelect = True
             else:

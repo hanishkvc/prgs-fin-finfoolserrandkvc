@@ -30,10 +30,7 @@ class Entities:
         typesD: Allows identify the typeIndex/typeId associated with given typeName
         typesL: Allows one to get the typeName from a given typeId
         """
-        self.nxtTypeIndex = 0
-        self.typesD = {}
-        self.typesL = []
-        self.typeMembers = {}
+        enttypes.init(self)
 
 
     def _init_dates(self, dateCnt):
@@ -85,19 +82,14 @@ class Entities:
         Add a type (typeName) into types db, if not already present.
         Return the typeId.
         """
-        if typeName not in self.types:
-            self.typesD[typeName]=self.nxtTypeIn
-            self.typesL.append(typeName)
-            self.typeMembers[typeName] = []
-            self.nxtTypeIn += 1
-        return self.typesD[typeName]
+        enttypes.add(self, typeName)
 
 
     def add_type_member(entTypeId, entCode):
         """
         Add a entity to the members list associated with its entityType.
         """
-        self.typeMembers[self.typesL[entTypeId]].append(entCode)
+        enttypes.add_member(self, entTypeId, entCode)
 
 
     def add_date(dateInt):
