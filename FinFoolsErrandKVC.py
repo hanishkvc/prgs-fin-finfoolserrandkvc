@@ -475,48 +475,6 @@ def update_metas(op, dataSrc, dataDst):
         gEnts.data['metas'][srelMetaData], gEnts.data['metas'][srelMetaLabel] = datadst_metakeys(dataDst)
 
 
-def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
-    """
-    Process the data relative to its 1st Non Zero value
-    It calculates the
-        Absolute return percentage,
-        Return per annum (taking compounding into account),
-        MovingAverage (optional)
-        RollingReturn (optional)
-    """
-    dataLen = len(data)
-    iStart = -1
-    for i in range(dataLen):
-        dStart = data[i]
-        if dStart > 0:
-            iStart = i
-            break
-    if dStart == 0:
-        return data, 0, 0, 0
-    dEnd = data[-1]
-    dataRel = ((data/dStart)-1)*100
-    if gbDataRelIgnoreBeginingNonData and (iStart != -1):
-        dataRel[:iStart] = 0
-    dAbsRetPercent = dataRel[-1]
-    durationInYears = (dataLen-iStart)/365
-    dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
-    if bMovingAvg:
-        dMovAvg = numpy.convolve(dataRel, numpy.ones(MOVINGAVG_WINSIZE)/MOVINGAVG_WINSIZE, MOVINGAVG_CONVOLVEMODE)
-    else:
-        dMovAvg = None
-    if bRollingRet:
-        dRollingRetPercents = numpy.zeros(dataLen)
-        tStart = iStart
-        tStart = 0
-        for i in range(tStart, dataLen):
-            tiEnd = i + ROLLINGRET_WINSIZE
-            if tiEnd >= dataLen:
-                break
-            dRollingRetPercents[tiEnd] = ((data[tiEnd]/data[i]) - 1)*100
-    else:
-        dRollingRetPercents = None
-    return dataRel, dMovAvg, dRollingRetPercents, dStart, dEnd, dAbsRetPercent, dRetPA, durationInYears
-
 
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
@@ -801,7 +759,7 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
         print("DBUG:plot_data:{}".format(dataSrc))
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         for entCode in entCodes:
-            index = gEnts.meta['code2index'][entCode]
+            index = gEnts.meta['codeD'][entCode]
             name = gEnts.meta['names'][index][:giLabelNameChopLen]
             try:
                 dataLabel = gEnts.data[dataSrcMetaLabel][index]
@@ -828,12 +786,12 @@ def _procdata_mabeta(dataSrc, refCode, entCodes):
     Get the slope of the entCodes wrt refCode.
     When the passed dataSrc is rollingRet, this is also called MaBeta.
     """
-    refIndex = gEnts.meta['code2index'][refCode]
+    refIndex = gEnts.meta['codeD'][refCode]
     refValid = gEnts.data[dataSrc][refIndex][numpy.isfinite(gEnts.data[dataSrc][refIndex])]
     refAvg = numpy.mean(refValid)
     maBeta = []
     for entCode in entCodes:
-        entIndex = gEnts.meta['code2index'][entCode]
+        entIndex = gEnts.meta['codeD'][entCode]
         entValid = gEnts.data[dataSrc][entIndex][numpy.isfinite(gEnts.data[dataSrc][entIndex])]
         entAvg = numpy.mean(entValid)
         entMaBeta = numpy.sum((entValid-entAvg)*(refValid-refAvg))/numpy.sum((refValid-refAvg)**2)
@@ -867,7 +825,7 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     """
     if entCodes == None:
         return data
-    indexes = [gEnts.meta['code2index'][code] for code in entCodes]
+    indexes = [gEnts.meta['codeD'][code] for code in entCodes]
     if entSelectType == 'normal':
         mask = numpy.zeros(data.size, dtype=bool)
         mask[indexes] = True
@@ -1131,7 +1089,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             ['roll1825', 'roll1825MetaLabel'],
             ]
     for entCode in entCodes:
-        entIndex = gEnts.meta['code2index'][entCode]
+        entIndex = gEnts.meta['codeD'][entCode]
         print("Name:", gEnts.meta['names'][entIndex])
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], gEnts.data[dataSrc[1]][entIndex]))
@@ -1169,7 +1127,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             dataSrcMetaData = dataSrc[1].replace('Label','Data')
         entCount = 0
         for entCode in entCodes:
-            entIndex = gEnts.meta['code2index'][entCode]
+            entIndex = gEnts.meta['codeD'][entCode]
             entName = gEnts.meta['names'][entIndex][:24]
             if dataSrc[0].startswith('roll'):
                 x.append(gEnts.data[dataSrcMetaData][entIndex,0])
@@ -1220,7 +1178,7 @@ def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=
     """
     entCodes = []
     if (len(entTypeTmpls) == 0) and (len(entNameTmpls) == 0):
-        entCodes = list(gEnts.meta['code2index'].keys())
+        entCodes = list(gEnts.meta['codeD'].keys())
     elif (len(entTypeTmpls) == 0):
         if len(entNameTmpls) > 0:
             fm,pm = search_data(entNameTmpls);
@@ -1270,44 +1228,6 @@ def _daterange_checkfine(startDateIndex, endDateIndex, caller):
         input("INFO:{}:load_data|show_plot will clear saved dateRange, so that you can lookat a new dateRange that you want to".format(caller))
         return False
     return True
-
-
-def lookatents_codes(entCodes, startDate=-1, endDate=-1):
-    """
-    Given a list of MF codes (as in AMFI dataset), look at their data.
-
-    Different representations of the data is plotted for the range of date given,
-    provided the corresponding global flags are enabled.
-
-    NOTE: The plot per se is not shown, till user calls show_plot()
-    NOTE: DateRange used should match that used in previous calls.
-          However load_data and or show_plot will reset dateRange to a clean slate,
-          and user will be free again to look at a new date range of their choosing.
-    """
-    startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    if not _daterange_checkfine(startDateIndex, endDateIndex, "lookatents_codes"):
-        return
-    for code in entCodes:
-        index = gEnts.meta['code2index'][code]
-        name = gEnts.meta['names'][index]
-        aRawData = gEnts.data['data'][index, startDateIndex:endDateIndex+1]
-        aRelData, aMovAvg, aRollingRet, aStart, aEnd, aAbsRetPercent, aRetPA, durYrs = procdata_relative(aRawData, gbDoMovingAvg, gbDoRollingRet)
-        aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
-        print(aLabel, name)
-        if gbDoRawData:
-            _plot_data(code, None, aRawData, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Raw")
-        if gbDoRelData:
-            _plot_data(code, None, aRelData, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), "Rel")
-        if gbDoMovingAvg:
-            if MOVINGAVG_CONVOLVEMODE == 'valid':
-                tStartPos = int(MOVINGAVG_WINSIZE/2)
-            else:
-                tStartPos = 0
-            typeTag = "DMA{}".format(MOVINGAVG_WINSIZE)
-            _plot_data(code, list(range(tStartPos,len(aMovAvg)+tStartPos)), aMovAvg, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
-        if gbDoRollingRet:
-            typeTag = "Rol{}".format(ROLLINGRET_WINSIZE)
-            _plot_data(code, None, aRollingRet, "{}, {}".format(aLabel,name[:giLabelNameChopLen]), typeTag)
 
 
 def _plot_data(entCode, xData, yData, label, typeTag):
@@ -1369,145 +1289,6 @@ def show_plot(clearGDataDateRangePlus=True):
         gEnts.meta['dateRange'] = [-1, -1]
         gEnts.meta['plots'] = set()
 
-
-def lookatents_names(entNames, startDate=-1, endDate=-1):
-    """
-    Given a list of MF names, look at their data.
-
-    findmatchingmf logic is called wrt each given name in the list.
-        All MFs returned as part of its full match list, will be looked at.
-
-    The data is plotted for the range of date given.
-    """
-    if type(entNames) != list:
-        entNames = entNames.split(';')
-    entCodes = []
-    for name in entNames:
-        f,p = findmatchingmf(name)
-        for c in f:
-            #print(c)
-            entCodes.append(c[0])
-    lookatents_codes(entCodes, startDate, endDate)
-
-
-def lookatents_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
-    """
-    Look for MFs which are at the top or the bottom among all the MFs,
-    based on their performance over the date range given.
-
-    opType could be either "TOP" or "BOTTOM"
-    startDate and endDate specify the date range to consider.
-        should be numerals of the form YYYYMMDD
-    count tells how many MFs to list from the top or bottom of the performance list.
-    """
-    if opType.upper() not in ["TOP", "BOTTOM"]:
-        print("ERRR:look4mfs: Unknown operation:", opType)
-        return
-    startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    tData = numpy.zeros([gEnts.meta['nxtEntIndex'], (endDateIndex-startDateIndex+1)])
-    for r in range(gEnts.meta['nxtEntIndex']):
-        try:
-            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tAbsRetPercent, tRetPA, tDurYrs = procdata_relative(gEnts.data['data'][r,startDateIndex:endDateIndex+1])
-        except:
-            traceback.print_exc()
-            print("WARN:{}:{}".format(r,gEnts.meta['names'][r]))
-    #breakpoint()
-    sortedIndex = numpy.argsort(tData[:,-1])
-    entCodes = []
-    if opType.upper() == "TOP":
-        startIndex = -1
-        endIndex = startIndex-count
-        delta = -1
-    elif opType.upper() == "BOTTOM":
-        startIndex = 0
-        endIndex = startIndex+count
-        delta = 1
-    for si in range(startIndex, endIndex, delta):
-        i = sortedIndex[si]
-        entName = gEnts.meta['names'][i]
-        entCode = gEnts.meta['codeL'][i]
-        entCodes.append(entCode)
-        #print("{}: {}:{}".format(i, entCode, entName))
-    lookatents_codes(entCodes, startDate, endDate)
-
-
-def _update_dataproccontrols(dataProcs):
-    """
-    Save current state of data proc controls, and inturn set them to
-    what is specified by the user.
-    """
-    if dataProcs == None:
-        return None
-    global gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE
-    savedDataProcControls = [ gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE ]
-    gbDoRawData, gbDoRelData, gbDoMovingAvg, gbDoRollingRet = False, False, False, False
-    for dp in dataProcs:
-        if dp.upper() == "RAW":
-            gbDoRawData = True
-        elif dp.upper() == "REL":
-            gbDoRelData = True
-        elif dp.upper().startswith("DMA"):
-            gbDoMovingAvg = True
-            days = dp.split('_')
-            if len(days) > 1:
-                MOVINGAVG_WINSIZE = int(days[1])
-        elif dp.upper().startswith("ROLL"):
-            gbDoRollingRet = True
-            days =dp.split('_')
-            if len(days) > 1:
-                ROLLINGRET_WINSIZE = int(days[1])
-    return savedDataProcControls
-
-
-def _restore_dataproccontrols(savedDataProcControls):
-    """
-    Restore data proc controls to a previously saved state.
-    """
-    if savedDataProcControls == None:
-        return
-    global gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE
-    [ gbDoRawData, gbDoRelData, gbDoMovingAvg, MOVINGAVG_WINSIZE, gbDoRollingRet, ROLLINGRET_WINSIZE ] = savedDataProcControls
-
-
-def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
-    """
-    Look at data of MFs from the currently loaded set.
-
-    Job could either be
-
-        a list of MF name parts like [ "mf name parts 1", "mf name parts 2", ... ]
-            a matching MF name should contain all the tokens in any one
-            of the match name parts in the list.
-
-            NOTE: if one prefixes -NO- to a token, then the MFName shouldnt contain
-            that token as part of its name.
-
-        a string specifying a operation like
-            "OP:TOP" - will get the top 10 performing MFs by default.
-            "OP:BOTTOM" - will get the bottom 10 performing MFs by default.
-            NOTE: absolute return is used to decide the TOP or BOTTOM candidates currently.
-
-    startDate and endDate specify the range of date over which the data should be collated.
-    If startDate is -1, then startDate corresponding to the currently loaded data is used.
-    If endDate is -1, then endDate corresponding to the currently loaded data is used.
-
-    count specifies how many MFs should be picked for TOP or BOTTOM operations.
-
-    dataProcs can be a list containing one or more of the following string tokens
-        "raw" | "rel" | "dma_<NumOfDays>" | "roll_<NumOfDays>"
-        This controls which aspects of the data is looked at and inturn plotted.
-    """
-    savedDataProcControls = _update_dataproccontrols(dataProcs)
-    if type(job) == list:
-        lookatents_names(job, startDate, endDate)
-    else:
-        if job.upper() in [ "OP:TOP", "OP:BOTTOM" ]:
-            job = job[3:]
-            lookatents_ops(job, startDate, endDate, count)
-        else:
-            print("ERRR:lookat_data: unknown operation:", job)
-            print("INFO:lookat_data: If you want to look up MF names put them in a list")
-    _restore_dataproccontrols(savedDataProcControls)
 
 
 def session_save(sessionName):
