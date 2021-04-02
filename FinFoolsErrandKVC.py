@@ -448,13 +448,7 @@ def datadst_metakeys(dataDst):
 
 
 def update_metas(op, dataSrc, dataDst):
-    """
-    Helps identify the last set of meta keys for a given kind of operation.
-    """
-    if op == "srel":
-        srelMetaData, srelMetaLabel = datadst_metakeys('srel')
-        gEnts.data['metas'][srelMetaData], gEnts.data['metas'][srelMetaLabel] = datadst_metakeys(dataDst)
-
+    pass
 
 
 gbRelDataPlusFloat = False
@@ -744,16 +738,6 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
                 dataLabel = gEnts.data[dataSrcMetaLabel][index]
             except:
                 dataLabel = ""
-            try:
-                metaKey = gEnts.data['metas'].get(srelMetaLabel, None)
-                if metaKey != None:
-                    srelLabel = gEnts.data[metaKey][index]
-                else:
-                    srelLabel = ""
-            except:
-                srelLabel = ""
-            if dataLabel == "":
-                dataLabel = srelLabel
             label = "{}:{:{width}}: {}".format(entCode, name, dataLabel, width=giLabelNameChopLen)
             print("\t{}:{}".format(label, index))
             label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
