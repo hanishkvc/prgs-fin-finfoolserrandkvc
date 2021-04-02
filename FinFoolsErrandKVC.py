@@ -45,18 +45,6 @@ FINFOOLSERRAND_BASE = None
 #
 gLoadFilters = { }
 
-#
-# Data processing and related
-#
-gbDoRawData=False
-gbDoRelData=True
-# MovingAvg related globals
-gbDoMovingAvg=False
-MOVINGAVG_WINSIZE = 20
-MOVINGAVG_CONVOLVEMODE = 'valid'
-# Rolling returns
-gbDoRollingRet=False
-ROLLINGRET_WINSIZE = 365
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 gHistoricGaps = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
 gHistoricGapsHdr = numpy.array(["1D", "5D", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
@@ -68,8 +56,6 @@ gHistoricGapsHdr = numpy.array(["1D", "5D", "1M", "3M", "6M", "1Y", "3Y", "5Y", 
 gbNotBeyondYesterday = True
 # Should proc_days ignore weekends.
 gbSkipWeekEnds = False
-# Should relative data calc ignore non data at begining of dataset
-gbDataRelIgnoreBeginingNonData = True
 
 #
 # Misc
@@ -82,12 +68,6 @@ gCal = calendar.Calendar()
 gEnts = None
 gDataKeys = ['data']
 gDS = []
-gCB = {
-        'fetch_data':[],
-        'fetch4date':[],
-        'load_data' :[],
-        'load4date' :[],
-    }
 
 
 
@@ -549,8 +529,6 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
     dont account for them being different from the default.
     """
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    if not _daterange_checkfine(startDateIndex, endDateIndex, "procdata_ex"):
-        return
     if type(opsList) == str:
         opsList = [ opsList ]
     for curOp in opsList:
@@ -1210,55 +1188,6 @@ def _date2index(startDate, endDate):
     return startDateIndex, endDateIndex
 
 
-def _daterange_checkfine(startDateIndex, endDateIndex, caller):
-    """
-    Check the DateRange specified matches previously saved DateRange.
-    Else alert user.
-    """
-    if gEnts.meta['dateRange'][0] == -1:
-        gEnts.meta['dateRange'][0] = startDateIndex
-    if gEnts.meta['dateRange'][1] == -1:
-        gEnts.meta['dateRange'][1] = endDateIndex
-    savedStartDateIndex = gEnts.meta['dateRange'][0]
-    savedEndDateIndex = gEnts.meta['dateRange'][1]
-    if (savedStartDateIndex != startDateIndex) or (savedEndDateIndex != endDateIndex):
-        print("WARN:{}:previously used dateRange:{} - {}".format(caller, gEnts.meta['dates'][savedStartDateIndex], gEnts.meta['dates'][savedEndDateIndex]))
-        print("WARN:{}:passed dateRange:{} - {}".format(caller, gEnts.meta['dates'][startDateIndex], gEnts.meta['dates'][endDateIndex]))
-        print("INFO:{}:call again with matching dateRange OR".format(caller))
-        input("INFO:{}:load_data|show_plot will clear saved dateRange, so that you can lookat a new dateRange that you want to".format(caller))
-        return False
-    return True
-
-
-def _plot_data(entCode, xData, yData, label, typeTag):
-    theTag = str([entCode, typeTag])
-    if theTag in gEnts.meta['plots']:
-        print("WARN:_plot_data: Skipping", entCode)
-        return
-    gEnts.meta['plots'].add(theTag)
-    label = "{}:{}".format(label, typeTag)
-    if xData == None:
-        plt.plot(yData, label=label)
-    else:
-        plt.plot(xData, yData, label=label)
-
-
-def _get_daterange_indexes():
-    """
-    Get the dateRange related indexes stored in gEnts.data.
-
-    If there is no valid dateRange info stored in gEnts.data, then return
-    indexes related to the date range of the currently loaded data.
-    """
-    iSDate = gEnts.meta['dateRange'][0]
-    if iSDate == -1:
-        iSDate = 0
-    iEDate = gEnts.meta['dateRange'][1]
-    if iEDate == -1:
-        iEDate = gEnts.meta['dataIndex']
-    return iSDate, iEDate
-
-
 def _show_plot():
     """
     Show the data plotted till now.
@@ -1268,7 +1197,7 @@ def _show_plot():
     for line in leg.get_lines():
         line.set_linewidth(8)
     plt.grid(True)
-    startDateIndex, endDateIndex = _get_daterange_indexes()
+    startDateIndex, endDateIndex = _date2index(-1,-1)
     curDates = gEnts.meta['dates'][startDateIndex:endDateIndex+1]
     numX = len(curDates)
     xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
@@ -1281,14 +1210,8 @@ def _show_plot():
 def show_plot(clearGDataDateRangePlus=True):
     """
     Show the data plotted till now.
-
-    clearGDataDateRangePlus if True, will clear gEnts.data dateRange and plots.
     """
     _show_plot()
-    if clearGDataDateRangePlus:
-        gEnts.meta['dateRange'] = [-1, -1]
-        gEnts.meta['plots'] = set()
-
 
 
 def session_save(sessionName):
