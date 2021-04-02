@@ -75,7 +75,7 @@ class IndiaMFDS(datasrc.DataSrc):
                 date = time.strptime(la[7], "%d-%b-%Y")
                 date = hlpr.dateint(date.tm_year,date.tm_mon,date.tm_mday)
                 #print(code, name, nav, date)
-                todayfile.add_ent(today, code, name, nav, curMFType, date)
+                todayfile.add_ent(today, code, name, [nav], curMFType, date)
             except:
                 print("ERRR:IndiaMFDS:parse_csv:{}".format(l))
                 print(sys.exc_info())

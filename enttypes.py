@@ -21,7 +21,7 @@ def add(self, typeName):
 
     Also return the typeId associated with the given typeName.
     """
-    if typeName not in self.types:
+    if typeName not in self.typesD:
         self.typesD[typeName]=self.nxtTypeIndex
         self.typesL.append(typeName)
         self.typeMembers[typeName] = []

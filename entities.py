@@ -107,7 +107,7 @@ class Entities:
             entIndex = self.nxtEntIndex
             self.nxtEntIndex += 1
             self.meta['name'][entIndex] = entName
-            self.meta['codeL'].append(entCode)
+            self.meta['codeL'][entIndex] = entCode
             self.meta['codeD'][entCode] = entIndex
             self.meta['typeId'][entIndex] = entTypeId
             self.add_type_member(entTypeId, entCode)
