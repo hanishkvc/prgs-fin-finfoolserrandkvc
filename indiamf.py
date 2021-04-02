@@ -107,9 +107,15 @@ class IndiaSTKDS(datasrc.DataSrc):
         hlpr.loadfilters_setup(loadFilters, "indiastk", None, None, None)
 
 
+    def _get_parts(self, fName):
+        date = time.strptime(fName[-10:-4], "%y%m%d")
+        csvFile = time.strftime("Pr%d%m%y.csv", date)
+        return csvFile, date
+
+
     def _valid_remotefile(self, fName):
         z = zipfile.ZipFile(fName)
-        csvFile = "Pr"+fName[-10:-4]+".csv"
+        csvFile, dateT = self._get_parts(fName)
         f = z.open(csvFile)
         l = f.readline()
         l = l.decode()
@@ -124,7 +130,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         Parse the specified data csv file and load it into passed today dictionary.
         """
         z = zipfile.ZipFile(sFile)
-        csvFile = "Pr"+fName[-10:-4]+".csv"
+        csvFile, dateT = self._get_parts(sFile)
         tFile = z.open(csvFile)
         tFile.readline()
         for l in tFile:
@@ -147,8 +153,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     val  = float(la[6])
                 except:
                     val = 0
-                date = time.strptime(sFile[-10:-4], "%d%m%y")
-                date = hlpr.dateint(date.tm_year,date.tm_mon,date.tm_mday)
+                date = hlpr.dateint(dateT.tm_year,dateT.tm_mon,dateT.tm_mday)
                 #print(code, name, nav, date)
                 todayfile.add_ent(today, code, name, [val], curType, date)
             except:
