@@ -83,6 +83,13 @@ class Entities:
         return self.typesD[typeName]
 
 
+    def add_type_member(entTypeId, entCode):
+        """
+        Add a entity to the members list associated with its entityType.
+        """
+        self.typeMembers[self.typesL[entTypeId]].append(entCode)
+
+
     def add_date(dateInt):
         """
         It is assumed that the date is added in chronological sequence.
@@ -94,6 +101,12 @@ class Entities:
 
 
     def add_ent(entCode, entName, entTypeId):
+        """
+        Add a entity to the entities db, if required, and return its index.
+
+        NOTE: entName and entTypeId required only if a new entity is being added,
+              else if one is trying to get the entIndex, these are ignored.
+        """
         entIndex = self.meta['codeD'].get(entCode, -1)
         if entIndex == -1:
             entIndex = self.nxtEntIndex
@@ -102,21 +115,44 @@ class Entities:
             self.meta['codeL'].append(entCode)
             self.meta['codeD'][entCode] = entIndex
             self.meta['typeId'][entIndex] = entTypeId
+            self.add_type_member(entTypeId, entCode)
         return entIndex
 
 
-    def add_data(entCode, entName, entData, entTypeId):
+    def get_entindex(entCode, entName=None, entTypeId=None):
         """
-        Add entity data.
+        Get the index associated with a given entity code,
+        adding the entity into the entities db, if required.
+
+        NOTE: entName and entTypeId required only if a new entity
+              is being added, indirectly using this logic.
+        If entName is passed, then it will be checked against what
+        is already there in entities db, and a warning generated
+        if there is  mismatch.
+        """
+        entIndex = add_ent(entCode, entName, entTypeId)
+        if entName != None:
+            nameInRecord = self.meta['name'][entIndex]
+            if nameInRecord != entName:
+                print("WARN:Entities:GetEntIndex:NameCheck: Existing [{}] != Passed [{}]".format(nameInRecord, entName))
+        return entIndex
+
+
+    def add_data(entCode, entData, entName=None, entTypeId=None):
+        """
+        Add one or more data beloning to a entity.
         entCode: Specifies a unique code associated with the entity
-        entName: is the name of the entity whose data is being added.
         entData: is either a single value or a dictionary of dataValues
             with their dataKeys.
+        entName: is the name of the entity whose data is being added.
         entTypeId: the typeId to which this entity belongs.
+
+        NOTE: entName and entTypeId required only if a new entity is being added,
+              else if one is trying to get the entIndex, these are ignored.
         """
         if type(entData) != dict:
             entData = { self.dataKey: entData }
-        entIndex = self.add_ent(entCode, entName, entTypeId)
+        entIndex = self.get_entindex(entCode, entName, entTypeId)
         if self.nxtDateIndex == 0:
             input("DBUG:Entities:AddData: Trying to add entity data, before date is specified")
             return
