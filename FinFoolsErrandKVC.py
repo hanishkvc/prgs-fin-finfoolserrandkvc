@@ -102,7 +102,7 @@ def setup_paths():
 
 def setup_gdata(startDate=-1, endDate=-1):
     """
-    Initialise the gData dictionary
+    Initialise the gEnts
 
     NumOfRows (corresponding to MFs) is set to a fixed value.
     NumOfCols (corresponding to Dates) is set based on date range.
@@ -328,7 +328,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
 
-    bClearData if set, resets the gData by calling setup_gdata.
+    bClearData if set, resets the gEnts by calling setup_gdata.
 
     loadFiltersName: User can optionally specify a previously defined loadFiltersName, in
     which case the whiteListEntTypes/whiteListEntNames/blackListEntNames, used by underlying
@@ -472,7 +472,7 @@ def update_metas(op, dataSrc, dataDst):
     """
     if op == "srel":
         srelMetaData, srelMetaLabel = datadst_metakeys('srel')
-        gData['metas'][srelMetaData], gData['metas'][srelMetaLabel] = datadst_metakeys(dataDst)
+        gEnts.data['metas'][srelMetaData], gEnts.data['metas'][srelMetaLabel] = datadst_metakeys(dataDst)
 
 
 def procdata_relative(data, bMovingAvg=False, bRollingRet=False):
@@ -522,8 +522,8 @@ gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
 def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
     """
-    Allow data from any valid data key in gData to be operated on and the results to be saved
-    into a destination data key in gData.
+    Allow data from any valid data key in gEnts.data to be operated on and the results to be saved
+    into a destination data key in gEnts.data.
 
     opsList is a list of operations, which specifies the key of the data source to work with,
     as well as the operation to do. It may also optionally specify the dataDst key to use to
@@ -607,21 +607,21 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
         print("DBUG:procdata_ex:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
-        tResult = gData[dataSrc].copy()
+        tResult = gEnts.data[dataSrc].copy()
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         dataDstMetaData, dataDstMetaLabel = datadst_metakeys(dataDst)
-        gData[dataDstMetaLabel] = []
+        gEnts.data[dataDstMetaLabel] = []
         #### Op specific things to do before getting into individual records
         if op == 'srel':
-            gData[dataDstMetaData] = numpy.zeros([gEnts.meta['nextEntIndex'],3])
+            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.meta['nxtEntIndex'],3])
         elif op.startswith("rel"):
-            gData[dataDstMetaData] = numpy.zeros([gEnts.meta['nextEntIndex'],3])
+            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.meta['nxtEntIndex'],3])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = int(op[4:].split('_')[0])
-            gData[dataDstMetaData] = numpy.zeros([gEnts.meta['nextEntIndex'], 4])
+            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.meta['nxtEntIndex'], 4])
         elif op.startswith("block"):
             blockDays = int(op[5:])
             blockTotalDays = endDateIndex - startDateIndex + 1
@@ -629,9 +629,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             dataDstAvgs = "{}Avgs".format(dataDst)
             dataDstStds = "{}Stds".format(dataDst)
             dataDstQntls = "{}Qntls".format(dataDst)
-            gData[dataDstAvgs] = numpy.zeros([gEnts.meta['nextEntIndex'],blockCnt])
-            gData[dataDstStds] = numpy.zeros([gEnts.meta['nextEntIndex'],blockCnt])
-            gData[dataDstQntls] = numpy.zeros([gEnts.meta['nextEntIndex'],blockCnt,5])
+            gEnts.data[dataDstAvgs] = numpy.zeros([gEnts.meta['nxtEntIndex'],blockCnt])
+            gEnts.data[dataDstStds] = numpy.zeros([gEnts.meta['nxtEntIndex'],blockCnt])
+            gEnts.data[dataDstQntls] = numpy.zeros([gEnts.meta['nxtEntIndex'],blockCnt,5])
             tResult = []
         elif op.startswith("reton"):
             retonT, retonType = op.split('_')
@@ -640,38 +640,38 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
             else:
                 retonDate = int(retonT[5:])
                 retonDateIndex = gEnts.meta['dates'].index(retonDate)
-            gData[dataDstMetaData] = numpy.ones([gEnts.meta['nextEntIndex'],gHistoricGaps.shape[0]])*numpy.nan
+            gEnts.data[dataDstMetaData] = numpy.ones([gEnts.meta['nxtEntIndex'],gHistoricGaps.shape[0]])*numpy.nan
             validHistoric = gHistoricGaps[gHistoricGaps < (retonDateIndex+1)]
             histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
-        for r in range(gEnts.meta['nextEntIndex']):
+        for r in range(gEnts.meta['nxtEntIndex']):
             try:
                 if op == "srel":
                     #breakpoint()
                     iStart = -1
                     dStart = 0
-                    nonZeros = numpy.nonzero(gData[dataSrc][r, startDateIndex:endDateIndex+1])[0]
+                    nonZeros = numpy.nonzero(gEnts.data[dataSrc][r, startDateIndex:endDateIndex+1])[0]
                     if (len(nonZeros) > 0):
                         iStart = nonZeros[0] + startDateIndex
-                        dStart = gData[dataSrc][r, iStart]
-                    dEnd = gData[dataSrc][r, endDateIndex]
+                        dStart = gEnts.data[dataSrc][r, iStart]
+                    dEnd = gEnts.data[dataSrc][r, endDateIndex]
                     if dStart != 0:
                         if gbRelDataPlusFloat:
-                            tResult[r,:] = (gData[dataSrc][r,:]/dStart)
+                            tResult[r,:] = (gEnts.data[dataSrc][r,:]/dStart)
                         else:
-                            tResult[r,:] = ((gData[dataSrc][r,:]/dStart)-1)*100
+                            tResult[r,:] = ((gEnts.data[dataSrc][r,:]/dStart)-1)*100
                         tResult[r,:iStart] = numpy.nan
                         dAbsRet = tResult[r, -1]
                         durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
                         dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
                         label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
-                        gData[dataDstMetaLabel].append(label)
-                        gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+                        gEnts.data[dataDstMetaLabel].append(label)
+                        gEnts.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                     else:
                         durationInYears = (endDateIndex-startDateIndex+1)/365
-                        gData[dataDstMetaLabel].append("")
-                        gData[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
+                        gEnts.data[dataDstMetaLabel].append("")
+                        gEnts.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
                 elif op.startswith("rel"):
                     baseDate = op[3:]
                     if baseDate != '':
@@ -679,33 +679,33 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         baseDateIndex = gEnts.meta['dates'].index(baseDate)
                     else:
                         baseDateIndex = startDateIndex
-                    baseData = gData[dataSrc][r, baseDateIndex]
-                    dEnd = gData[dataSrc][r, endDateIndex]
-                    tResult[r,:] = (((gData[dataSrc][r,:])/baseData)-1)*100
+                    baseData = gEnts.data[dataSrc][r, baseDateIndex]
+                    dEnd = gEnts.data[dataSrc][r, endDateIndex]
+                    tResult[r,:] = (((gEnts.data[dataSrc][r,:])/baseData)-1)*100
                     dAbsRet = tResult[r, -1]
                     durationInYears = (endDateIndex-baseDateIndex+1)/365
                     dRetPA = ((((dAbsRet/100)+1)**(1/durationInYears))-1)*100
                     label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
-                    gData[dataDstMetaLabel].append(label)
-                    gData[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+                    gEnts.data[dataDstMetaLabel].append(label)
+                    gEnts.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 elif op.startswith("reton"):
                     retonType = op.split('_')[1]
-                    retonData = gData[dataSrc][r, retonDateIndex]
+                    retonData = gEnts.data[dataSrc][r, retonDateIndex]
                     if retonType == 'absret':
-                        tResult[r,:] = ((retonData/gData[dataSrc][r,:])-1)*100
+                        tResult[r,:] = ((retonData/gEnts.data[dataSrc][r,:])-1)*100
                     else:
-                        tResult[r,:] = (((retonData/gData[dataSrc][r,:])**(365/histDays))-1)*100
-                    gData[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
-                    gData[dataDstMetaLabel].append(hlpr.array_str(gData[dataDstMetaData][r], width=7))
+                        tResult[r,:] = (((retonData/gEnts.data[dataSrc][r,:])**(365/histDays))-1)*100
+                    gEnts.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
+                    gEnts.data[dataDstMetaLabel].append(hlpr.array_str(gEnts.data[dataDstMetaData][r], width=7))
                 elif op.startswith("dma"):
                     days = int(op[3:])
-                    tResult[r,:] = numpy.convolve(gData[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                    tResult[r,:] = numpy.convolve(gEnts.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
                     inv = int(days/2)
                     tResult[r,:inv] = numpy.nan
                     tResult[r,gEnts.meta['dataIndex']-inv:] = numpy.nan
                     if True:
                         try:
-                            dataSrcLabel = gData[dataSrcMetaLabel][r]
+                            dataSrcLabel = gEnts.data[dataSrcMetaLabel][r]
                         except:
                             if bDebug:
                                 print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
@@ -719,7 +719,7 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         else:
                             label = ""
                         label = "{} : {}".format(dataSrcLabel, label)
-                        gData[dataDstMetaLabel].append(label)
+                        gEnts.data[dataDstMetaLabel].append(label)
                 elif op.startswith("roll"):
                     durationForPA = rollDays/365
                     if '_' in op:
@@ -727,9 +727,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         if opType == 'abs':
                             durationForPA = 1
                     if gbRelDataPlusFloat:
-                        tResult[r,rollDays:] = (gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA)
+                        tResult[r,rollDays:] = (gEnts.data[dataSrc][r,rollDays:]/gEnts.data[dataSrc][r,:-rollDays])**(1/durationForPA)
                     else:
-                        tResult[r,rollDays:] = (((gData[dataSrc][r,rollDays:]/gData[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
+                        tResult[r,rollDays:] = (((gEnts.data[dataSrc][r,rollDays:]/gEnts.data[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
                     tResult[r,:rollDays] = numpy.nan
                     # Additional meta data
                     trValidResult = tResult[r][numpy.isfinite(tResult[r])]
@@ -747,9 +747,9 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trAvg = numpy.nan
                         trStd = numpy.nan
                         trMaSharpeMinT = numpy.nan
-                    gData[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
+                    gEnts.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
                     label = "{:5.2f} {:5.2f} {} {:5.2f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT)
-                    gData[dataDstMetaLabel].append(label)
+                    gEnts.data[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
                     # Calc the Avgs
                     iEnd = endDateIndex+1
@@ -757,33 +757,33 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
                     lStds = []
                     for i in range(blockCnt):
                         iStart = iEnd-blockDays
-                        tBlockData = gData[dataSrc][r,iStart:iEnd]
+                        tBlockData = gEnts.data[dataSrc][r,iStart:iEnd]
                         tBlockData = tBlockData[numpy.isfinite(tBlockData)]
                         lAvgs.insert(0, numpy.mean(tBlockData))
                         lStds.insert(0, numpy.std(tBlockData))
                         iEnd = iStart
                         if len(tBlockData) == 0:
                             tBlockData = [0]
-                        gData[dataDstQntls][r, blockCnt-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
+                        gEnts.data[dataDstQntls][r, blockCnt-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
                     avgAvgs = numpy.nanmean(lAvgs)
                     avgStds = numpy.nanmean(lStds)
-                    gData[dataDstAvgs][r,:] = lAvgs
-                    gData[dataDstStds][r,:] = lStds
-                    #gData[dataDstMetaData][r] = [avgAvgs, avgStds]
+                    gEnts.data[dataDstAvgs][r,:] = lAvgs
+                    gEnts.data[dataDstStds][r,:] = lStds
+                    #gEnts.data[dataDstMetaData][r] = [avgAvgs, avgStds]
                     label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
-                    gData[dataDstMetaLabel].append(label)
+                    gEnts.data[dataDstMetaLabel].append(label)
             except:
                 traceback.print_exc()
                 print("DBUG:ProcDataEx:Exception skipping entity at ",r)
         if len(tResult) > 0:
-            gData[dataDst] = tResult
+            gEnts.data[dataDst] = tResult
 
 
 def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
     """
     Plot specified datas for the specified MFs, over the specified date range.
 
-    dataSrcs: Is a key or a list of keys used to retreive the data from gData.
+    dataSrcs: Is a key or a list of keys used to retreive the data from gEnts.data.
     entCodes: Is a entCode or a list of entCodes.
     startDate and endDate: specify the date range over which the data should be
         retreived and plotted.
@@ -804,13 +804,13 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
             index = gEnts.meta['code2index'][entCode]
             name = gEnts.meta['names'][index][:giLabelNameChopLen]
             try:
-                dataLabel = gData[dataSrcMetaLabel][index]
+                dataLabel = gEnts.data[dataSrcMetaLabel][index]
             except:
                 dataLabel = ""
             try:
-                metaKey = gData['metas'].get(srelMetaLabel, None)
+                metaKey = gEnts.data['metas'].get(srelMetaLabel, None)
                 if metaKey != None:
-                    srelLabel = gData[metaKey][index]
+                    srelLabel = gEnts.data[metaKey][index]
                 else:
                     srelLabel = ""
             except:
@@ -820,7 +820,7 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
             label = "{}:{:{width}}: {}".format(entCode, name, dataLabel, width=giLabelNameChopLen)
             print("\t{}:{}".format(label, index))
             label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
-            plt.plot(gData[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
+            plt.plot(gEnts.data[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
 def _procdata_mabeta(dataSrc, refCode, entCodes):
@@ -829,12 +829,12 @@ def _procdata_mabeta(dataSrc, refCode, entCodes):
     When the passed dataSrc is rollingRet, this is also called MaBeta.
     """
     refIndex = gEnts.meta['code2index'][refCode]
-    refValid = gData[dataSrc][refIndex][numpy.isfinite(gData[dataSrc][refIndex])]
+    refValid = gEnts.data[dataSrc][refIndex][numpy.isfinite(gEnts.data[dataSrc][refIndex])]
     refAvg = numpy.mean(refValid)
     maBeta = []
     for entCode in entCodes:
         entIndex = gEnts.meta['code2index'][entCode]
-        entValid = gData[dataSrc][entIndex][numpy.isfinite(gData[dataSrc][entIndex])]
+        entValid = gEnts.data[dataSrc][entIndex][numpy.isfinite(gEnts.data[dataSrc][entIndex])]
         entAvg = numpy.mean(entValid)
         entMaBeta = numpy.sum((entValid-entAvg)*(refValid-refAvg))/numpy.sum((refValid-refAvg)**2)
         maBeta.append(entMaBeta)
@@ -973,7 +973,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             for i in range(-1, -(gEnts.meta['dataIndex']+1),-1):
                 if bDebug:
                     print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
-                theSaneArray = gData[dataSrc][:,i].copy()
+                theSaneArray = gEnts.data[dataSrc][:,i].copy()
                 theSaneArray[numpy.isinf(theSaneArray)] = iSkip
                 theSaneArray[numpy.isnan(theSaneArray)] = iSkip
                 if not numpy.all(numpy.isinf(theSaneArray) | numpy.isnan(theSaneArray)):
@@ -984,32 +984,32 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             if (type(theIndex) == type(None)) and (type(theDate) != type(None)):
                 startDateIndex, theIndex = _date2index(theDate, theDate)
             print("INFO:AnalDataSimple:{}:theIndex:{}".format(op, theIndex))
-            theSaneArray = gData[dataSrc][:,theIndex].copy()
+            theSaneArray = gEnts.data[dataSrc][:,theIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif opType.startswith("srel"):
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         if opType == 'srel_absret':
-            theSaneArray = gData[dataSrcMetaData][:,0].copy()
+            theSaneArray = gEnts.data[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
-            theSaneArray = gData[dataSrcMetaData][:,1].copy()
+            theSaneArray = gEnts.data[dataSrcMetaData][:,1].copy()
         else:
             input("ERRR:AnalDataSimple:dataSrc[{}]:{} unknown srel opType, returning...".format(opType))
             return None
     elif opType.startswith("roll"):
         dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
         if opType == 'roll_avg':
-            theSaneArray = gData[dataSrcMetaData][:,0].copy()
+            theSaneArray = gEnts.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif opType == "block_ranked":
         metaDataAvgs = "{}Avgs".format(dataSrc)
-        tNumEnts, tNumBlocks = gData[metaDataAvgs].shape
+        tNumEnts, tNumBlocks = gEnts.data[metaDataAvgs].shape
         theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
         iValidBlockAtBegin = 0
         bValidBlockFound = False
         for b in range(tNumBlocks):
-            tArray = gData[metaDataAvgs][:,b]
+            tArray = gEnts.data[metaDataAvgs][:,b]
             tValidArray = tArray[numpy.isfinite(tArray)]
             tSaneArray = hlpr.sane_array(tArray, iSkip)
             if len(tValidArray) != 0:
@@ -1036,14 +1036,14 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
         if (dataYearsAvailable < minEntityLifeDataInYears):
             print("WARN:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
         srelMetaData, srelMetaLabel = datadst_metakeys('srel')
-        theSRelMetaData = gData.get(srelMetaData, None)
+        theSRelMetaData = gEnts.data.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
             procdata_ex('srel=srel(data)')
         if bDebug:
             tNames = numpy.array(gEnts.meta['names'])
-            tDroppedNames = tNames[gData[srelMetaData][:,2] < minEntityLifeDataInYears]
+            tDroppedNames = tNames[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears]
             print("INFO:AnalDataSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
-        theSaneArray[gData[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
+        theSaneArray[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(gEnts.meta['lastSeen'] < (gEnts.meta['dates'][gEnts.meta['dataIndex']]-7))[0]
         if bDebug:
@@ -1074,7 +1074,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             break
         curEntry = [gEnts.meta['codeL'][index], gEnts.meta['names'][index], theSaneArray[index]]
         if opType == "roll_avg":
-            curEntry.extend(gData[dataSrcMetaData][index,1:])
+            curEntry.extend(gEnts.data[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
         if iClipNameWidth == None:
             curEntry[1] = "{:64}".format(curEntry[1])
@@ -1086,7 +1086,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             extra = ""
         elif opType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
-            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gData[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
+            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gEnts.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
         else:
             extra = ""
         print("    {} {}".format(extra, curEntry))
@@ -1134,7 +1134,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
         entIndex = gEnts.meta['code2index'][entCode]
         print("Name:", gEnts.meta['names'][entIndex])
         for dataSrc in dataSrcs:
-            print("\t{:16}: {}".format(dataSrc[0], gData[dataSrc[1]][entIndex]))
+            print("\t{:16}: {}".format(dataSrc[0], gEnts.data[dataSrc[1]][entIndex]))
 
     dateDuration = (gEnts.meta['dataIndex']+1)/365
     if dateDuration > 1.5:
@@ -1172,10 +1172,10 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             entIndex = gEnts.meta['code2index'][entCode]
             entName = gEnts.meta['names'][entIndex][:24]
             if dataSrc[0].startswith('roll'):
-                x.append(gData[dataSrcMetaData][entIndex,0])
-                y.append(gData[dataSrcMetaData][entIndex,1])
+                x.append(gEnts.data[dataSrcMetaData][entIndex,0])
+                y.append(gEnts.data[dataSrcMetaData][entIndex,1])
                 c.append(entCode)
-            print("\t{}:{:24}: {}".format(entCode, entName, gData[dataSrc[1]][entIndex]))
+            print("\t{}:{:24}: {}".format(entCode, entName, gEnts.data[dataSrc[1]][entIndex]))
             entCount += 1
             if (numEntries > 0) and (entCount > numEntries):
                 break
@@ -1290,7 +1290,7 @@ def lookatents_codes(entCodes, startDate=-1, endDate=-1):
     for code in entCodes:
         index = gEnts.meta['code2index'][code]
         name = gEnts.meta['names'][index]
-        aRawData = gData['data'][index, startDateIndex:endDateIndex+1]
+        aRawData = gEnts.data['data'][index, startDateIndex:endDateIndex+1]
         aRelData, aMovAvg, aRollingRet, aStart, aEnd, aAbsRetPercent, aRetPA, durYrs = procdata_relative(aRawData, gbDoMovingAvg, gbDoRollingRet)
         aLabel = "{}: {:6.2f}% {:6.2f}%pa ({:4.1f}Yrs) : {:8.4f} - {:8.4f}".format(code, round(aAbsRetPercent,2), round(aRetPA,2), round(durYrs,1), aStart, aEnd)
         print(aLabel, name)
@@ -1325,9 +1325,9 @@ def _plot_data(entCode, xData, yData, label, typeTag):
 
 def _get_daterange_indexes():
     """
-    Get the dateRange related indexes stored in gData.
+    Get the dateRange related indexes stored in gEnts.data.
 
-    If there is no valid dateRange info stored in gData, then return
+    If there is no valid dateRange info stored in gEnts.data, then return
     indexes related to the date range of the currently loaded data.
     """
     iSDate = gEnts.meta['dateRange'][0]
@@ -1362,7 +1362,7 @@ def show_plot(clearGDataDateRangePlus=True):
     """
     Show the data plotted till now.
 
-    clearGDataDateRangePlus if True, will clear gData dateRange and plots.
+    clearGDataDateRangePlus if True, will clear gEnts.data dateRange and plots.
     """
     _show_plot()
     if clearGDataDateRangePlus:
@@ -1404,10 +1404,10 @@ def lookatents_ops(opType="TOP", startDate=-1, endDate=-1, count=10):
         print("ERRR:look4mfs: Unknown operation:", opType)
         return
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    tData = numpy.zeros([gEnts.meta['nextEntIndex'], (endDateIndex-startDateIndex+1)])
-    for r in range(gEnts.meta['nextEntIndex']):
+    tData = numpy.zeros([gEnts.meta['nxtEntIndex'], (endDateIndex-startDateIndex+1)])
+    for r in range(gEnts.meta['nxtEntIndex']):
         try:
-            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tAbsRetPercent, tRetPA, tDurYrs = procdata_relative(gData['data'][r,startDateIndex:endDateIndex+1])
+            tData[r,:], tMovAvg, tRollingRet, tStart, tEnd, tAbsRetPercent, tRetPA, tDurYrs = procdata_relative(gEnts.data['data'][r,startDateIndex:endDateIndex+1])
         except:
             traceback.print_exc()
             print("WARN:{}:{}".format(r,gEnts.meta['names'][r]))
@@ -1512,20 +1512,20 @@ def lookat_data(job, startDate=-1, endDate=-1, count=10, dataProcs=None):
 
 def session_save(sessionName):
     """
-    Save current gData-gEnts.meta into a pickle, so that it can be restored fast later.
+    Save current gEnts.data-gEnts.meta into a pickle, so that it can be restored fast later.
     """
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    hlpr.save_pickle(fName, gData, gEnts.meta, "Main:SessionSave")
+    hlpr.save_pickle(fName, gEnts.data, gEnts.meta, "Main:SessionSave")
 
 
 def session_restore(sessionName):
     """
-    Restore a previously saved gData-gEnts.meta fast from a pickle.
+    Restore a previously saved gEnts.data-gEnts.meta fast from a pickle.
     Also setup the modules used by the main logic.
     """
-    global gData, gEnts.meta
+    global gEnts.data, gEnts.meta
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    ok, gData, gEnts.meta = hlpr.load_pickle(fName)
+    ok, gEnts.data, gEnts.meta = hlpr.load_pickle(fName)
     enttypes.init(gEnts.meta, False)
     setup_modules()
 
