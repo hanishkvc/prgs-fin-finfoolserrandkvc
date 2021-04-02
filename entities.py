@@ -33,6 +33,7 @@ class Entities:
         self.nxtTypeIndex = 0
         self.typesD = {}
         self.typesL = []
+        self.typeMembers = {}
 
 
     def _init_dates(self, dateCnt):
@@ -76,6 +77,7 @@ class Entities:
         if typeName not in self.types:
             self.typesD[typeName]=self.nxtTypeIn
             self.typesL.append(typeName)
+            self.typeMembers[typeName] = []
             self.nxtTypeIn += 1
         return self.typesD[typeName]
 
