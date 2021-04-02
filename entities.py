@@ -82,7 +82,7 @@ class Entities:
         Add a type (typeName) into types db, if not already present.
         Return the typeId.
         """
-        enttypes.add(self, typeName)
+        return enttypes.add(self, typeName)
 
 
     def add_type_member(entTypeId, entCode):

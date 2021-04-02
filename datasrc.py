@@ -1,4 +1,4 @@
-# Module to help work with Indian MFs
+# A class to help work with Data Sources
 # HanishKVC, 2021
 
 import os
@@ -9,167 +9,120 @@ import hlpr
 import enttypes
 
 
-gData = None
-gMeta = None
-#
-# Fetching and Saving related
-#
-MFS_FNAMECSV_TMPL = "data/{}{:02}{:02}.csv"
-#https://www.amfiindia.com/spages/NAVAll.txt?t=27022021
-#http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt=01-Feb-2021
-MFS_BaseURL = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?frmdt={}-{}-{}"
+class DataSource:
 
 
-
-def setup_paths(basePath):
-    """
-    Setup the basepath for data files, based on path passed by main logic
-    """
-    global MFS_FNAMECSV_TMPL
-    MFS_FNAMECSV_TMPL = os.path.expanduser(os.path.join(basePath, MFS_FNAMECSV_TMPL))
-    print("INFO:IndiaMF:setup_paths:", MFS_FNAMECSV_TMPL)
+    pathTmpl = None
+    tag = "DSBase"
+    TODAY_MARKER = "TODAYKVC_V1"
 
 
-MF_ALLOW_ENTTYPES=[ "open equity", "open elss", "open other", "open hybrid", "open solution" ]
-MF_ALLOW_ENTNAMES=None
-MF_SKIP_ENTNAMES =[ "~PART~dividend", "-RE-(?i).*regular plan.*", "-RE-(?i).*bonus.*" ]
-def setup(basePath, theGData, theGMeta, theCB, theLoadFilters):
-    global gData, gMeta
-    setup_paths(basePath)
-    gData = theGData
-    gMeta = theGMeta
-    theCB['fetch4date'].append(fetch4date)
-    theCB['load4date'].append(load4date)
-    hlpr.loadfilters_setup(theLoadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
-    print("INFO:IndiaMF:setup:gNameCleanupMap:", gNameCleanupMap)
+    def __init__(self, basePath, loadFilters, nameCleanupMap):
+        """
+        Initialise a data source instance.
+        """
+        self.loadFilters = loadFilters
+        self.nameCleanupMap = nameCleanupMap
+        if (pathTmpl != None) and (basePath != None):
+            self.pathTmpl = os.path.expanduser(os.path.join(basePath, pathTmpl))
+        print("INFO:{}:pathTmpl:{}".format(self.tag, self.pathTmpl))
 
 
-gNameCleanupMap = [
-        ['-', ' '],
-        ['Divided', 'Dividend'],
-        ['Diviend', 'Dividend'],
-        ['Divdend', 'Dividend'],
-        ]
-def parse_csv(sFile):
-    """
-    Parse the specified data csv file and load it into global data dictionary.
+    def _init_today(self, date, dataKeys):
+        today = {
+                    'marker': self.TODAY_MARKER, 
+                    'date': date,
+                    'bUpToDate': False,
+                    'entTypes': [],
+                    'dataKeys': dataKeys,
+                    'codeD': {},
+                    'data': []
+                }
+        return today
 
-    NOTE: It uses the white and black lists wrt MFTypes and MFNames, if any
-    specified in gData, to decide whether a given MF should be added to the
-    dataset or not. User can control this in the normal usage flow by either
-    passing these lists explicitly to load_data and or by setting related
-    global variables before calling load_data.
-    """
-    tFile = open(sFile)
-    curMFType = ""
-    today = {
-                'entTypes': [],
-                'code2index': {},
-                'mfs': []
-            }
-    typeId = -1
-    mfIndex = -1
-    for l in tFile:
-        l = l.strip()
-        if l == '':
-            continue
-        if l[0].isalpha():
-            if l[-1] == ')':
-                curMFType = l
-                if curMFType not in today['entTypes']:
-                    typeId += 1
-                    today['entTypes'].append([curMFType,[]])
-                else:
-                    input("DBUG:IndiaMF:_parsecsv:Duplicate entType [{}] in [{}]".format(curMFType, sFile))
-            continue
-        try:
-            la = l.split(';')
-            code = int(la[0])
-            name = hlpr.string_cleanup(la[1], gNameCleanupMap)
-            try:
-                nav  = float(la[4])
-            except:
-                nav = 0
-            date = datetime.datetime.strptime(la[7], "%d-%b-%Y")
-            date = hlpr.dateint(date.year,date.month,date.day)
-            #print(code, name, nav, date)
-            checkMFIndex = today['code2index'].get(code, None)
-            if checkMFIndex == None:
-                mfIndex += 1
-                today['code2index'][code] = mfIndex
-                today['mfs'].append([code, name, nav, date, typeId])
-                today['entTypes'][typeId][1].append(code)
+
+    def _load_today(self, today, edb):
+        """
+        Load data in today dictionary into the given entities db (edb).
+
+        If any filters were setup wrt entType or entName, the same will
+        be applied and inturn the filtered data which passes the check
+        will only be loaded into edb.
+
+        today dictionary contains
+
+            'marker': TODAY_MARKER
+            'date': YYYYMMDD
+            'bUpToDate': True/False
+            'entTypes': [ [typeName1, [entCode1A, entCode1B, ...]],
+                          [typeName2, [entCode2A, entCode2B, ...]],
+                          ....
+                        ]
+            'dataKeys': [ key1, key2, ...]
+            'codeD': { ent1Code: ent1Index, ent2Code: ent2Index, ... }
+            'data': [
+                        [ent1Code, ent1Name, [ent1Val1, ent1Val2, ...] ],
+                        [ent2Code, ent2Name, [ent2Val1, ent2Val2, ...] ],
+                        ...
+                    ]
+        TOTHINK: Should I maintain entDate within today['data'] for each ent.
+            Can give finer entity level info has to data is uptodate or not.
+            But as currently I am not using it, so ignoring for now.
+        """
+        # Handle entTypes and their entities
+        for [curType, entCodes] in today['entTypes']:
+            curTypeId = edb.add(curType)
+            if self.loadFilters['whiteListEntTypes'] == None:
+                bSkipCurType = False
             else:
-                input("WARN:IndiaMF:parse_csv:Duplicate MF {}:{}=={}".format(code, name, today['mfs'][checkMFIndex][1]))
-        except:
-            print("ERRR:IndiaMF:parse_csv:{}".format(l))
-            print(sys.exc_info())
-    tFile.close()
-    return today
-
-
-def _loaddata(today):
-    """
-    Parse the specified data csv file and load it into global data dictionary.
-
-    NOTE: It uses the white and black lists wrt MFTypes and MFNames, if any
-    specified in gData, to decide whether a given MF should be added to the
-    dataset or not. User can control this in the normal usage flow by either
-    passing these lists explicitly to load_data and or by setting related
-    global variables before calling load_data.
-    """
-    # Handle MFTypes
-    for [curMFType, mfCodes] in today['entTypes']:
-        mfTypesId = enttypes.add(curMFType)
-        if gMeta['whiteListEntTypes'] == None:
-            bSkipCurMFType = False
-        else:
-            fm,pm = hlpr.matches_templates(curMFType, gMeta['whiteListEntTypes'])
-            if len(fm) == 0:
-                bSkipCurMFType = True
-            else:
-                bSkipCurMFType = False
-        if bSkipCurMFType:
-            continue
-
-        # Handle MFs
-        for mfCode in mfCodes:
-            todayMFIndex = today['code2index'][mfCode]
-            code, name, nav, date, typeId = today['mfs'][todayMFIndex]
-            if (mfCode != code):
-                input("DBUG:IndiaMF:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(code, mfCode))
-                continue
-            if False and (typeId != mfTypesId):
-                # Csv data files for different dates could have difference in what fund types and funds they have in them
-                # especially wrt working days and holidays. So ignoring this.
-                enttypes.list()
-                print([x[0] for x in today['entTypes']])
-                breakpoint()
-            if (gMeta['whiteListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gMeta['whiteListEntNames'])
+                fm,pm = hlpr.matches_templates(curType, self.loadFilters['whiteListEntTypes'])
                 if len(fm) == 0:
-                    gMeta['skipped'].add(str([code, name]))
+                    bSkipCurType = True
+                else:
+                    bSkipCurType = False
+            if bSkipCurType:
+                continue
+            # Handle entities
+            for entCode in entCodes:
+                entIndex = today['codeD'][entCode]
+                code, name, values = today['data'][entIndex]
+                if (entCode != code):
+                    input("DBUG:{}:_LoadData: Code[{}] NotMatchExpected [{}], skipping".format(self.tag, code, entCode))
                     continue
-            if (gMeta['blackListEntNames'] != None):
-                fm, pm = hlpr.matches_templates(name, gMeta['blackListEntNames'])
-                if len(fm) > 0:
-                    gMeta['skipped'].add(str([code, name]))
-                    continue
-            hlpr.gdata_add(gData, gMeta, mfTypesId, curMFType, code, name, nav, date, "IndiaMF:_LoadData")
+                if (self.loadFilters['whiteListEntNames'] != None):
+                    fm, pm = hlpr.matches_templates(name, self.loadFilters['whiteListEntNames'])
+                    if len(fm) == 0:
+                        #gMeta['skipped'].add(str([code, name]))
+                        continue
+                if (self.loadFilters['blackListEntNames'] != None):
+                    fm, pm = hlpr.matches_templates(name, self.loadFilters['blackListEntNames'])
+                    if len(fm) > 0:
+                        #gMeta['skipped'].add(str([code, name]))
+                        continue
+                datas = {}
+                for i in range(len(today['dataKeys'])):
+                    dataKey = today['dataKeys'][i]
+                    datas[dataKey] = values[i]
+                edb.add_data(entCode, datas, name, curType)
 
 
-def _fetchdata(url, fName):
-    """
-    Fetch give url to specified file, and check its valid.
-    """
-    print(url, fName)
-    hlpr.wget_better(url, fName)
-    f = open(fName)
-    l = f.readline()
-    if not l.startswith("Scheme Code"):
-        print("ERRR:IndiaMF:fetchdata:Not a valid nav file, removing it")
-        os.remove(fName)
-    f.close()
+    def _valid_remotefile(fName):
+        """
+        Check if the given file is a valid data file or not.
+        NOTE: Child classes need to provide a valid implementation of this.
+        """
+        return False
+
+
+    def _fetch_remote(url, fName):
+        """
+        Fetch give url to specified file, and check its valid.
+        """
+        print(url, fName)
+        hlpr.wget_better(url, fName)
+        if not self._valid_remotefile(fName):
+            print("ERRR:{}:_FetchRemote:[{}] not a valid file, removing it".format(self.tag, fName))
+            os.remove(fName)
 
 
 fetchPreDateErrCnt = 0
