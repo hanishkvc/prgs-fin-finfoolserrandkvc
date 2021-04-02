@@ -23,6 +23,7 @@ class DataSrc:
     urlTmpl: template used to create the url to fetch.
     pathTmpl: template used to create local filename for saving fetched data.
 
+    dataKeys: should be a list of data keys.
 
     The child class should also provide valid implementation of the following
     functions.
@@ -89,17 +90,15 @@ class DataSrc:
         Verify that the passed local file is a pickle file containing potentially
         valid data in it.
         NOTE: Child classes can optionally provide a better implementation of this.
-        TOTHINK: Should I also check for bUpToDate and return false, if its false.
-            This could potentially force a attempt at fetching data from remote
-            server again.
+        Returns: bValid(OrNot), bUpToDate, todayDict
         """
         if hlpr.pickle_ok(fName, 64):
             bOk, today, temp = hlpr.load_pickle(fName)
             if bOk:
                 bMarker, bUpToDate = todayfile.valid_today(today)
                 if bMarker:
-                    return True
-        return False
+                    return True, bUpToDate, today
+        return False, False, None
 
 
     def fetch4date(self, y, m, d, opts):
@@ -128,7 +127,7 @@ class DataSrc:
         if bForceRemote:
             self._fetch_remote(url, fName)
             bParseFile=True
-        elif not self._valid_picklefile(fName):
+        elif not self._valid_picklefile(fName)[0]:
             if not bForceLocal:
                 self._fetch_remote(url, fName)
             bParseFile=True
@@ -158,11 +157,9 @@ class DataSrc:
         fName = time.strftime(self.pathTmpl, timeTuple)
         ok = False
         for i in range(3):
-            ok,today,tIgnore = hlpr.load_pickle(fName)
+            ok, bUpToDate, today = self._valid_picklefile(fName)
             if ok:
-                if todayfile.valid_today(today):
-                    break
-            ok = False
+                break
             print("WARN:{}:Load4Date:Try={}: No valid data pickle found for {}".format(self.tag, i, fName))
             if i > 0:
                 opts = { 'ForceRemote': True }

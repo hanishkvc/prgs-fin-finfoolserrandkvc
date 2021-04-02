@@ -131,6 +131,6 @@ def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None,
             for i in range(len(today['dataKeys'])):
                 dataKey = today['dataKeys'][i]
                 datas[dataKey] = values[i]
-            edb.add_data(entCode, datas, name, curEntType)
+            edb.add_data(entCode, datas, name, curEntTypeId)
 
 
