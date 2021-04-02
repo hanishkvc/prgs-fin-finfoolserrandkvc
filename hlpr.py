@@ -268,7 +268,7 @@ def loadfilters_list(theLoadFilters, caller="Main"):
     for lfName in theLoadFilters:
         print("    {}".format(lfName))
         for t in theLoadFilters[lfName]:
-            print("        {} : {}".format(t, gLoadFilters[lfName][t]))
+            print("        {} : {}".format(t, theLoadFilters[lfName][t]))
 
 
 def loadfilters_activate(theLoadFilters, loadFiltersName=None):
@@ -277,7 +277,7 @@ def loadfilters_activate(theLoadFilters, loadFiltersName=None):
     If None is passed, then loadfilters will be cleared.
     """
     if loadFiltersName != None:
-        group = gLoadFilters[loadFiltersName]
+        group = theLoadFilters[loadFiltersName]
     else:
         group = None
     theLoadFilters['active'] = group

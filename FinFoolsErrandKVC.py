@@ -18,6 +18,7 @@ import hlpr
 import indiamf
 import enttypes
 import indexes
+import entities
 
 
 """
@@ -1227,7 +1228,7 @@ def session_restore(sessionName):
     Restore a previously saved gEnts.data-gEnts.meta fast from a pickle.
     Also setup the modules used by the main logic.
     """
-    global gEnts.data, gEnts.meta
+    global gEnts
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     ok, gEnts.data, gEnts.meta = hlpr.load_pickle(fName)
     enttypes.init(gEnts.meta, False)
