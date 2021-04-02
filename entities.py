@@ -161,4 +161,13 @@ class Entities:
             self.data[dataKey][entIndex,self.nxtDateIndex-1] = entData[dataKey]
 
 
+    def optimise_size(self, dataKeys):
+        """
+        Reduce the arrays used to fit the currently loaded set of data.
+        """
+        for dataKey in dataKeys:
+            self.data[dataKey] = self.data[dataKey][:self.meta['nxtEntIndex'],:self.meta['nxtDateIndex']]
+        for key in [ 'firstSeen', 'lastSeen', 'name', 'codeL', 'typeId' ]:
+            self.meta[key] = self.meta[key][:self.meta['nxtEntIndex']]
+
 

@@ -353,9 +353,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     loadfilters_activate(loadFiltersName)
     load4daterange(startDate, endDate)
     if bOptimizeSize:
-        gData['data'] = gData['data'][:gMeta['nextEntIndex'],:gMeta['dataIndex']+1]
-        gMeta['lastSeen'] = gMeta['lastSeen'][:gMeta['nextEntIndex']]
-        gMeta['typeId'] = gMeta['typeId'][:gMeta['nextEntIndex']]
+        gEnts.optimise_size()
 
 
 def _fillin4holidays(mfIndex=-1):
