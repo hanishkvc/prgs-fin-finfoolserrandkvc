@@ -259,7 +259,7 @@ def load4date(y, m, d, opts):
     gEnts.add_date(hlpr.dateint(y,m,d))
     for ds in gDS:
         if 'load4date' in dir(ds):
-            ds.load4date(y, m, d, opts)
+            ds.load4date(y, m, d, gEnts, opts)
 
 
 def load4daterange(startDate, endDate, opts=None):

@@ -56,8 +56,11 @@ def valid_today(today):
     Check passed today dictionary contains a valid marker.
     Also give the UpToDate status stored in it.
     """
-    bMarker = (today['marker'] == TODAY_MARKER)
-    return bMarker, today['bUpToDate']
+    if 'marker' in today:
+        bMarker = (today['marker'] == TODAY_MARKER)
+        return bMarker, today['bUpToDate']
+    else:
+        return False, False
 
 
 def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None, caller="TodayFile"):
@@ -90,7 +93,7 @@ def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None,
         Can give finer entity level info has to data is uptodate or not.
         But as currently I am not using it, so ignoring for now.
     """
-    loadFilters = hlpr.loadFilters_get(loadFilters, filterName)
+    loadFilters = hlpr.loadfilters_get(loadFilters, filterName)
     # Handle entTypes and their entities
     for curEntType in today['entTypes']:
         entCodes = today['entTypes'][curEntType]
