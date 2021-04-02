@@ -2,11 +2,9 @@
 # HanishKVC, 2021
 
 import os
-import calendar
 import sys
-import datetime
+import time
 import hlpr
-import enttypes
 import todayfile
 
 
@@ -138,35 +136,37 @@ class DataSource:
                 print(sys.exc_info())
 
 
-def load4date(y, m, d, opts):
-    """
-    Load data for the given date.
+    def load4date(self, y, m, d, edb, opts):
+        """
+        Load data for the given date into Entities DB.
 
-    NOTE: If loading pickled data fails, then it will try to load
-    the data corresponding to given date, from the locally downloaded
-    csv file if possible, else it will try to fetch it freshly from
-    the internet/remote server.
+        NOTE: If loading pickled data fails, then it will try to load
+        the data corresponding to given date, from the locally downloaded
+        data file if possible, else it will try to fetch it freshly from
+        the internet/remote server.
 
-    NOTE: This logic wont fill in prev nav for holidays,
-    you will have to call fillin4holidays explicitly.
-    """
-    fName = MFS_FNAMECSV_TMPL.format(y,m,d)
-    ok = False
-    for i in range(3):
-        ok,today,tIgnore = hlpr.load_pickle(fName)
-        if ok:
-            break
-        else:
-            print("WARN:IndiaMF:load4date:Try={}: No data pickle found for {}".format(i, fName))
+        NOTE: This logic wont fill in missing data wrt holidays,
+        you will have to call fillin4holidays explicitly.
+        """
+        timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
+        fName = time.strftime(self.pathTmpl, timeTuple)
+        ok = False
+        for i in range(3):
+            ok,today,tIgnore = hlpr.load_pickle(fName)
+            if ok:
+                if todayfile.valid_today(today):
+                    break
+            ok = False
+            print("WARN:{}:Load4Date:Try={}: No valid data pickle found for {}".format(self.tag, i, fName))
             if i > 0:
                 opts = { 'ForceRemote': True }
             else:
                 opts = { 'ForceLocal': True }
-            fetch4date(y, m, d, opts)
-    if ok:
-        _loaddata(today)
-    else:
-        print("WARN:IndiaMF:load4date:No data wrt {}, so skipping".format(fName))
+            self.fetch4date(y, m, d, opts)
+        if ok:
+            todayfile.load2edb(today, edb, self.loadFilters, self.tag)
+        else:
+            print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 
 
 
