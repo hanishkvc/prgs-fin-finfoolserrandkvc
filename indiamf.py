@@ -5,6 +5,7 @@ import sys
 import time
 import hlpr
 import datasrc
+import todayfile
 
 
 #
@@ -72,7 +73,7 @@ class IndiaMFDS(datasrc.DataSrc):
                 except:
                     nav = 0
                 date = time.strptime(la[7], "%d-%b-%Y")
-                date = hlpr.dateint(date.year,date.month,date.day)
+                date = hlpr.dateint(date.tm_year,date.tm_mon,date.tm_mday)
                 #print(code, name, nav, date)
                 todayfile.add_ent(today, code, name, nav, curMFType, date)
             except:
