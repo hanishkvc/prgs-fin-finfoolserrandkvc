@@ -4,6 +4,7 @@
 import os
 import sys
 import time
+import calendar
 import hlpr
 import todayfile
 
@@ -37,6 +38,7 @@ class DataSrc:
     pathTmpl = None
     dataKeys = None
     tag = "DSBase"
+    bSkipWeekEnds = False
 
 
     def __init__(self, basePath, loadFilters, nameCleanupMap):
@@ -115,6 +117,8 @@ class DataSrc:
                 of the local data pickle file is ok or not.
             NOTE: ForceRemote takes precedence over ForceLocal.
         """
+        if self.bSkipWeekEnds and (calendar.weekday(y,m,d) > 4):
+            return
         timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
         dateInt = hlpr.dateint(y,m,d)
         url = time.strftime(self.urlTmpl, timeTuple)
@@ -153,6 +157,8 @@ class DataSrc:
         NOTE: This logic wont fill in missing data wrt holidays,
         you will have to call fillin4holidays explicitly.
         """
+        if self.bSkipWeekEnds and (calendar.weekday(y,m,d) > 4):
+            return
         timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
         fName = time.strftime(self.pathTmpl, timeTuple)
         ok = False

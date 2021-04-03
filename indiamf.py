@@ -100,6 +100,7 @@ class IndiaSTKDS(datasrc.DataSrc):
     pathTmpl = STK_FNAMECSV_TMPL
     dataKeys = [ 'data' ]
     tag = "IndiaSTKDS"
+    bSkipWeekEnds = True
 
     def __init__(self, basePath="~/", loadFilters=None, nameCleanupMap=None):
         if nameCleanupMap == None:
