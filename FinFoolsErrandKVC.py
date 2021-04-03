@@ -15,7 +15,7 @@ import readline
 import warnings
 import tabcomplete as tc
 import hlpr
-import indiamf
+import india
 import enttypes
 import indexes
 import entities
@@ -94,8 +94,8 @@ def setup_gdata(startDate=-1, endDate=-1):
 
 
 def setup_modules():
-    gDS.append(indiamf.IndiaMFDS(FINFOOLSERRAND_BASE, gLoadFilters))
-    gDS.append(indiamf.IndiaSTKDS(FINFOOLSERRAND_BASE, gLoadFilters))
+    gDS.append(india.IndiaMFDS(FINFOOLSERRAND_BASE, gLoadFilters))
+    gDS.append(india.IndiaSTKDS(FINFOOLSERRAND_BASE, gLoadFilters))
 
 
 def setup():
