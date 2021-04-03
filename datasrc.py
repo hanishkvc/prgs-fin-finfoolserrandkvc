@@ -91,7 +91,10 @@ class DataSrc:
         """
         if not self.valid_remotefile(fName):
             print(errMsg)
-            os.remove(fName)
+            try:
+                os.remove(fName)
+            except FileNotFoundError:
+                pass
 
 
     def _fetch_remote(self, url, fName):
