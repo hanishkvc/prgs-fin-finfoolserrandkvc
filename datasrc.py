@@ -57,6 +57,7 @@ class DataSrc:
         if (self.pathTmpl != None) and (basePath != None):
             self.pathTmpl = os.path.expanduser(os.path.join(basePath, self.pathTmpl))
         print("INFO:{}:pathTmpl:{}".format(self.tag, self.pathTmpl))
+        self.listNoDataDates = []
 
 
     def _valid_remotefile(self, fName):
@@ -208,6 +209,7 @@ class DataSrc:
         if ok:
             todayfile.load2edb(today, edb, self.loadFilters, self.nameCleanupMap, 'active', self.tag)
         else:
+            self.listNoDataDates.append(dateInt)
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 
 

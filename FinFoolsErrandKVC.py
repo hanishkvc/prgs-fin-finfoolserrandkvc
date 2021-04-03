@@ -333,10 +333,16 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
         endDate = startDate
     if bClearData:
         setup_gdata(startDate, endDate)
+    for ds in gDS:
+        ds.listNoDataDates = []
     loadfilters_activate(loadFiltersName)
     load4daterange(startDate, endDate)
     if bOptimizeSize:
         gEnts.optimise_size(gDataKeys)
+    for ds in gDS:
+        if len(ds.listNoDataDates) > 0:
+            print("WARN:LoadData:{}:Data missing for {}".format(ds.tag, ds.listNoDataDates))
+
 
 
 def _fillin4holidays(entIndex=-1):
