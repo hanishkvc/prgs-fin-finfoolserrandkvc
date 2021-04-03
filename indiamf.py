@@ -4,6 +4,7 @@
 import sys
 import time
 import zipfile
+import traceback
 import hlpr
 import datasrc
 import todayfile
@@ -108,8 +109,9 @@ class IndiaSTKDS(datasrc.DataSrc):
 
 
     def _get_parts(self, fName):
-        date = time.strptime(fName[-10:-4], "%y%m%d")
+        date = time.strptime(fName[-12:-4], "%Y%m%d")
         csvFile = time.strftime("Pr%d%m%y.csv", date)
+        print("DBUG:{}:GetParts:{},{}".format(self.tag, csvFile, date))
         return csvFile, date
 
 
@@ -134,6 +136,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         tFile = z.open(csvFile)
         tFile.readline()
         for l in tFile:
+            l = l.decode()
             l = l.strip()
             lt = l.split(',')
             la = []
@@ -158,7 +161,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                 todayfile.add_ent(today, code, name, [val], curType, date)
             except:
                 print("ERRR:IndiaSTKDS:parse_csv:{}".format(l))
-                print(sys.exc_info())
+                traceback.print_exc()
         tFile.close()
         z.close()
 
