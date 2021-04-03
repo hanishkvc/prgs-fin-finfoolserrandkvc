@@ -37,6 +37,12 @@ class IndiaMFDS(datasrc.DataSrc):
     tag = "IndiaMFDS"
 
     def __init__(self, basePath="~/", loadFilters=None, nameCleanupMap=None):
+        """
+        Initialise the India MFs related data source.
+
+        Add a possible loadFilters wrt MFs.
+        Also add NameCleanupMap to fix some errors noticed in MF Names.
+        """
         if nameCleanupMap == None:
             nameCleanupMap = gNameCleanupMap
         super().__init__(basePath, loadFilters, nameCleanupMap)
@@ -44,12 +50,27 @@ class IndiaMFDS(datasrc.DataSrc):
 
 
     def _valid_remotefile(self, fName):
+        """
+        Check the file downloaded from the remote server seems fine
+        by checking for the header in the 1st line as well as
+        closed funds or multiple fund types.
+        As No closed funds in 2006 and so, so avoiding close funds check.
+        """
         f = open(fName)
         l = f.readline()
+        bFoundHdr = False
+        if l.startswith("Scheme Code"):
+            bFoundHdr = True
+        bFoundClosed = False
+        bFundTypesCnt = 0
+        for l in f:
+            l = l.strip()
+            if l.lower().startswith('close'):
+                bFoundClosed = True
+            if l[0].isalpha() and l[-1] == ')':
+                bFundTypesCnt += 1
         f.close()
-        if not l.startswith("Scheme Code"):
-            return False
-        return True
+        return (bFoundHdr and (bFundTypesCnt > 5))
 
 
     def _parse_file(self, sFile, today):
