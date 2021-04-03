@@ -39,6 +39,7 @@ class DataSrc:
     dataKeys = None
     tag = "DSBase"
     bSkipWeekEnds = False
+    earliestDate = 0
 
 
     def __init__(self, basePath, loadFilters, nameCleanupMap):
@@ -145,6 +146,8 @@ class DataSrc:
             return
         timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
         dateInt = hlpr.dateint(y,m,d)
+        if dateInt < self.earliestDate:
+            return
         url = time.strftime(self.urlTmpl, timeTuple)
         fName = time.strftime(self.pathTmpl, timeTuple)
         bParseFile=False
@@ -185,6 +188,9 @@ class DataSrc:
         you will have to call fillin4holidays explicitly.
         """
         if self.bSkipWeekEnds and (calendar.weekday(y,m,d) > 4):
+            return
+        dateInt = hlpr.dateint(y,m,d)
+        if dateInt < self.earliestDate:
             return
         timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
         fName = time.strftime(self.pathTmpl, timeTuple)

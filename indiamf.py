@@ -35,6 +35,7 @@ class IndiaMFDS(datasrc.DataSrc):
     pathTmpl = MFS_FNAMECSV_TMPL
     dataKeys = [ 'data' ]
     tag = "IndiaMFDS"
+    earliestDate = 20060401
 
     def __init__(self, basePath="~/", loadFilters=None, nameCleanupMap=None):
         """
@@ -124,6 +125,7 @@ class IndiaSTKDS(datasrc.DataSrc):
     dataKeys = [ 'data' ]
     tag = "IndiaSTKDS"
     bSkipWeekEnds = True
+    earliestDate = 19940101
 
     def __init__(self, basePath="~/", loadFilters=None, nameCleanupMap=None):
         if nameCleanupMap == None:
