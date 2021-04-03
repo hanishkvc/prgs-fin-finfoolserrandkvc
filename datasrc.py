@@ -202,10 +202,12 @@ class DataSrc:
                 break
             print("WARN:{}:Load4Date:Try={}: No valid data pickle found for {}".format(self.tag, i, fName))
             if i > 0:
-                opts = { 'ForceRemote': True }
+                optsFD = { 'ForceRemote': True }
+                if opts.get('LoadLocalOnly'):
+                    break
             else:
-                opts = { 'ForceLocal': True }
-            self.fetch4date(y, m, d, opts)
+                optsFD = { 'ForceLocal': True }
+            self.fetch4date(y, m, d, optsFD)
         if ok:
             todayfile.load2edb(today, edb, self.loadFilters, self.nameCleanupMap, 'active', self.tag)
         else:

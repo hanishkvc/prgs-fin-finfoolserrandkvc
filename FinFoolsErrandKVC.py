@@ -304,7 +304,7 @@ def loadfilters_list():
     hlpr.loadfilters_list(gLoadFilters)
 
 
-def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, loadFiltersName='default'):
+def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, loadFiltersName='default', opts={'LoadLocalOnly': True}):
     """
     Load data for given date range.
 
@@ -336,7 +336,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     for ds in gDS:
         ds.listNoDataDates = []
     loadfilters_activate(loadFiltersName)
-    load4daterange(startDate, endDate)
+    load4daterange(startDate, endDate, opts)
     if bOptimizeSize:
         gEnts.optimise_size(gDataKeys)
     for ds in gDS:
