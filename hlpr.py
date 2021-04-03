@@ -243,46 +243,6 @@ def load_pickle(fName):
     return False, None, None
 
 
-def loadfilters_setup(theLoadFilters, loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
-    if theLoadFilters == None:
-        return
-    theLoadFilters[loadFiltersName] = {
-            'whiteListEntTypes': whiteListEntTypes,
-            'whiteListEntNames': whiteListEntNames,
-            'blackListEntNames': blackListEntNames
-        }
-
-
-def loadfilters_get(theLoadFilters, loadFiltersName):
-    if theLoadFilters == None:
-        loadFilters = None
-    else:
-        loadFilters = theLoadFilters.get(loadFiltersName, None)
-    if loadFilters == None:
-        loadFilters = { 'whiteListEntTypes': None, 'whiteListEntNames': None, 'blackListEntNames': None }
-    return loadFilters
-
-
-def loadfilters_list(theLoadFilters, caller="Main"):
-    print("INFO:{}:LoadFilters".format(caller))
-    for lfName in theLoadFilters:
-        print("    {}".format(lfName))
-        for t in theLoadFilters[lfName]:
-            print("        {} : {}".format(t, theLoadFilters[lfName][t]))
-
-
-def loadfilters_activate(theLoadFilters, loadFiltersName=None):
-    """
-    Helper function to activate a previously defined set of loadfilters.
-    If None is passed, then loadfilters will be cleared.
-    """
-    if loadFiltersName != None:
-        group = theLoadFilters[loadFiltersName]
-    else:
-        group = None
-    theLoadFilters['active'] = group
-
-
 def sane_array(theArray, skip):
     theSaneArray = theArray.copy()
     theSaneArray[numpy.isinf(theSaneArray)] = skip
