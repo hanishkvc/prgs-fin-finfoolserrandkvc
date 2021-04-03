@@ -65,12 +65,14 @@ class IndiaMFDS(datasrc.DataSrc):
         bFundTypesCnt = 0
         for l in f:
             l = l.strip()
+            if l == '':
+                continue
             if l.lower().startswith('close'):
                 bFoundClosed = True
             if l[0].isalpha() and l[-1] == ')':
                 bFundTypesCnt += 1
         f.close()
-        return (bFoundHdr and (bFundTypesCnt > 5))
+        return (bFoundHdr and (bFundTypesCnt > 3))
 
 
     def _parse_file(self, sFile, today):
