@@ -135,7 +135,7 @@ class IndiaSTKDS(datasrc.DataSrc):
     def _get_parts(self, fName):
         date = time.strptime(fName[-12:-4], "%Y%m%d")
         csvFile = time.strftime("Pr%d%m%y.csv", date)
-        print("DBUG:{}:GetParts:{},{}".format(self.tag, csvFile, date))
+        #print("DBUG:{}:GetParts:{},{}".format(self.tag, csvFile, date))
         return csvFile, date
 
 

@@ -67,12 +67,27 @@ class DataSrc:
         return False
 
 
+    def valid_remotefile(self, fName):
+        """
+        Check if the given file is a valid data file containing fetched data from
+        the remove server on not.
+        This traps exceptions if any by the provided _valid_remotefile.
+        NOTE: Dont override this in the child class, override _valid_remotefile.
+        """
+        try:
+            bOk = self._valid_remotefile(fName)
+        except:
+            print("ERRR:{}:ValidRemoteFile:{}".format(self.tag, sys.exc_info()))
+            bOk = False
+        return bOk
+
+
     def remove_if_invalid(self, fName, errMsg):
         """
-        Check if passed file is valid or not by calling _valid_remotefile.
+        Check if passed file is valid or not by calling valid_remotefile.
         In case if its invalid, remove the file.
         """
-        if not self._valid_remotefile(fName):
+        if not self.valid_remotefile(fName):
             print(errMsg)
             os.remove(fName)
 
