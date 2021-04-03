@@ -67,15 +67,24 @@ class DataSrc:
         return False
 
 
+    def remove_if_invalid(self, fName, errMsg):
+        """
+        Check if passed file is valid or not by calling _valid_remotefile.
+        In case if its invalid, remove the file.
+        """
+        if not self._valid_remotefile(fName):
+            print(errMsg)
+            os.remove(fName)
+
+
     def _fetch_remote(self, url, fName):
         """
         Fetch give url to specified file, and check its valid.
         """
         print(url, fName)
         hlpr.wget_better(url, fName)
-        if not self._valid_remotefile(fName):
-            print("ERRR:{}:_FetchRemote:[{}] not a valid file, removing it".format(self.tag, fName))
-            os.remove(fName)
+        errMsg = "ERRR:{}:_FetchRemote:[{}] not a valid file, removing it".format(self.tag, fName)
+        self.remove_if_invalid(fName, errMsg)
 
 
     def _parse_file(self, fName, today):
@@ -134,6 +143,9 @@ class DataSrc:
         elif not self._valid_picklefile(fName)[0]:
             if not bForceLocal:
                 self._fetch_remote(url, fName)
+            else:
+                errMsg = "ERRR:{}:Fetch4Date:{}:Available remote file not valid".format(self.tag, fName)
+                self.remove_if_invalid(fName, errMsg)
             bParseFile=True
         if bParseFile:
             try:
