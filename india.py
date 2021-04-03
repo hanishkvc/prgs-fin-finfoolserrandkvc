@@ -163,7 +163,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         tFile = z.open(csvFile)
         tFile.readline()
         for l in tFile:
-            l = l.decode()
+            l = l.decode(errors='ignore')
             l = l.strip()
             lt = l.split(',')
             la = []
