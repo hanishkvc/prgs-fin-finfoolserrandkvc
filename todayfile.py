@@ -3,6 +3,7 @@
 
 
 import hlpr
+import loadfilters
 
 
 TODAY_MARKER = "TODAYFILEKVC_V1"
@@ -93,7 +94,7 @@ def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None,
         Can give finer entity level info has to data is uptodate or not.
         But as currently I am not using it, so ignoring for now.
     """
-    loadFilters = hlpr.loadfilters_get(loadFilters, filterName)
+    loadFilters = loadfilters.get(filterName, loadFilters)
     # Handle entTypes and their entities
     for curEntType in today['entTypes']:
         entCodes = today['entTypes'][curEntType]

@@ -8,6 +8,7 @@ import traceback
 import hlpr
 import datasrc
 import todayfile
+import loadfilters
 
 
 #
@@ -47,7 +48,7 @@ class IndiaMFDS(datasrc.DataSrc):
         if nameCleanupMap == None:
             nameCleanupMap = gNameCleanupMap
         super().__init__(basePath, loadFilters, nameCleanupMap)
-        hlpr.loadfilters_setup(loadFilters, "indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES)
+        loadfilters.setup("indiamf", MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES, loadFilters)
 
 
     def _valid_remotefile(self, fName):
@@ -131,7 +132,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         if nameCleanupMap == None:
             nameCleanupMap = gNameCleanupMap
         super().__init__(basePath, loadFilters, nameCleanupMap)
-        hlpr.loadfilters_setup(loadFilters, "indiastk", None, None, None)
+        loadfilters.setup("indiastk", None, None, None, loadFilters)
 
 
     def _get_parts(self, fName):

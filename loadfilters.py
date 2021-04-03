@@ -8,12 +8,27 @@ filter entity types as well as entity names.
 User or Modules can define loadFilters, which inturn can be used as required later.
 """
 
-def setup(dLoadFilters, loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
+
+#
+# The default global dictionary to store the different loadFilters.
+#
+gLoadFilters = { }
+def _dLoadFilters(dLoadFilters=None):
     """
-    Add a new loadFilters into the dLoadFilters dictionary
+    If a custom dictionary of loadFilters is not specified,
+    then the default global dictionary will be used.
     """
     if dLoadFilters == None:
-        return
+        dLoadFilters = gLoadFilters
+    return dLoadFilters
+
+
+def setup(loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None, dLoadFilters=None):
+    """
+    Add a new named loadFilters into the dLoadFilters dictionary.
+    Same can be used later, if required by logics like load_data,...
+    """
+    dLoadFilters = _dLoadFilters(dLoadFilters)
     dLoadFilters[loadFiltersName] = {
         'whiteListEntTypes': whiteListEntTypes,
         'whiteListEntNames': whiteListEntNames,
@@ -21,25 +36,32 @@ def setup(dLoadFilters, loadFiltersName, whiteListEntTypes=None, whiteListEntNam
         }
 
 
-def get(dLoadFilters, loadFiltersName):
+def copy(fromLF, toLF, dLoadFilters=None):
+    """
+    Make a copy of the fromLF loadFilters into a loadFilters named toLF.
+    """
+    dLoadFilters = _dLoadFilters(dLoadFilters)
+    dLoadFilters[toLF] = dLoadFilters[fromLF].copy()
+
+
+def get(loadFiltersName, dLoadFilters=None):
     """
     Retreive the specified loadFilters.
     If there is no valid loadFilters of that name,
     then a empty loadFilters is returned.
     """
-    if dLoadFilters == None:
-        loadFilters = None
-    else:
-        loadFilters = dLoadFilters.get(loadFiltersName, None)
+    dLoadFilters = _dLoadFilters(dLoadFilters)
+    loadFilters = dLoadFilters.get(loadFiltersName, None)
     if loadFilters == None:
         loadFilters = { 'whiteListEntTypes': None, 'whiteListEntNames': None, 'blackListEntNames': None }
     return loadFilters
 
 
-def list(dLoadFilters, caller="Main"):
+def list(caller="Main", dLoadFilters=None):
     """
     List the currently defined loadFilters.
     """
+    dLoadFilters = _dLoadFilters(dLoadFilters)
     print("INFO:{}:LoadFilters".format(caller))
     for lfName in dLoadFilters:
         print("    {}".format(lfName))
@@ -47,11 +69,12 @@ def list(dLoadFilters, caller="Main"):
             print("        {} : {}".format(t, dLoadFilters[lfName][t]))
 
 
-def activate(dLoadFilters, loadFiltersName=None):
+def activate(loadFiltersName=None, dLoadFilters=None):
     """
     Set the specified loadFilters as the active loadFilters.
     If None is passed, then active loadFilters, if any is cleared.
     """
+    dLoadFilters = _dLoadFilters(dLoadFilters)
     if loadFiltersName != None:
         group = dLoadFilters[loadFiltersName]
     else:

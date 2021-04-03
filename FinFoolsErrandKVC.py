@@ -19,6 +19,7 @@ import india
 import enttypes
 import indexes
 import entities
+import loadfilters
 
 
 """
@@ -41,10 +42,6 @@ Usage scenario
 
 gbDEBUG = False
 FINFOOLSERRAND_BASE = None
-#
-# A set of default load filters for different dataset sources
-#
-gLoadFilters = { }
 
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 gHistoricGaps = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
@@ -94,16 +91,16 @@ def setup_gdata(startDate=-1, endDate=-1):
 
 
 def setup_modules():
-    gDS.append(india.IndiaMFDS(FINFOOLSERRAND_BASE, gLoadFilters))
-    gDS.append(india.IndiaSTKDS(FINFOOLSERRAND_BASE, gLoadFilters))
+    gDS.append(india.IndiaMFDS(FINFOOLSERRAND_BASE))
+    gDS.append(india.IndiaSTKDS(FINFOOLSERRAND_BASE))
 
 
 def setup():
     setup_gdata()
     setup_paths()
     setup_modules()
-    gLoadFilters['default'] = gLoadFilters['indiamf'].copy()
-    loadfilters_list()
+    loadfilters.copy("indiamf", "default")
+    loadfilters.list()
 
 
 def proc_days(start, end, handle_date_func, opts=None, bNotBeyondYesterday=True, bDebug=False):
@@ -285,25 +282,6 @@ def load4daterange(startDate, endDate, opts=None):
     fillin4holidays()
 
 
-def loadfilters_activate(loadFiltersName=None):
-    """
-    Helper function to activate a previously defined set of loadfilters wrt different data sources/users preferences.
-    If None is passed, then loadfilters will be cleared.
-    """
-    hlpr.loadfilters_activate(gLoadFilters, loadFiltersName)
-
-
-def loadfilters_setup(loadFiltersName, whiteListEntTypes=None, whiteListEntNames=None, blackListEntNames=None):
-    """
-    Setup a named loadFilters, which inturn can be used with load_data later.
-    """
-    hlpr.loadfilters_setup(gLoadFilters, loadFiltersName, whiteListEntTypes, whiteListEntNames, blackListEntNames)
-
-
-def loadfilters_list():
-    hlpr.loadfilters_list(gLoadFilters)
-
-
 def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, loadFiltersName='default', opts={'LoadLocalOnly': True}):
     """
     Load data for given date range.
@@ -335,7 +313,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
         setup_gdata(startDate, endDate)
     for ds in gDS:
         ds.listNoDataDates = []
-    loadfilters_activate(loadFiltersName)
+    loadfilters.activate(loadFiltersName)
     load4daterange(startDate, endDate, opts)
     if bOptimizeSize:
         gEnts.optimise_size(gDataKeys)
