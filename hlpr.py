@@ -31,7 +31,7 @@ def wget_better(url, localFName):
         mtimePrev = os.stat(localFName).st_mtime
     else:
         mtimePrev = -1
-    cmd = "wget '{}' --continue --output-document={}".format(url,localFName)
+    cmd = "wget '{}' --continue --timeout=4 --tries=4 --output-document={}".format(url,localFName)
     print(cmd)
     os.system(cmd)
     if os.path.exists(localFName):
