@@ -724,7 +724,7 @@ def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=
             entCodesMore = []
         entCodes = entCodes + entCodesMore
     else:
-        entCodes = enttypes.members(entDB, entTypeTmpls, entNameTmpls)
+        entCodes = enttypes._members(entDB, entTypeTmpls, entNameTmpls)
     infoset1_result_entcodes(entCodes, bPrompt, numEntries, entDB=entDB)
 
 

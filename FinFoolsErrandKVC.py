@@ -447,7 +447,6 @@ def session_restore(sessionName):
     global gEntDB
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     ok, gEntDB, tIgnore = hlpr.load_pickle(fName)
-    enttypes.init(gEntDB)
     modules_sync_gentdb(gEntDB)
 
 

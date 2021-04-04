@@ -5,7 +5,7 @@
 import hlpr
 
 
-def init(self):
+def _init(self):
     """
     Initialise the entity types related members of passed self.
     """
@@ -15,7 +15,7 @@ def init(self):
     self.typeMembers = {}
 
 
-def add(self, typeName):
+def _add(self, typeName):
     """
     Add the given typeName into entities db, if required.
 
@@ -29,7 +29,7 @@ def add(self, typeName):
     return self.typesD[typeName]
 
 
-def list(self):
+def _list(self):
     """
     List entity types found in the passed entities db.
     """
@@ -37,14 +37,14 @@ def list(self):
         print(k)
 
 
-def add_member(self, entTypeId, entCode):
+def _add_member(self, entTypeId, entCode):
     """
     Add a entity to the members list associated with its entityType.
     """
     self.typeMembers[self.typesL[entTypeId]].append(entCode)
 
 
-def members(self, entTypeTmpls, entNameTmpls=[]):
+def _members(self, entTypeTmpls, entNameTmpls=[]):
     """
     List the members of the specified entity types
 
