@@ -48,10 +48,6 @@ Usage scenario
 gbDEBUG = False
 FINFOOLSERRAND_BASE = None
 
-# 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
-gHistoricGaps = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
-gHistoricGapsHdr = numpy.array(["1D", "5D", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
-
 #
 # proc_days related controls
 #
