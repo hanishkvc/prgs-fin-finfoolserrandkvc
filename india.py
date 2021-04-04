@@ -80,16 +80,28 @@ class IndiaMFDS(datasrc.DataSrc):
     def _parse_file(self, sFile, today):
         """
         Parse the specified data csv file and load it into passed today dictionary.
+
+        The MF CSV file is seen to have these three characteristics wrt lines specifying MFType
+        1) They start with a Alpha character; NOTE: THis is being checked.
+        2) They end with " )" NOTE: Currently only ')' being checked.
+        3) They are followed by a emtpy line; NOTE: This is being checked.
         """
         tFile = open(sFile)
         curMFType = ""
+        maybeMFType = ""
+        maybeLCnt = -1
+        lCnt = 0
         for l in tFile:
+            lCnt += 1
             l = l.strip()
             if l == '':
+                if (lCnt - maybeLCnt) == 1:
+                    curMFType = maybeMFType
                 continue
             if l[0].isalpha():
                 if l[-1] == ')':
-                    curMFType = l
+                    maybeMFType = l
+                    maybeLCnt = lCnt
                 continue
             try:
                 la = l.split(';')
