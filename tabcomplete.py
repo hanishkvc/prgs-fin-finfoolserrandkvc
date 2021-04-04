@@ -6,14 +6,13 @@ import readline
 
 
 gMeta = None
-L1 = [ "load_data", "fetch_data", "lookat_data", "search_data",
-        "show_plot",
+L1 = [ "load_data", "fetch_data", "search_data",
         "enttypes.list", "enttypes.members",
-        "procdata_ex", "plot_data", "procdata_mabeta",
+        "procdata.ops", "procdata.mabeta", "procdata.anal_simple",
+        "plot.data", "plot.show",
         "loadfilters.setup", "loadfilters.list", "loadfilters.get", "loadfilters.activate", "loadfilters.copy",
-        "analdata_simple",
         "session_save", "session_restore",
-        "infoset1_prep", "infoset1_result",
+        "procdata.infoset1_prep", "procdata.infoset1_result",
         "quit"
         ]
 
