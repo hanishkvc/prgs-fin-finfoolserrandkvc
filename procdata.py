@@ -708,22 +708,3 @@ def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=
     infoset1_result_entcodes(entCodes, bPrompt, numEntries)
 
 
-def _date2index(startDate, endDate):
-    """
-    Get the indexes corresponding to the start and end date
-
-    If either of the date is -1, then it will be mapped to
-    either the beginning or end of the current valid dataset,
-    as appropriate. i.e start maps to 0, end maps to dateIndex.
-    """
-    if startDate == -1:
-        startDateIndex = 0
-    else:
-        startDateIndex = gEnts.datesD[startDate]
-    if endDate == -1:
-        endDateIndex = gEnts.nxtDateIndex-1
-    else:
-        endDateIndex = gEnts.datesD[endDate]
-    return startDateIndex, endDateIndex
-
-

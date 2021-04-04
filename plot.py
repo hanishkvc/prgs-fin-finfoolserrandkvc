@@ -29,7 +29,7 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     Remember to call show func, when you want to see plots, accumulated till then.
     """
     entDB = _entDB(entDB)
-    startDateIndex, endDateIndex = _date2index(startDate, endDate)
+    startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(dataKeys) == str:
         dataKeys = [ dataKeys ]
     if type(entCodes) == int:
@@ -60,7 +60,7 @@ def _show(entDB):
     for line in leg.get_lines():
         line.set_linewidth(8)
     plt.grid(True)
-    startDateIndex, endDateIndex = _date2index(-1,-1)
+    startDateIndex, endDateIndex = entDB.daterange2index(-1,-1)
     curDates = entDB.dates[startDateIndex:endDateIndex+1]
     numX = len(curDates)
     xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
