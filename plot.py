@@ -4,6 +4,10 @@
 
 import numpy
 import matplotlib.pyplot as plt
+import hlpr
+
+
+giLabelNameChopLen = 36
 
 
 gEntDB = None

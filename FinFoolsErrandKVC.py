@@ -26,20 +26,17 @@ import plot
 
 """
 Usage scenario
-    fetch_data(2010, 202103)
+    fetch_data(2010, 2021)
     load_data(2013, 20190105)
     # explore option 1
-    procdata.gEntDB = gEntDB
     procdata.infoset1_prep()
     procdata.infoset1_result(['open elss'], ['direct'])
     procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
     # explore option 2
-    procdata.gEntDB = gEntDB
     procdata.ops(['srel=srel(data)', 'roll3Y=roll1095(data)'])
     search_data(['match name tokens1', 'match name tokens2'])
     procdata.anal_simple('srel', 'srel_retpa', 'top')
     procdata.anal_simple('roll3Y', 'roll_avg', 'top')
-    plot.gEntDB = gEntDB
     plot.data('srel', [ entCode1, entCode2 ])
     plot.show()
     quit()
@@ -60,7 +57,6 @@ gbSkipWeekEnds = False
 # Misc
 #
 LOADFILTERSNAME_AUTO = '-AUTO-'
-giLabelNameChopLen = 36
 
 
 
