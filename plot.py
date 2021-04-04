@@ -16,12 +16,12 @@ def _entDB(entDB=None):
     return entDB
 
 
-def data(dataSrcs, entCodes, startDate=-1, endDate=-1, entDB=None):
+def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     """
     Plot specified datas for the specified entities from entDB, over the specified
     date range.
 
-    dataSrcs: Is a key or a list of keys used to retreive the data from entDB.data.
+    dataKeys: Is a key or a list of keys used to retreive the data from entDB.data.
     entCodes: Is a entCode or a list of entCodes.
     startDate and endDate: specify the date range over which the data should be
         retreived and plotted.
@@ -30,25 +30,25 @@ def data(dataSrcs, entCodes, startDate=-1, endDate=-1, entDB=None):
     """
     entDB = _entDB(entDB)
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
-    if type(dataSrcs) == str:
-        dataSrcs = [ dataSrcs ]
+    if type(dataKeys) == str:
+        dataKeys = [ dataKeys ]
     if type(entCodes) == int:
         entCodes = [ entCodes]
     srelMetaData, srelMetaLabel = data_metakeys('srel')
-    for dataSrc in dataSrcs:
-        print("DBUG:plot_data:{}".format(dataSrc))
-        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
+    for dataKey in dataKeys:
+        print("DBUG:plot_data:{}".format(dataKey))
+        dataKeyMetaData, dataKeyMetaLabel = data_metakeys(dataKey)
         for entCode in entCodes:
             index = entDB.meta['codeD'][entCode]
             name = entDB.meta['name'][index][:giLabelNameChopLen]
             try:
-                dataLabel = entDB.data[dataSrcMetaLabel][index]
+                dataLabel = entDB.data[dataKeyMetaLabel][index]
             except:
                 dataLabel = ""
             label = "{}:{:{width}}: {}".format(entCode, name, dataLabel, width=giLabelNameChopLen)
             print("\t{}:{}".format(label, index))
-            label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
-            plt.plot(entDB.data[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
+            label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataKey, dataLabel, width=giLabelNameChopLen)
+            plt.plot(entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
 
 
 def _show(entDB):
