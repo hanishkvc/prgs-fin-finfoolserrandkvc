@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 # Handle entity types related members of Entities class.
 # HanishKVC, 2021
+# GPL
 
 import hlpr
 

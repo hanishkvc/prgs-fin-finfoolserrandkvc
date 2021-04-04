@@ -4,7 +4,7 @@ Try look at MF/Indexes/... Nav data
 Author: HanishKVC
 Version: v20210326IST2019
 License: GPL
-Status: Partly OUT OF SYNC with PROGRAM
+Status: FULLY OUT OF SYNC with new version of PROGRAM
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -205,17 +205,21 @@ based on EntityName, so each loadfilter is a named dictionary containing
 
    a blacklist of matching templates wrt entityName
 
-One can use loadfilters_setup to define these named loadFilters. One can define multiple
+One can use loadfilters.setup to define these named loadFilters. One can define multiple
 such named loadFilters. Even the program may define some named loadFilters.
 
-loadfilters_setup(loadFiltersName, whiteListEntTypes, whiteListEntNames, blackListEntNames)
+loadfilters.setup(loadFiltersName, whiteListEntTypes, whiteListEntNames, blackListEntNames)
 
-One can use loadfilters_list to look at the currently defined loadfilters.
+One can use loadfilters.list to look at the currently defined loadfilters.
 
 Inturn while calling load_data, one can pass the optional loadFiltersName argument, to
-filter entities based on the corresponding list of filters. If user doesnt specify this
-argument, then the program will use the 'default' loadFilter. If user doesnt want to
-filter any of the entities, then pass None wrt loadFiltersName.
+filter entities based on the corresponding list of filters.
+
+   If user doesnt specify this argument, then the program will set this to a special
+   LOADFILTERSNAME_AUTO loadFilters. Which automatically maps to the loadFilters prefered
+   by the individual data sources.
+
+   If user doesnt want to filter any of the entities, then pass None wrt loadFiltersName.
 
 
 

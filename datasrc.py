@@ -47,9 +47,11 @@ class DataSrc:
         Initialise a data source instance.
 
         basePath: is used to setup the local file path, wrt fetched files.
-        loadFilters: a DataSrc can define/suggest its own set of load filters.
+        loadFilters: a DataSrc can define/suggest its own set of loadFilters.
             The same can be selected by end user, if they want to, by copying
-            the same as the 'active' set.
+            the same as the 'active' set, before calling the load function.
+            DataSrc base class saves the root loadFilters dictionary.
+            The child classes can define the loadFilters they prefer.
         nameCleanupMap: will be used to cleanup the entity names.
         """
         self.loadFilters = loadFilters

@@ -59,6 +59,7 @@ gbSkipWeekEnds = False
 #
 # Misc
 #
+LOADFILTERSNAME_AUTO = '-AUTO-'
 giLabelNameChopLen = 36
 
 
@@ -106,7 +107,6 @@ def setup():
     setup_gentdb()
     setup_paths()
     setup_modules()
-    loadfilters.copy("indiamf", "default")
     loadfilters.list()
 
 
@@ -263,6 +263,10 @@ def load4date(y, m, d, opts):
     """
     gEntDB.add_date(hlpr.dateint(y,m,d))
     for ds in gDS:
+        loadFiltersName = opts['loadFiltersName']
+        if loadFiltersName == LOADFILTERSNAME_AUTO:
+            loadFiltersName = ds.tag
+        loadfilters.activate(loadFiltersName)
         if 'load4date' in dir(ds):
             ds.load4date(y, m, d, gEntDB, opts)
 
@@ -289,7 +293,7 @@ def load4daterange(startDate, endDate, opts=None):
     fillin4holidays()
 
 
-def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, loadFiltersName='default', opts={'LoadLocalOnly': True}):
+def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts={'LoadLocalOnly': True}):
     """
     Load data for given date range.
 
@@ -301,7 +305,8 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     which case the whiteListEntTypes/whiteListEntNames/blackListEntNames, used by underlying
     load logic, if any, will be set as defined by the given loadFiltersName.
 
-        If this argument is not specified, then the default loadFilters will be used.
+        If this argument is not specified (i.e LOADFILTERSNAME_AUTO) , then the loadFilters
+        suggested by individual data sources, will be used wrt their load logic.
         If you dont want any loadfilters to be applied, then pass None.
 
         NOTE: The _findmatching logic will be used for matching templates.
@@ -320,7 +325,8 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
         setup_gentdb(startDate, endDate)
     for ds in gDS:
         ds.listNoDataDates = []
-    loadfilters.activate(loadFiltersName)
+    if 'loadFiltersName' not in opts:
+        opts['loadFiltersName'] = loadFiltersName
     load4daterange(startDate, endDate, opts)
     if bOptimizeSize:
         gEntDB.optimise_size(gDataKeys)
