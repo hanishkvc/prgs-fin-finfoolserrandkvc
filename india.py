@@ -48,6 +48,7 @@ class IndiaMFDS(datasrc.DataSrc):
         if nameCleanupMap == None:
             nameCleanupMap = gNameCleanupMap
         super().__init__(basePath, loadFilters, nameCleanupMap)
+        self.dataSrcType = DataSrcType.MF
         loadfilters.setup(self.tag, MF_ALLOW_ENTTYPES, MF_ALLOW_ENTNAMES, MF_SKIP_ENTNAMES, loadFilters)
 
 
@@ -144,6 +145,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         if nameCleanupMap == None:
             nameCleanupMap = gNameCleanupMap
         super().__init__(basePath, loadFilters, nameCleanupMap)
+        self.dataSrcType = DataSrcType.Stock
         loadfilters.setup(self.tag, None, None, None, loadFilters)
 
 

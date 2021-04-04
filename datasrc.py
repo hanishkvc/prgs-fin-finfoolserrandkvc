@@ -5,8 +5,12 @@ import os
 import sys
 import time
 import calendar
+import enum
 import hlpr
 import todayfile
+
+
+DataSrcType = enum.Enum('DataSrcType', 'Any MF Stock')
 
 
 class DataSrc:
@@ -54,6 +58,7 @@ class DataSrc:
             The child classes can define the loadFilters they prefer.
         nameCleanupMap: will be used to cleanup the entity names.
         """
+        self.dataSrcType = DataSrcType.Any
         self.loadFilters = loadFilters
         self.nameCleanupMap = nameCleanupMap
         if (self.pathTmpl != None) and (basePath != None):
