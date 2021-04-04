@@ -364,15 +364,15 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal', entD
     return data
 
 
-def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEntities=10, entCodes=None,
+def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=None, numEntities=10, entCodes=None,
                         minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64, entDB=None):
     """
     Find the top/bottom N entities, [wrt the given date or index,]
     from the given dataSrc.
 
-    op: could be either 'top' or 'bottom'
+    order: could be either 'top' or 'bottom'
 
-    opType: could be one of 'normal', 'srel_absret', 'srel_retpa',
+    analType: could be one of 'normal', 'srel_absret', 'srel_retpa',
         'roll_avg', 'block_ranked'
 
         normal: Look at data corresponding to the identified date,
@@ -449,47 +449,47 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
 
     """
     entDB = _entDB(entDB)
-    print("DBUG:AnalSimple:{}-{}:{}".format(dataSrc, opType, op))
-    if op == 'top':
+    print("DBUG:AnalSimple:{}-{}:{}".format(dataSrc, analType, order))
+    if order == 'top':
         iSkip = -numpy.inf
     else:
         iSkip = numpy.inf
     theSaneArray = None
-    if opType == 'normal':
+    if analType == 'normal':
         if (type(theDate) == type(None)) and (type(theIndex) == type(None)):
             for i in range(-1, -entDB.nxtDateIndex, -1):
                 if bDebug:
-                    print("DBUG:AnalSimple:{}:findDateIndex:{}".format(op, i))
+                    print("DBUG:AnalSimple:{}:findDateIndex:{}".format(order, i))
                 theSaneArray = entDB.data[dataSrc][:,i].copy()
                 theSaneArray[numpy.isinf(theSaneArray)] = iSkip
                 theSaneArray[numpy.isnan(theSaneArray)] = iSkip
                 if not numpy.all(numpy.isinf(theSaneArray) | numpy.isnan(theSaneArray)):
                     dateIndex = entDB.nxtDateIndex+i
-                    print("INFO:AnalSimple:{}:DateIndex:{}".format(op, dateIndex))
+                    print("INFO:AnalSimple:{}:DateIndex:{}".format(order, dateIndex))
                     break
         else:
             if (type(theIndex) == type(None)) and (type(theDate) != type(None)):
                 startDateIndex, theIndex = entDB.daterange2index(theDate, theDate)
-            print("INFO:AnalSimple:{}:theIndex:{}".format(op, theIndex))
+            print("INFO:AnalSimple:{}:theIndex:{}".format(order, theIndex))
             theSaneArray = entDB.data[dataSrc][:,theIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-    elif opType.startswith("srel"):
+    elif analType.startswith("srel"):
         dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
-        if opType == 'srel_absret':
+        if analType == 'srel_absret':
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
-        elif opType == 'srel_retpa':
+        elif analType == 'srel_retpa':
             theSaneArray = entDB.data[dataSrcMetaData][:,1].copy()
         else:
-            input("ERRR:AnalSimple:dataSrc[{}]:{} unknown srel opType, returning...".format(opType))
+            input("ERRR:AnalSimple:dataSrc[{}]:{} unknown srel analType, returning...".format(analType))
             return None
-    elif opType.startswith("roll"):
+    elif analType.startswith("roll"):
         dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
-        if opType == 'roll_avg':
+        if analType == 'roll_avg':
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-    elif opType == "block_ranked":
+    elif analType == "block_ranked":
         metaDataAvgs = "{}Avgs".format(dataSrc)
         tNumEnts, tNumBlocks = entDB.data[metaDataAvgs].shape
         theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
@@ -512,16 +512,16 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
         tNumBlocks = tNumBlocks - iValidBlockAtBegin
         theSaneArray = theRankArray[:,tNumBlocks]
     else:
-        input("ERRR:AnalSimple:dataSrc[{}]:{} unknown opType, returning...".format(opType))
+        input("ERRR:AnalSimple:dataSrc[{}]:{} unknown analType, returning...".format(analType))
         return None
     if type(theSaneArray) == type(None):
-        print("DBUG:AnalSimple:{}:{}:{}: No SaneArray????".format(op, dataSrc, opType))
+        print("DBUG:AnalSimple:{}:{}:{}: No SaneArray????".format(order, dataSrc, analType))
         breakpoint()
     theSaneArray = _forceval_entities(theSaneArray, entCodes, iSkip, 'invert', entDB=entDB)
     if minEntityLifeDataInYears > 0:
         dataYearsAvailable = entDB.nxtDateIndex/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
-            print("WARN:AnalSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
+            print("WARN:AnalSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(order, dataYearsAvailable, minEntityLifeDataInYears))
         srelMetaData, srelMetaLabel = data_metakeys('srel')
         theSRelMetaData = entDB.data.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
@@ -529,7 +529,7 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
         if bDebug:
             tNames = numpy.array(entDB.meta['name'])
             tDroppedNames = tNames[entDB.data[srelMetaData][:,2] < minEntityLifeDataInYears]
-            print("INFO:AnalSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
+            print("INFO:AnalSimple:{}:{}:{}:Dropping if baby Entity".format(order, dataSrc, analType), tDroppedNames)
         theSaneArray[entDB.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(entDB.meta['lastSeen'] < (entDB.dates[entDB.nxtDateIndex-1]-7))[0]
@@ -537,30 +537,30 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
             #aNames = numpy.array(entDB.meta['name'])
             #print(aNames[oldEntities])
             for index in oldEntities:
-                print("DBUG:AnalSimple:{}:IgnoringOldEntity:{}, {}".format(op, entDB.meta['name'][index], entDB.meta['lastSeen'][index]))
+                print("DBUG:AnalSimple:{}:IgnoringOldEntity:{}, {}".format(order, entDB.meta['name'][index], entDB.meta['lastSeen'][index]))
         theSaneArray[oldEntities] = iSkip
     theRows=numpy.argsort(theSaneArray)[-numEntities:]
     rowsLen = len(theRows)
     if numEntities > rowsLen:
-        print("WARN:AnalSimple:{}:RankContenders[{}] < numEntities[{}] requested, adjusting".format(op, rowsLen, numEntities))
+        print("WARN:AnalSimple:{}:RankContenders[{}] < numEntities[{}] requested, adjusting".format(order, rowsLen, numEntities))
         numEntities = rowsLen
-    if op == 'top':
+    if order == 'top':
         lStart = -1
         lStop = -(numEntities+1)
         lDelta = -1
-    elif op == 'bottom':
+    elif order == 'bottom':
         lStart = 0
         lStop = numEntities
         lDelta = 1
     theSelected = []
-    print("INFO:AnalSimple:{}:{}:{}".format(op, dataSrc, opType))
+    print("INFO:AnalSimple:{}:{}:{}".format(order, dataSrc, analType))
     for i in range(lStart,lStop,lDelta):
         index = theRows[i]
-        if (theSaneArray[index] == iSkip) or ((opType == 'block_ranked') and (theSaneArray[index] == 0)):
-            print("    WARN:AnalSimple:{}:No more valid elements".format(op))
+        if (theSaneArray[index] == iSkip) or ((analType == 'block_ranked') and (theSaneArray[index] == 0)):
+            print("    WARN:AnalSimple:{}:No more valid elements".format(order))
             break
         curEntry = [entDB.meta['codeL'][index], entDB.meta['name'][index], theSaneArray[index]]
-        if opType == "roll_avg":
+        if analType == "roll_avg":
             curEntry.extend(entDB.data[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
         if iClipNameWidth == None:
@@ -568,10 +568,10 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
         else:
             curEntry[1] = "{:{width}}".format(curEntry[1][:iClipNameWidth], width=iClipNameWidth)
         curEntry[2] = numpy.round(curEntry[2],2)
-        if opType == "roll_avg":
+        if analType == "roll_avg":
             curEntry[3:] = numpy.round(curEntry[3:],2)
             extra = ""
-        elif opType == "block_ranked":
+        elif analType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
             extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(entDB.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
         else:
