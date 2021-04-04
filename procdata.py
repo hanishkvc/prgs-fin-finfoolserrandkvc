@@ -21,6 +21,17 @@ import entities
 import loadfilters
 
 
+gEntDB = None
+def _entDB(entDB=None):
+    """
+    Either use the passed entDB or else the gEntDB, which might
+    have been set by the user previously.
+    """
+    if entDB == None:
+        return gEntDB
+    return entDB
+
+
 def data_metakeys(dataDst):
     """
     Returns the Meta Keys related to given dataDst key.
@@ -41,10 +52,10 @@ def update_metas(op, dataSrc, dataDst):
 
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
-def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
+def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     """
-    Allow data from any valid data key in gEnts.data to be operated on and the results to be saved
-    into a destination data key in gEnts.data.
+    Allow data from any valid data key in entDB.data to be operated on and the results to be saved
+    into a destination data key in entDB.data.
 
     opsList is a list of operations, which specifies the key of the data source to work with,
     as well as the operation to do. It may also optionally specify the dataDst key to use to
@@ -111,7 +122,8 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
     TODO: Currently dont change startDate and endDate from their default, because many operations
     dont account for them being different from the default.
     """
-    startDateIndex, endDateIndex = _date2index(startDate, endDate)
+    entDB = _entDB(entDB)
+    startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(opsList) == str:
         opsList = [ opsList ]
     for curOp in opsList:
@@ -126,21 +138,21 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
             dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
         print("DBUG:ops:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
-        tResult = gEnts.data[dataSrc].copy()
+        tResult = entDB.data[dataSrc].copy()
         dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
         dataDstMetaData, dataDstMetaLabel = data_metakeys(dataDst)
-        gEnts.data[dataDstMetaLabel] = []
+        entDB.data[dataDstMetaLabel] = []
         #### Op specific things to do before getting into individual records
         if op == 'srel':
-            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.nxtEntIndex,3])
+            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("rel"):
-            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.nxtEntIndex,3])
+            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = int(op[4:].split('_')[0])
-            gEnts.data[dataDstMetaData] = numpy.zeros([gEnts.nxtEntIndex, 4])
+            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 4])
         elif op.startswith("block"):
             blockDays = int(op[5:])
             blockTotalDays = endDateIndex - startDateIndex + 1
@@ -148,9 +160,9 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
             dataDstAvgs = "{}Avgs".format(dataDst)
             dataDstStds = "{}Stds".format(dataDst)
             dataDstQntls = "{}Qntls".format(dataDst)
-            gEnts.data[dataDstAvgs] = numpy.zeros([gEnts.nxtEntIndex,blockCnt])
-            gEnts.data[dataDstStds] = numpy.zeros([gEnts.nxtEntIndex,blockCnt])
-            gEnts.data[dataDstQntls] = numpy.zeros([gEnts.nxtEntIndex,blockCnt,5])
+            entDB.data[dataDstAvgs] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
+            entDB.data[dataDstStds] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
+            entDB.data[dataDstQntls] = numpy.zeros([entDB.nxtEntIndex,blockCnt,5])
             tResult = []
         elif op.startswith("reton"):
             retonT, retonType = op.split('_')
@@ -158,73 +170,73 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
                 retonDateIndex = endDateIndex
             else:
                 retonDate = int(retonT[5:])
-                retonDateIndex = gEnts.datesD[retonDate]
-            gEnts.data[dataDstMetaData] = numpy.ones([gEnts.nxtEntIndex,gHistoricGaps.shape[0]])*numpy.nan
+                retonDateIndex = entDB.datesD[retonDate]
+            entDB.data[dataDstMetaData] = numpy.ones([entDB.nxtEntIndex,gHistoricGaps.shape[0]])*numpy.nan
             validHistoric = gHistoricGaps[gHistoricGaps < (retonDateIndex+1)]
             histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
-        for r in range(gEnts.nxtEntIndex):
+        for r in range(entDB.nxtEntIndex):
             try:
                 if op == "srel":
                     #breakpoint()
                     iStart = -1
                     dStart = 0
-                    nonZeros = numpy.nonzero(gEnts.data[dataSrc][r, startDateIndex:endDateIndex+1])[0]
+                    nonZeros = numpy.nonzero(entDB.data[dataSrc][r, startDateIndex:endDateIndex+1])[0]
                     if (len(nonZeros) > 0):
                         iStart = nonZeros[0] + startDateIndex
-                        dStart = gEnts.data[dataSrc][r, iStart]
-                    dEnd = gEnts.data[dataSrc][r, endDateIndex]
+                        dStart = entDB.data[dataSrc][r, iStart]
+                    dEnd = entDB.data[dataSrc][r, endDateIndex]
                     if dStart != 0:
                         if gbRelDataPlusFloat:
-                            tResult[r,:] = (gEnts.data[dataSrc][r,:]/dStart)
+                            tResult[r,:] = (entDB.data[dataSrc][r,:]/dStart)
                         else:
-                            tResult[r,:] = ((gEnts.data[dataSrc][r,:]/dStart)-1)*100
+                            tResult[r,:] = ((entDB.data[dataSrc][r,:]/dStart)-1)*100
                         tResult[r,:iStart] = numpy.nan
                         dAbsRet = tResult[r, -1]
                         durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
                         dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
                         label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
-                        gEnts.data[dataDstMetaLabel].append(label)
-                        gEnts.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+                        entDB.data[dataDstMetaLabel].append(label)
+                        entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                     else:
                         durationInYears = (endDateIndex-startDateIndex+1)/365
-                        gEnts.data[dataDstMetaLabel].append("")
-                        gEnts.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
+                        entDB.data[dataDstMetaLabel].append("")
+                        entDB.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
                 elif op.startswith("rel"):
                     baseDate = op[3:]
                     if baseDate != '':
                         baseDate = int(baseDate)
-                        baseDateIndex = gEnts.datesD[baseDate]
+                        baseDateIndex = entDB.datesD[baseDate]
                     else:
                         baseDateIndex = startDateIndex
-                    baseData = gEnts.data[dataSrc][r, baseDateIndex]
-                    dEnd = gEnts.data[dataSrc][r, endDateIndex]
-                    tResult[r,:] = (((gEnts.data[dataSrc][r,:])/baseData)-1)*100
+                    baseData = entDB.data[dataSrc][r, baseDateIndex]
+                    dEnd = entDB.data[dataSrc][r, endDateIndex]
+                    tResult[r,:] = (((entDB.data[dataSrc][r,:])/baseData)-1)*100
                     dAbsRet = tResult[r, -1]
                     durationInYears = (endDateIndex-baseDateIndex+1)/365
                     dRetPA = ((((dAbsRet/100)+1)**(1/durationInYears))-1)*100
                     label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
-                    gEnts.data[dataDstMetaLabel].append(label)
-                    gEnts.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+                    entDB.data[dataDstMetaLabel].append(label)
+                    entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 elif op.startswith("reton"):
                     retonType = op.split('_')[1]
-                    retonData = gEnts.data[dataSrc][r, retonDateIndex]
+                    retonData = entDB.data[dataSrc][r, retonDateIndex]
                     if retonType == 'absret':
-                        tResult[r,:] = ((retonData/gEnts.data[dataSrc][r,:])-1)*100
+                        tResult[r,:] = ((retonData/entDB.data[dataSrc][r,:])-1)*100
                     else:
-                        tResult[r,:] = (((retonData/gEnts.data[dataSrc][r,:])**(365/histDays))-1)*100
-                    gEnts.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
-                    gEnts.data[dataDstMetaLabel].append(hlpr.array_str(gEnts.data[dataDstMetaData][r], width=7))
+                        tResult[r,:] = (((retonData/entDB.data[dataSrc][r,:])**(365/histDays))-1)*100
+                    entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
+                    entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("dma"):
                     days = int(op[3:])
-                    tResult[r,:] = numpy.convolve(gEnts.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                    tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
                     inv = int(days/2)
                     tResult[r,:inv] = numpy.nan
-                    tResult[r,gEnts.nxtDateIndex-inv:] = numpy.nan
+                    tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
                     if True:
                         try:
-                            dataSrcLabel = gEnts.data[dataSrcMetaLabel][r]
+                            dataSrcLabel = entDB.data[dataSrcMetaLabel][r]
                         except:
                             if bDebug:
                                 print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
@@ -238,7 +250,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
                         else:
                             label = ""
                         label = "{} : {}".format(dataSrcLabel, label)
-                        gEnts.data[dataDstMetaLabel].append(label)
+                        entDB.data[dataDstMetaLabel].append(label)
                 elif op.startswith("roll"):
                     durationForPA = rollDays/365
                     if '_' in op:
@@ -246,9 +258,9 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
                         if opType == 'abs':
                             durationForPA = 1
                     if gbRelDataPlusFloat:
-                        tResult[r,rollDays:] = (gEnts.data[dataSrc][r,rollDays:]/gEnts.data[dataSrc][r,:-rollDays])**(1/durationForPA)
+                        tResult[r,rollDays:] = (entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA)
                     else:
-                        tResult[r,rollDays:] = (((gEnts.data[dataSrc][r,rollDays:]/gEnts.data[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
+                        tResult[r,rollDays:] = (((entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
                     tResult[r,:rollDays] = numpy.nan
                     # Additional meta data
                     trValidResult = tResult[r][numpy.isfinite(tResult[r])]
@@ -266,9 +278,9 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
                         trAvg = numpy.nan
                         trStd = numpy.nan
                         trMaSharpeMinT = numpy.nan
-                    gEnts.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
+                    entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
                     label = "{:5.2f} {:5.2f} {} {:5.2f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT)
-                    gEnts.data[dataDstMetaLabel].append(label)
+                    entDB.data[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
                     # Calc the Avgs
                     iEnd = endDateIndex+1
@@ -276,47 +288,48 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
                     lStds = []
                     for i in range(blockCnt):
                         iStart = iEnd-blockDays
-                        tBlockData = gEnts.data[dataSrc][r,iStart:iEnd]
+                        tBlockData = entDB.data[dataSrc][r,iStart:iEnd]
                         tBlockData = tBlockData[numpy.isfinite(tBlockData)]
                         lAvgs.insert(0, numpy.mean(tBlockData))
                         lStds.insert(0, numpy.std(tBlockData))
                         iEnd = iStart
                         if len(tBlockData) == 0:
                             tBlockData = [0]
-                        gEnts.data[dataDstQntls][r, blockCnt-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
+                        entDB.data[dataDstQntls][r, blockCnt-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
                     avgAvgs = numpy.nanmean(lAvgs)
                     avgStds = numpy.nanmean(lStds)
-                    gEnts.data[dataDstAvgs][r,:] = lAvgs
-                    gEnts.data[dataDstStds][r,:] = lStds
-                    #gEnts.data[dataDstMetaData][r] = [avgAvgs, avgStds]
+                    entDB.data[dataDstAvgs][r,:] = lAvgs
+                    entDB.data[dataDstStds][r,:] = lStds
+                    #entDB.data[dataDstMetaData][r] = [avgAvgs, avgStds]
                     label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
-                    gEnts.data[dataDstMetaLabel].append(label)
+                    entDB.data[dataDstMetaLabel].append(label)
             except:
                 traceback.print_exc()
                 print("DBUG:ProcDataEx:Exception skipping entity at ",r)
         if len(tResult) > 0:
-            gEnts.data[dataDst] = tResult
+            entDB.data[dataDst] = tResult
 
 
-def _mabeta(dataSrc, refCode, entCodes):
+def _mabeta(dataSrc, refCode, entCodes, entDB=None):
     """
     Get the slope of the entCodes wrt refCode.
     When the passed dataSrc is rollingRet, this is also called MaBeta.
     """
-    refIndex = gEnts.meta['codeD'][refCode]
-    refValid = gEnts.data[dataSrc][refIndex][numpy.isfinite(gEnts.data[dataSrc][refIndex])]
+    entDB = _entDB(entDB)
+    refIndex = entDB.meta['codeD'][refCode]
+    refValid = entDB.data[dataSrc][refIndex][numpy.isfinite(entDB.data[dataSrc][refIndex])]
     refAvg = numpy.mean(refValid)
     maBeta = []
     for entCode in entCodes:
-        entIndex = gEnts.meta['codeD'][entCode]
-        entValid = gEnts.data[dataSrc][entIndex][numpy.isfinite(gEnts.data[dataSrc][entIndex])]
+        entIndex = entDB.meta['codeD'][entCode]
+        entValid = entDB.data[dataSrc][entIndex][numpy.isfinite(entDB.data[dataSrc][entIndex])]
         entAvg = numpy.mean(entValid)
         entMaBeta = numpy.sum((entValid-entAvg)*(refValid-refAvg))/numpy.sum((refValid-refAvg)**2)
         maBeta.append(entMaBeta)
     return maBeta
 
 
-def mabeta(dataSrc, refCode, entCodes):
+def mabeta(dataSrc, refCode, entCodes, entDB=None):
     '''
     Calculate a measure of how similar or dissimilar is the change/movement in
     the value of given entities in entCodes list wrt changes in value of the
@@ -328,11 +341,12 @@ def mabeta(dataSrc, refCode, entCodes):
         the given entity moves more compared to the ref entity.
     Value lower than 0 - Both entities move in dissimilar/oppositive manner.
     '''
+    entDB = _entDB(entDB)
     ops('roll1Abs=roll1_abs({})'.format(dataSrc))
     return _mabeta('roll1Abs', refCode, entCodes)
 
 
-def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
+def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal', entDB=None):
     """
     Set the specified locations in the data, to the given forcedValue.
 
@@ -340,9 +354,10 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
         'normal': for locations corresponding to the specified entCodes,
         'invert': for locations not specified in entCodes.
     """
+    entDB = _entDB(entDB)
     if entCodes == None:
         return data
-    indexes = [gEnts.meta['codeD'][code] for code in entCodes]
+    indexes = [entDB.meta['codeD'][code] for code in entCodes]
     if entSelectType == 'normal':
         mask = numpy.zeros(data.size, dtype=bool)
         mask[indexes] = True
@@ -354,7 +369,7 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
 
 
 def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEntities=10, entCodes=None,
-                        minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64):
+                        minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64, entDB=None):
     """
     Find the top/bottom N entities, [wrt the given date or index,]
     from the given dataSrc.
@@ -437,6 +452,7 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
         Else the program limits the Name to specified width.
 
     """
+    entDB = _entDB(entDB)
     print("DBUG:AnalDataSimple:{}-{}:{}".format(dataSrc, opType, op))
     if op == 'top':
         iSkip = -numpy.inf
@@ -445,46 +461,46 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
     theSaneArray = None
     if opType == 'normal':
         if (type(theDate) == type(None)) and (type(theIndex) == type(None)):
-            for i in range(-1, -gEnts.nxtDateIndex, -1):
+            for i in range(-1, -entDB.nxtDateIndex, -1):
                 if bDebug:
                     print("DBUG:AnalDataSimple:{}:findDateIndex:{}".format(op, i))
-                theSaneArray = gEnts.data[dataSrc][:,i].copy()
+                theSaneArray = entDB.data[dataSrc][:,i].copy()
                 theSaneArray[numpy.isinf(theSaneArray)] = iSkip
                 theSaneArray[numpy.isnan(theSaneArray)] = iSkip
                 if not numpy.all(numpy.isinf(theSaneArray) | numpy.isnan(theSaneArray)):
-                    dateIndex = gEnts.nxtDateIndex+i
+                    dateIndex = entDB.nxtDateIndex+i
                     print("INFO:AnalDataSimple:{}:DateIndex:{}".format(op, dateIndex))
                     break
         else:
             if (type(theIndex) == type(None)) and (type(theDate) != type(None)):
-                startDateIndex, theIndex = _date2index(theDate, theDate)
+                startDateIndex, theIndex = entDB.daterange2index(theDate, theDate)
             print("INFO:AnalDataSimple:{}:theIndex:{}".format(op, theIndex))
-            theSaneArray = gEnts.data[dataSrc][:,theIndex].copy()
+            theSaneArray = entDB.data[dataSrc][:,theIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif opType.startswith("srel"):
         dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
         if opType == 'srel_absret':
-            theSaneArray = gEnts.data[dataSrcMetaData][:,0].copy()
+            theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
-            theSaneArray = gEnts.data[dataSrcMetaData][:,1].copy()
+            theSaneArray = entDB.data[dataSrcMetaData][:,1].copy()
         else:
             input("ERRR:AnalDataSimple:dataSrc[{}]:{} unknown srel opType, returning...".format(opType))
             return None
     elif opType.startswith("roll"):
         dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
         if opType == 'roll_avg':
-            theSaneArray = gEnts.data[dataSrcMetaData][:,0].copy()
+            theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif opType == "block_ranked":
         metaDataAvgs = "{}Avgs".format(dataSrc)
-        tNumEnts, tNumBlocks = gEnts.data[metaDataAvgs].shape
+        tNumEnts, tNumBlocks = entDB.data[metaDataAvgs].shape
         theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
         iValidBlockAtBegin = 0
         bValidBlockFound = False
         for b in range(tNumBlocks):
-            tArray = gEnts.data[metaDataAvgs][:,b]
+            tArray = entDB.data[metaDataAvgs][:,b]
             tValidArray = tArray[numpy.isfinite(tArray)]
             tSaneArray = hlpr.sane_array(tArray, iSkip)
             if len(tValidArray) != 0:
@@ -507,25 +523,25 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
         breakpoint()
     theSaneArray = _forceval_entities(theSaneArray, entCodes, iSkip, 'invert')
     if minEntityLifeDataInYears > 0:
-        dataYearsAvailable = gEnts.nxtDateIndex/365
+        dataYearsAvailable = entDB.nxtDateIndex/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
             print("WARN:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
         srelMetaData, srelMetaLabel = data_metakeys('srel')
-        theSRelMetaData = gEnts.data.get(srelMetaData, None)
+        theSRelMetaData = entDB.data.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
             ops('srel=srel(data)')
         if bDebug:
-            tNames = numpy.array(gEnts.meta['name'])
-            tDroppedNames = tNames[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears]
+            tNames = numpy.array(entDB.meta['name'])
+            tDroppedNames = tNames[entDB.data[srelMetaData][:,2] < minEntityLifeDataInYears]
             print("INFO:AnalDataSimple:{}:{}:{}:Dropping if baby Entity".format(op, dataSrc, opType), tDroppedNames)
-        theSaneArray[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
+        theSaneArray[entDB.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
     if bCurrentEntitiesOnly:
-        oldEntities = numpy.nonzero(gEnts.meta['lastSeen'] < (gEnts.dates[gEnts.nxtDateIndex-1]-7))[0]
+        oldEntities = numpy.nonzero(entDB.meta['lastSeen'] < (entDB.dates[entDB.nxtDateIndex-1]-7))[0]
         if bDebug:
-            #aNames = numpy.array(gEnts.meta['name'])
+            #aNames = numpy.array(entDB.meta['name'])
             #print(aNames[oldEntities])
             for index in oldEntities:
-                print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, gEnts.meta['name'][index], gEnts.meta['lastSeen'][index]))
+                print("DBUG:AnalDataSimple:{}:IgnoringOldEntity:{}, {}".format(op, entDB.meta['name'][index], entDB.meta['lastSeen'][index]))
         theSaneArray[oldEntities] = iSkip
     theRows=numpy.argsort(theSaneArray)[-numEntities:]
     rowsLen = len(theRows)
@@ -547,9 +563,9 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
         if (theSaneArray[index] == iSkip) or ((opType == 'block_ranked') and (theSaneArray[index] == 0)):
             print("    WARN:AnalDataSimple:{}:No more valid elements".format(op))
             break
-        curEntry = [gEnts.meta['codeL'][index], gEnts.meta['name'][index], theSaneArray[index]]
+        curEntry = [entDB.meta['codeL'][index], entDB.meta['name'][index], theSaneArray[index]]
         if opType == "roll_avg":
-            curEntry.extend(gEnts.data[dataSrcMetaData][index,1:])
+            curEntry.extend(entDB.data[dataSrcMetaData][index,1:])
         theSelected.append(curEntry)
         if iClipNameWidth == None:
             curEntry[1] = "{:64}".format(curEntry[1])
@@ -561,29 +577,30 @@ def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEn
             extra = ""
         elif opType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
-            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(gEnts.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
+            extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(entDB.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
         else:
             extra = ""
         print("    {} {}".format(extra, curEntry))
     return theSelected
 
 
-def infoset1_prep():
+def infoset1_prep(entDB=None):
     """
     Run a common set of operations, which can be used to get some amount of
     potentially useful info, on the loaded data,
     """
+    entDB = _entDB(entDB)
     warnings.filterwarnings('ignore')
     ops(['srel=srel(data)', 'dma50Srel=dma50(srel)'])
     ops(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'])
     ops(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'])
     ops(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
-    blockDays = int(gEnts.nxtDateIndex/5)
+    blockDays = int(entDB.nxtDateIndex/5)
     ops(['blockNRoll1095=block{}(roll1095)'.format(blockDays)])
     warnings.filterwarnings('default')
 
 
-def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
+def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1, entDB=None):
     """
     Print data generated by processing the loaded data, wrt the specified entities,
     to the user.
@@ -598,6 +615,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
     numEntries if greater than 0, will limit the number of entities that are shown
     in the comparitive print wrt each processed data type.
     """
+    entDB = _entDB(entDB)
     dataSrcs = [
             ['srel', 'srelMetaLabel'],
             ['absRet', 'roabsMetaLabel'],
@@ -606,12 +624,12 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             ['roll1825', 'roll1825MetaLabel'],
             ]
     for entCode in entCodes:
-        entIndex = gEnts.meta['codeD'][entCode]
-        print("Name:", gEnts.meta['name'][entIndex])
+        entIndex = entDB.meta['codeD'][entCode]
+        print("Name:", entDB.meta['name'][entIndex])
         for dataSrc in dataSrcs:
-            print("\t{:16}: {}".format(dataSrc[0], gEnts.data[dataSrc[1]][entIndex]))
+            print("\t{:16}: {}".format(dataSrc[0], entDB.data[dataSrc[1]][entIndex]))
 
-    dateDuration = gEnts.nxtDateIndex/365
+    dateDuration = entDB.nxtDateIndex/365
     if dateDuration > 1.5:
         dateDuration = 1.5
     print("INFO:dateDuration:", dateDuration)
@@ -644,13 +662,13 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             dataSrcMetaData = dataSrc[1].replace('Label','Data')
         entCount = 0
         for entCode in entCodes:
-            entIndex = gEnts.meta['codeD'][entCode]
-            entName = gEnts.meta['name'][entIndex][:24]
+            entIndex = entDB.meta['codeD'][entCode]
+            entName = entDB.meta['name'][entIndex][:24]
             if dataSrc[0].startswith('roll'):
-                x.append(gEnts.data[dataSrcMetaData][entIndex,0])
-                y.append(gEnts.data[dataSrcMetaData][entIndex,1])
+                x.append(entDB.data[dataSrcMetaData][entIndex,0])
+                y.append(entDB.data[dataSrcMetaData][entIndex,1])
                 c.append(entCode)
-            print("\t{}:{:24}: {}".format(entCode, entName, gEnts.data[dataSrc[1]][entIndex]))
+            print("\t{}:{:24}: {}".format(entCode, entName, entDB.data[dataSrc[1]][entIndex]))
             entCount += 1
             if (numEntries > 0) and (entCount > numEntries):
                 break
@@ -665,7 +683,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
             input("Press any key to continue...")
 
 
-def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=20):
+def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=20, entDB=None):
     """
     Print data generated by processing the loaded data, wrt the specified entities,
     to the user, so that they can compare data across the entities.
@@ -693,9 +711,10 @@ def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=
     numEntries if greater than 0, will limit the number of entities that are shown
     in the comparitive print wrt each processed data type.
     """
+    entDB = _entDB(entDB)
     entCodes = []
     if (len(entTypeTmpls) == 0) and (len(entNameTmpls) == 0):
-        entCodes = list(gEnts.meta['codeD'].keys())
+        entCodes = list(entDB.meta['codeD'].keys())
     elif (len(entTypeTmpls) == 0):
         if len(entNameTmpls) > 0:
             fm,pm = search_data(entNameTmpls);
@@ -704,7 +723,7 @@ def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=
             entCodesMore = []
         entCodes = entCodes + entCodesMore
     else:
-        entCodes = enttypes.members(gEnts, entTypeTmpls, entNameTmpls)
+        entCodes = enttypes.members(entDB, entTypeTmpls, entNameTmpls)
     infoset1_result_entcodes(entCodes, bPrompt, numEntries)
 
 
