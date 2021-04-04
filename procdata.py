@@ -702,13 +702,8 @@ def infoset1_result(entTypeTmpls=[], entNameTmpls=[], bPrompt=False, numEntries=
     entCodes = []
     if (len(entTypeTmpls) == 0) and (len(entNameTmpls) == 0):
         entCodes = list(entDB.meta['codeD'].keys())
-    elif (len(entTypeTmpls) == 0):
-        if len(entNameTmpls) > 0:
-            fm,pm = search_data(entNameTmpls) # TODO this call requires to be fixed
-            entCodesMore = [ x[0] for x in fm ]
-        else:
-            entCodesMore = []
-        entCodes = entCodes + entCodesMore
+    elif (len(entTypeTmpls) == 0) and (len(entNameTmpls) > 0):
+        entCodes = enttypes._members(entDB, [ '-RE-.*'], entNameTmpls)
     else:
         entCodes = enttypes._members(entDB, entTypeTmpls, entNameTmpls)
     infoset1_result_entcodes(entCodes, bPrompt, numEntries, entDB=entDB)
