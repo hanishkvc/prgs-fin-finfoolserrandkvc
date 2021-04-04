@@ -5,18 +5,30 @@
 import matplotlib.pyplot as plt
 
 
-def data(dataSrcs, entCodes, startDate=-1, endDate=-1):
+gEntDB = None
+def _entDB(entDB=None):
     """
-    Plot specified datas for the specified MFs, over the specified date range.
+    Either use the passed entDB or else the gEntDB, which might
+    have been set by the user previously.
+    """
+    if entDB == None:
+        return gEntDB
+    return entDB
 
-    dataSrcs: Is a key or a list of keys used to retreive the data from gEnts.data.
+
+def data(dataSrcs, entCodes, startDate=-1, endDate=-1, entDB=None):
+    """
+    Plot specified datas for the specified entities from entDB, over the specified
+    date range.
+
+    dataSrcs: Is a key or a list of keys used to retreive the data from entDB.data.
     entCodes: Is a entCode or a list of entCodes.
     startDate and endDate: specify the date range over which the data should be
         retreived and plotted.
 
-    Remember to call plt.plot or show_plot, when you want to see the plots,
-    accumulated till that time.
+    Remember to call show func, when you want to see plots, accumulated till then.
     """
+    entDB = _entDB(entDB)
     startDateIndex, endDateIndex = _date2index(startDate, endDate)
     if type(dataSrcs) == str:
         dataSrcs = [ dataSrcs ]
@@ -27,19 +39,19 @@ def data(dataSrcs, entCodes, startDate=-1, endDate=-1):
         print("DBUG:plot_data:{}".format(dataSrc))
         dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
         for entCode in entCodes:
-            index = gEnts.meta['codeD'][entCode]
-            name = gEnts.meta['name'][index][:giLabelNameChopLen]
+            index = entDB.meta['codeD'][entCode]
+            name = entDB.meta['name'][index][:giLabelNameChopLen]
             try:
-                dataLabel = gEnts.data[dataSrcMetaLabel][index]
+                dataLabel = entDB.data[dataSrcMetaLabel][index]
             except:
                 dataLabel = ""
             label = "{}:{:{width}}: {}".format(entCode, name, dataLabel, width=giLabelNameChopLen)
             print("\t{}:{}".format(label, index))
             label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataSrc, dataLabel, width=giLabelNameChopLen)
-            plt.plot(gEnts.data[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
+            plt.plot(entDB.data[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def _show():
+def _show(entDB):
     """
     Show the data plotted till now.
     """
@@ -49,7 +61,7 @@ def _show():
         line.set_linewidth(8)
     plt.grid(True)
     startDateIndex, endDateIndex = _date2index(-1,-1)
-    curDates = gEnts.dates[startDateIndex:endDateIndex+1]
+    curDates = entDB.dates[startDateIndex:endDateIndex+1]
     numX = len(curDates)
     xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
     xTicks[-1] -= 1
@@ -58,10 +70,11 @@ def _show():
     plt.show()
 
 
-def show():
+def show(entDB=None):
     """
     Show the data plotted till now.
     """
-    _show_plot()
+    entDB = _entDB(entDB)
+    _show(entDB)
 
 
