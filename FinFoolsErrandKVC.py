@@ -29,17 +29,17 @@ Usage scenario
     fetch_data(2010, 202103)
     load_data(2013, 20190105)
     # explore option 1
-    procdata.gEntDB = gEnts
+    procdata.gEntDB = gEntDB
     procdata.infoset1_prep()
     procdata.infoset1_result(['open elss'], ['direct'])
     procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
     # explore option 2
-    procdata.gEntDB = gEnts
+    procdata.gEntDB = gEntDB
     procdata.ops(['srel=srel(data)', 'roll3Y=roll1095(data)'])
     search_data(['match name tokens1', 'match name tokens2'])
     procdata.anal_simple('srel', 'srel_retpa', 'top')
     procdata.anal_simple('roll3Y', 'roll_avg', 'top')
-    plot.gEntDB = gEnts
+    plot.gEntDB = gEntDB
     plot.data('srel', [ entCode1, entCode2 ])
     plot.show()
     quit()
@@ -68,7 +68,7 @@ giLabelNameChopLen = 36
 
 
 gCal = calendar.Calendar()
-gEnts = None
+gEntDB = None
 gDataKeys = ['data']
 gDS = []
 
@@ -85,14 +85,14 @@ def setup_paths():
 
 def setup_gdata(startDate=-1, endDate=-1):
     """
-    Initialise the gEnts
+    Initialise the gEntDB
 
     NumOfRows (corresponding to MFs) is set to a fixed value.
     NumOfCols (corresponding to Dates) is set based on date range.
     """
-    global gEnts
+    global gEntDB
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
-    gEnts = entities.Entities(gDataKeys, 8192*4, numDates)
+    gEntDB = entities.EntitiesDB(gDataKeys, 8192*4, numDates)
 
 
 def setup_modules():
@@ -259,10 +259,10 @@ def load4date(y, m, d, opts):
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
-    gEnts.add_date(hlpr.dateint(y,m,d))
+    gEntDB.add_date(hlpr.dateint(y,m,d))
     for ds in gDS:
         if 'load4date' in dir(ds):
-            ds.load4date(y, m, d, gEnts, opts)
+            ds.load4date(y, m, d, gEntDB, opts)
 
 
 def load4daterange(startDate, endDate, opts=None):
@@ -293,7 +293,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
 
-    bClearData if set, resets the gEnts by calling setup_gdata.
+    bClearData if set, resets the gEntDB by calling setup_gdata.
 
     loadFiltersName: User can optionally specify a previously defined loadFiltersName, in
     which case the whiteListEntTypes/whiteListEntNames/blackListEntNames, used by underlying
@@ -321,7 +321,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     loadfilters.activate(loadFiltersName)
     load4daterange(startDate, endDate, opts)
     if bOptimizeSize:
-        gEnts.optimise_size(gDataKeys)
+        gEntDB.optimise_size(gDataKeys)
     for ds in gDS:
         if len(ds.listNoDataDates) > 0:
             print("WARN:LoadData:{}:Data missing for {}".format(ds.tag, ds.listNoDataDates))
@@ -335,12 +335,12 @@ def _fillin4holidays(entIndex=-1):
     """
     for key in gDataKeys:
         lastData = -1
-        for c in range(gEnts.nxtDateIndex):
-            if gEnts.data[key][entIndex,c] == 0:
+        for c in range(gEntDB.nxtDateIndex):
+            if gEntDB.data[key][entIndex,c] == 0:
                 if lastData > 0:
-                    gEnts.data[key][entIndex,c] = lastData
+                    gEntDB.data[key][entIndex,c] = lastData
             else:
-                lastData = gEnts.data[key][entIndex,c]
+                lastData = gEntDB.data[key][entIndex,c]
 
 
 def fillin4holidays():
@@ -348,7 +348,7 @@ def fillin4holidays():
     As there may not be any data for holidays including weekends,
     so fill them with the data from the prev working day for the corresponding entity.
     """
-    for r in range(gEnts.nxtEntIndex):
+    for r in range(gEntDB.nxtEntIndex):
         _fillin4holidays(r)
 
 
@@ -382,14 +382,14 @@ def findmatchingmf(entNameTmpl, fullMatch=False, partialTokens=False, ignoreCase
 
     NOTE: look at help of _findmatching for the search/matching behaviour.
     """
-    fm, pm = _findmatching(entNameTmpl, gEnts.meta['name'], fullMatch, partialTokens, ignoreCase)
+    fm, pm = _findmatching(entNameTmpl, gEntDB.meta['name'], fullMatch, partialTokens, ignoreCase)
     #breakpoint()
     fmNew = []
     for curName, curIndex in fm:
-        fmNew.append([gEnts.meta['codeL'][curIndex], curName, curIndex])
+        fmNew.append([gEntDB.meta['codeL'][curIndex], curName, curIndex])
     pmNew = []
     for curName, curIndex in pm:
-        pmNew.append([gEnts.meta['codeL'][curIndex], curName, curIndex])
+        pmNew.append([gEntDB.meta['codeL'][curIndex], curName, curIndex])
     return fmNew, pmNew
 
 
@@ -425,21 +425,21 @@ def search_data(findNameTmpls, bFullMatch=False, bPartialTokens=False, bIgnoreCa
 
 def session_save(sessionName):
     """
-    Save current gEnts.data-gEnts.meta into a pickle, so that it can be restored fast later.
+    Save current gEntDB.data-gEntDB.meta into a pickle, so that it can be restored fast later.
     """
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    hlpr.save_pickle(fName, gEnts, None, "Main:SessionSave")
+    hlpr.save_pickle(fName, gEntDB, None, "Main:SessionSave")
 
 
 def session_restore(sessionName):
     """
-    Restore a previously saved gEnts.data-gEnts.meta fast from a pickle.
+    Restore a previously saved gEntDB.data-gEntDB.meta fast from a pickle.
     Also setup the modules used by the main logic.
     """
-    global gEnts
+    global gEntDB
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    ok, gEnts, tIgnore = hlpr.load_pickle(fName)
-    enttypes.init(gEnts)
+    ok, gEntDB, tIgnore = hlpr.load_pickle(fName)
+    enttypes.init(gEntDB)
     setup_modules()
 
 

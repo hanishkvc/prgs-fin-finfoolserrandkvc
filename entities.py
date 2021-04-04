@@ -14,7 +14,7 @@ import enttypes
 
 
 
-class Entities:
+class EntitiesDB:
 
 
     def _init_types(self):
