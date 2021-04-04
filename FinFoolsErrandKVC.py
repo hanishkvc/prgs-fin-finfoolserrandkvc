@@ -263,11 +263,13 @@ def load4date(y, m, d, opts):
     you will have to call fillin4holidays explicitly.
     """
     gEntDB.add_date(hlpr.dateint(y,m,d))
+    dataSrcTypeReqd = opts['dataSrcType']
     for ds in gDS:
-        dataSrcTypeReqd = opts['dataSrcType']
         if dataSrcTypeReqd != ds.dataSrcType:
             if dataSrcTypeReqd != datasrc.DSType.Any:
+                #print("WARN:Load4Date:ReqdDSType[{}], so skipping [{}:{}]...".format(dataSrcTypeReqd, ds.tag, ds.dataSrcType))
                 continue
+        #print("INFO:Load4Date:ReqdDSType[{}], Loading [{}:{}]...".format(dataSrcTypeReqd, ds.tag, ds.dataSrcType))
         loadFiltersName = opts['loadFiltersName']
         if loadFiltersName == LOADFILTERSNAME_AUTO:
             loadFiltersName = ds.tag
@@ -299,7 +301,7 @@ def load4daterange(startDate, endDate, opts=None):
 
 
 def load_data(startDate, endDate = None, dataSrcType=datasrc.DSType.Any,
-        bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts={'LoadLocalOnly': True}):
+        bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts=None):
     """
     Load data for given date range.
 
@@ -336,6 +338,10 @@ def load_data(startDate, endDate = None, dataSrcType=datasrc.DSType.Any,
         setup_gentdb(startDate, endDate)
     for ds in gDS:
         ds.listNoDataDates = []
+    if opts == None:
+        opts = {}
+    if 'LoadLocalOnly' not in opts:
+        opts['LoadLocalOnly'] = True
     if 'loadFiltersName' not in opts:
         opts['loadFiltersName'] = loadFiltersName
     if 'dataSrcType' not in opts:
