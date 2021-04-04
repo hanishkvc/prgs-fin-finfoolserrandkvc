@@ -21,7 +21,7 @@ import entities
 import loadfilters
 
 
-def datadst_metakeys(dataDst):
+def data_metakeys(dataDst):
     """
     Returns the Meta Keys related to given dataDst key.
 
@@ -41,7 +41,7 @@ def update_metas(op, dataSrc, dataDst):
 
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
-def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
+def ops(opsList, startDate=-1, endDate=-1, bDebug=False):
     """
     Allow data from any valid data key in gEnts.data to be operated on and the results to be saved
     into a destination data key in gEnts.data.
@@ -124,11 +124,11 @@ def procdata_ex(opsList, startDate=-1, endDate=-1, bDebug=False):
         dataSrc = dataSrc[:-1]
         if dataDst == '':
             dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
-        print("DBUG:procdata_ex:op[{}]:dst[{}]".format(curOpFull, dataDst))
+        print("DBUG:ops:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = gEnts.data[dataSrc].copy()
-        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
-        dataDstMetaData, dataDstMetaLabel = datadst_metakeys(dataDst)
+        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
+        dataDstMetaData, dataDstMetaLabel = data_metakeys(dataDst)
         gEnts.data[dataDstMetaLabel] = []
         #### Op specific things to do before getting into individual records
         if op == 'srel':
@@ -315,10 +315,10 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
         dataSrcs = [ dataSrcs ]
     if type(entCodes) == int:
         entCodes = [ entCodes]
-    srelMetaData, srelMetaLabel = datadst_metakeys('srel')
+    srelMetaData, srelMetaLabel = data_metakeys('srel')
     for dataSrc in dataSrcs:
         print("DBUG:plot_data:{}".format(dataSrc))
-        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
+        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
         for entCode in entCodes:
             index = gEnts.meta['codeD'][entCode]
             name = gEnts.meta['name'][index][:giLabelNameChopLen]
@@ -332,7 +332,7 @@ def plot_data(dataSrcs, entCodes, startDate=-1, endDate=-1):
             plt.plot(gEnts.data[dataSrc][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def _procdata_mabeta(dataSrc, refCode, entCodes):
+def _mabeta(dataSrc, refCode, entCodes):
     """
     Get the slope of the entCodes wrt refCode.
     When the passed dataSrc is rollingRet, this is also called MaBeta.
@@ -350,7 +350,7 @@ def _procdata_mabeta(dataSrc, refCode, entCodes):
     return maBeta
 
 
-def procdata_mabeta(dataSrc, refCode, entCodes):
+def mabeta(dataSrc, refCode, entCodes):
     '''
     Calculate a measure of how similar or dissimilar is the change/movement in
     the value of given entities in entCodes list wrt changes in value of the
@@ -362,8 +362,8 @@ def procdata_mabeta(dataSrc, refCode, entCodes):
         the given entity moves more compared to the ref entity.
     Value lower than 0 - Both entities move in dissimilar/oppositive manner.
     '''
-    procdata_ex('roll1Abs=roll1_abs({})'.format(dataSrc))
-    return _procdata_mabeta('roll1Abs', refCode, entCodes)
+    ops('roll1Abs=roll1_abs({})'.format(dataSrc))
+    return _mabeta('roll1Abs', refCode, entCodes)
 
 
 def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
@@ -387,7 +387,7 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal'):
     return data
 
 
-def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEntities=10, entCodes=None,
+def anal_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, numEntities=10, entCodes=None,
                         minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64):
     """
     Find the top/bottom N entities, [wrt the given date or index,]
@@ -403,15 +403,15 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
 
         srel_absret: Look at the Absolute Returns data associated
         with the given dataSrc (which should be generated using
-        srel procdata_ex operation), to decide on entities.
+        srel ops operation), to decide on entities.
 
         srel_retpa: Look at the Returns PerAnnum data associated
         with the given dataSrc (which should be generated using
-        srel procdata_ex operation), to decide on entities.
+        srel ops operation), to decide on entities.
 
         roll_avg: look at Average ReturnsPerAnnum, calculated using
         rolling return (dataSrc specified should be generated using
-        roll procdata_ex operation), to decide on entities ranking.
+        roll ops operation), to decide on entities ranking.
 
         block_ranked: look at the Avgs calculated by block op,
         for each sub date periods, rank them and average over all
@@ -454,7 +454,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
         NOTE: It expects the info about duration for which data is
         available for each entity, to be available under 'srelMetaData'
         key. If this is not the case, it will trigger a generic 'srel'
-        operation through procdata_ex to generate the same.
+        operation through ops to generate the same.
 
             It also means that the check is done wrt overall amount
             of data available for a given entity in the loaded dataset,
@@ -497,7 +497,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif opType.startswith("srel"):
-        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
+        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
         if opType == 'srel_absret':
             theSaneArray = gEnts.data[dataSrcMetaData][:,0].copy()
         elif opType == 'srel_retpa':
@@ -506,7 +506,7 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
             input("ERRR:AnalDataSimple:dataSrc[{}]:{} unknown srel opType, returning...".format(opType))
             return None
     elif opType.startswith("roll"):
-        dataSrcMetaData, dataSrcMetaLabel = datadst_metakeys(dataSrc)
+        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
         if opType == 'roll_avg':
             theSaneArray = gEnts.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
@@ -544,10 +544,10 @@ def analdata_simple(dataSrc, op, opType='normal', theDate=None, theIndex=None, n
         dataYearsAvailable = gEnts.nxtDateIndex/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
             print("WARN:AnalDataSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(op, dataYearsAvailable, minEntityLifeDataInYears))
-        srelMetaData, srelMetaLabel = datadst_metakeys('srel')
+        srelMetaData, srelMetaLabel = data_metakeys('srel')
         theSRelMetaData = gEnts.data.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
-            procdata_ex('srel=srel(data)')
+            ops('srel=srel(data)')
         if bDebug:
             tNames = numpy.array(gEnts.meta['name'])
             tDroppedNames = tNames[gEnts.data[srelMetaData][:,2] < minEntityLifeDataInYears]
@@ -608,12 +608,12 @@ def infoset1_prep():
     potentially useful info, on the loaded data,
     """
     warnings.filterwarnings('ignore')
-    procdata_ex(['srel=srel(data)', 'dma50Srel=dma50(srel)'])
-    procdata_ex(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'])
-    procdata_ex(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'])
-    procdata_ex(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
+    ops(['srel=srel(data)', 'dma50Srel=dma50(srel)'])
+    ops(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'])
+    ops(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'])
+    ops(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'])
     blockDays = int(gEnts.nxtDateIndex/5)
-    procdata_ex(['blockNRoll1095=block{}(roll1095)'.format(blockDays)])
+    ops(['blockNRoll1095=block{}(roll1095)'.format(blockDays)])
     warnings.filterwarnings('default')
 
 
@@ -649,17 +649,17 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1):
     if dateDuration > 1.5:
         dateDuration = 1.5
     print("INFO:dateDuration:", dateDuration)
-    analR1095 = analdata_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration)
+    analR1095 = anal_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration)
     analR1095EntCodes = [ x[0] for x in analR1095 ]
     s1 = set(entCodes)
     s2 = set(analR1095EntCodes)
     otherEntCodes = s1-s2
-    analSRelRPA = analdata_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minEntityLifeDataInYears=dateDuration)
+    analSRelRPA = anal_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minEntityLifeDataInYears=dateDuration)
     analSRelRPAEntCodes = [ x[0] for x in analSRelRPA ]
     s3 = set(analSRelRPAEntCodes)
     entCodes = analR1095EntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))
 
-    analdata_simple('blockNRoll1095', 'top', 'block_ranked', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration)
+    anal_simple('blockNRoll1095', 'top', 'block_ranked', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration)
 
     totalEntries = len(entCodes)
     if numEntries > totalEntries:
