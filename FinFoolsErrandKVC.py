@@ -20,6 +20,8 @@ import enttypes
 import indexes
 import entities
 import loadfilters
+import procdata
+import plot
 
 
 """
@@ -27,16 +29,19 @@ Usage scenario
     fetch_data(2010, 202103)
     load_data(2013, 20190105)
     # explore option 1
-    infoset1_prep()
-    infoset1_result(['open elss'], ['direct'])
-    infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
+    procdata.gEntDB = gEnts
+    procdata.infoset1_prep()
+    procdata.infoset1_result(['open elss'], ['direct'])
+    procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
     # explore option 2
-    procdata_ex(['srel=srel(data)', 'roll3Y=roll1095(data)'])
+    procdata.gEntDB = gEnts
+    procdata.ops(['srel=srel(data)', 'roll3Y=roll1095(data)'])
     search_data(['match name tokens1', 'match name tokens2'])
-    analdata_simple('srel', 'top', 'srel_retpa')
-    analdata_simple('roll3Y', 'top', 'roll_avg')
-    plot_data('srel', [ entCode1, entCode2 ])
-    show_plot()
+    procdata.anal_simple('srel', 'srel_retpa', 'top')
+    procdata.anal_simple('roll3Y', 'roll_avg', 'top')
+    plot.gEntDB = gEnts
+    plot.data('srel', [ entCode1, entCode2 ])
+    plot.show()
     quit()
 """
 

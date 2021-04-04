@@ -629,17 +629,17 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1, entDB=None)
     if dateDuration > 1.5:
         dateDuration = 1.5
     print("INFO:dateDuration:", dateDuration)
-    analR1095 = anal_simple('roll1095', 'top', 'roll_avg', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    analR1095 = anal_simple('roll1095', 'roll_avg', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
     analR1095EntCodes = [ x[0] for x in analR1095 ]
     s1 = set(entCodes)
     s2 = set(analR1095EntCodes)
     otherEntCodes = s1-s2
-    analSRelRPA = anal_simple('srel', 'top', 'srel_retpa', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    analSRelRPA = anal_simple('srel', 'srel_retpa', 'top', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
     analSRelRPAEntCodes = [ x[0] for x in analSRelRPA ]
     s3 = set(analSRelRPAEntCodes)
     entCodes = analR1095EntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))
 
-    anal_simple('blockNRoll1095', 'top', 'block_ranked', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    anal_simple('blockNRoll1095', 'block_ranked', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
 
     totalEntries = len(entCodes)
     if numEntries > totalEntries:
