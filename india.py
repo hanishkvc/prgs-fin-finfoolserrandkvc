@@ -137,7 +137,7 @@ class IndiaSTKDS(datasrc.DataSrc):
 
     def _get_parts(self, fName):
         date = time.strptime(fName[-12:-4], "%Y%m%d")
-        csvFile = time.strftime("Pr%d%m%y.csv", date)
+        csvFile = time.strftime("Pd%d%m%y.csv", date)
         #print("DBUG:{}:GetParts:{},{}".format(self.tag, csvFile, date))
         return csvFile, date
 
@@ -149,7 +149,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         l = f.readline()
         l = l.decode()
         f.close()
-        if not l.startswith("MKT,SECURITY"):
+        if not l.startswith("MKT,SERIES,SYMBOL,SECURITY"):
             return False
         return True
 
@@ -173,14 +173,18 @@ class IndiaSTKDS(datasrc.DataSrc):
                 continue
             try:
                 curType = la[0]
+                series = la[1]
+                code = la[2]
+                name = la[3]
                 if curType.lower() == 'y':
                     curType = 'Index'
+                    code = name
                 else:
                     curType = 'Stock'
-                code = la[1]
-                name = la[1]
+                    if series.lower() != 'eq':
+                        continue
                 try:
-                    val  = float(la[6])
+                    val  = float(la[8])
                 except:
                     val = 0
                 date = hlpr.dateint(dateT.tm_year,dateT.tm_mon,dateT.tm_mday)
