@@ -2,6 +2,7 @@
 # HanishKVC, 2021
 # GPL
 
+import numpy
 import matplotlib.pyplot as plt
 
 
@@ -34,10 +35,9 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
         dataKeys = [ dataKeys ]
     if type(entCodes) == int:
         entCodes = [ entCodes]
-    srelMetaData, srelMetaLabel = data_metakeys('srel')
     for dataKey in dataKeys:
         print("DBUG:plot_data:{}".format(dataKey))
-        dataKeyMetaData, dataKeyMetaLabel = data_metakeys(dataKey)
+        dataKeyMetaData, dataKeyMetaLabel = hlpr.data_metakeys(dataKey)
         for entCode in entCodes:
             index = entDB.meta['codeD'][entCode]
             name = entDB.meta['name'][index][:giLabelNameChopLen]

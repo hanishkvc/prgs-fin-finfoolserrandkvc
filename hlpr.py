@@ -289,3 +289,17 @@ def array_str(arr, width=5, precision=2):
     return strA
 
 
+def data_metakeys(dataDst):
+    """
+    Returns the possible Meta Keys related to given data key.
+
+    MetaData: This key points to raw meta data wrt each entity, which can be
+        processed further for comparing with other entities etc.
+    MetaLabel: This key points to processed label/summary info wrt each entity.
+        This is useful for labeling plots etc.
+    """
+    dataKey="{}MetaData".format(dataDst)
+    labelKey="{}MetaLabel".format(dataDst)
+    return dataKey, labelKey
+
+

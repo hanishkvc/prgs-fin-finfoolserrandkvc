@@ -33,20 +33,6 @@ def _entDB(entDB=None):
     return entDB
 
 
-def data_metakeys(dataDst):
-    """
-    Returns the Meta Keys related to given dataDst key.
-
-    MetaData: This key points to raw meta data wrt each MF, which can be
-        processed further for comparing with other MFs etc.
-    MetaLabel: This key points to processed label/summary info wrt each MF.
-        This is useful for labeling plots etc.
-    """
-    dataKey="{}MetaData".format(dataDst)
-    labelKey="{}MetaLabel".format(dataDst)
-    return dataKey, labelKey
-
-
 def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
@@ -140,8 +126,8 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
         print("DBUG:ops:op[{}]:dst[{}]".format(curOpFull, dataDst))
         #dataLen = endDateIndex - startDateIndex + 1
         tResult = entDB.data[dataSrc].copy()
-        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
-        dataDstMetaData, dataDstMetaLabel = data_metakeys(dataDst)
+        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
+        dataDstMetaData, dataDstMetaLabel = hlpr.data_metakeys(dataDst)
         entDB.data[dataDstMetaLabel] = []
         #### Op specific things to do before getting into individual records
         if op == 'srel':
@@ -480,7 +466,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif analType.startswith("srel"):
-        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
+        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         if analType == 'srel_absret':
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
         elif analType == 'srel_retpa':
@@ -489,7 +475,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             input("ERRR:AnalSimple:dataSrc[{}]:{} unknown srel analType, returning...".format(analType))
             return None
     elif analType.startswith("roll"):
-        dataSrcMetaData, dataSrcMetaLabel = data_metakeys(dataSrc)
+        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         if analType == 'roll_avg':
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
@@ -527,7 +513,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         dataYearsAvailable = entDB.nxtDateIndex/365
         if (dataYearsAvailable < minEntityLifeDataInYears):
             print("WARN:AnalSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(order, dataYearsAvailable, minEntityLifeDataInYears))
-        srelMetaData, srelMetaLabel = data_metakeys('srel')
+        srelMetaData, srelMetaLabel = hlpr.data_metakeys('srel')
         theSRelMetaData = entDB.data.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
             ops('srel=srel(data)')
