@@ -83,7 +83,12 @@ def setup_paths():
     print("INFO:Main:setup_paths:", FINFOOLSERRAND_BASE)
 
 
-def setup_gdata(startDate=-1, endDate=-1):
+def modules_sync_gentdb(entDB):
+    procdata.gEntDB = entDB
+    plot.gEntDB = entDB
+
+
+def setup_gentdb(startDate=-1, endDate=-1):
     """
     Initialise the gEntDB
 
@@ -93,6 +98,7 @@ def setup_gdata(startDate=-1, endDate=-1):
     global gEntDB
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
     gEntDB = entities.EntitiesDB(gDataKeys, 8192*4, numDates)
+    modules_sync_gentdb(gEntDB)
 
 
 def setup_modules():
@@ -101,7 +107,7 @@ def setup_modules():
 
 
 def setup():
-    setup_gdata()
+    setup_gentdb()
     setup_paths()
     setup_modules()
     loadfilters.copy("indiamf", "default")
@@ -293,7 +299,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
 
-    bClearData if set, resets the gEntDB by calling setup_gdata.
+    bClearData if set, resets the gEntDB by calling setup_gentdb.
 
     loadFiltersName: User can optionally specify a previously defined loadFiltersName, in
     which case the whiteListEntTypes/whiteListEntNames/blackListEntNames, used by underlying
@@ -315,7 +321,7 @@ def load_data(startDate, endDate = None, bClearData=True, bOptimizeSize=True, lo
     if endDate == None:
         endDate = startDate
     if bClearData:
-        setup_gdata(startDate, endDate)
+        setup_gentdb(startDate, endDate)
     for ds in gDS:
         ds.listNoDataDates = []
     loadfilters.activate(loadFiltersName)
@@ -440,7 +446,7 @@ def session_restore(sessionName):
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     ok, gEntDB, tIgnore = hlpr.load_pickle(fName)
     enttypes.init(gEntDB)
-    setup_modules()
+    modules_sync_gentdb(gEntDB)
 
 
 def input_multi(prompt="OO>", altPrompt="...", theFile=None):
