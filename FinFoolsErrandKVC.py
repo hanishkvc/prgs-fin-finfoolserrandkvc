@@ -15,6 +15,7 @@ import readline
 import warnings
 import tabcomplete as tc
 import hlpr
+import datasrc
 import india
 import enttypes
 import indexes
@@ -265,7 +266,7 @@ def load4date(y, m, d, opts):
     for ds in gDS:
         dataSrcTypeReqd = opts['dataSrcType']
         if dataSrcTypeReqd != ds.dataSrcType:
-            if dataSrcTypeReqd != datasrc.DataSrcType.Any:
+            if dataSrcTypeReqd != datasrc.DSType.Any:
                 continue
         loadFiltersName = opts['loadFiltersName']
         if loadFiltersName == LOADFILTERSNAME_AUTO:
@@ -297,13 +298,14 @@ def load4daterange(startDate, endDate, opts=None):
     fillin4holidays()
 
 
-def load_data(startDate, endDate = None, dataSrcType=DataSrcType.Any, bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts={'LoadLocalOnly': True}):
+def load_data(startDate, endDate = None, dataSrcType=datasrc.DSType.Any,
+        bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts={'LoadLocalOnly': True}):
     """
     Load data for given date range.
 
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
 
-    dataSrcType: Could be Any, MF or Stock
+    dataSrcType: Could be datasrc.DSType.Any|DSType.MF|DSType.Stock
         Any  : then both stock or MF data sources are loaded.
         MF   : Only MF related data sources are loaded.
         Stock: Only Stock related data sources are loaded.
