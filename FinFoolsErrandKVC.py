@@ -81,6 +81,10 @@ def setup_paths():
 
 
 def modules_sync_gentdb(entDB):
+    """
+    Setup the helper modules' gEntDB
+    """
+    enttypes.gEntDB = entDB
     procdata.gEntDB = entDB
     plot.gEntDB = entDB
 
