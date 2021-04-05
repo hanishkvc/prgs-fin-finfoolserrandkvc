@@ -121,7 +121,9 @@ class EntitiesDB:
         Add a entity to the entities db, if required, and return its index.
 
         NOTE: entName and entTypeId required only if a new entity is being added,
-              else if one is trying to get the entIndex, these are ignored.
+              else if one is trying to get the entIndex, these can be ignored.
+              However if name is passed, for a entity already in DB, the same
+              will be updated in the DB.
         """
         entIndex = self.meta['codeD'].get(entCode, -1)
         if entIndex == -1:
@@ -132,6 +134,9 @@ class EntitiesDB:
             self.meta['codeD'][entCode] = entIndex
             self.meta['typeId'][entIndex] = entTypeId
             self.add_type_member(entTypeId, entCode)
+        else:
+            if entName != None:
+                self.meta['name'][entIndex] = entName
         return entIndex
 
 
