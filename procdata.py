@@ -266,7 +266,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         trStd = numpy.nan
                         trMaSharpeMinT = numpy.nan
                     entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
-                    label = "{:5.2f} {:5.2f} {} {:5.2f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT)
+                    label = "{:7.2f} {:7.2f} {} {:7.2f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT)
                     entDB.data[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
                     # Calc the Avgs
@@ -655,7 +655,7 @@ def infoset1_result_entcodes(entCodes, bPrompt=False, numEntries=-1, entDB=None)
         elif dataSrc[0] == 'srel':
             print("\t{:16}:{:24}:   AbsRet     RetPA   DurYrs : startVal  -  endVal".format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print("\t{:16}:{:24}:   Avg   Std [ <{}% ] MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
+            print("\t{:16}:{:24}:     Avg     Std [ <{}% ]   MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
             x = []
             y = []
             c = []
