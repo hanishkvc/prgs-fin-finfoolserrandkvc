@@ -18,8 +18,8 @@ import entities
 
 
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
-gHistoricGaps = numpy.array([1, 5, 30, 92, 183, 365, 1095, 1825, 3650])
-gHistoricGapsHdr = numpy.array(["1D", "5D", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
+gHistoricGaps = numpy.array([1, 7, 30, 92, 183, 365, 1095, 1825, 3650])
+gHistoricGapsHdr = numpy.array(["1D", "7D", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
 
 
 gEntDB = None
@@ -213,7 +213,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         tResult[r,:] = ((retonData/entDB.data[dataSrc][r,:])-1)*100
                     else:
                         tResult[r,:] = (((retonData/entDB.data[dataSrc][r,:])**(365/histDays))-1)*100
-                    entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-validHistoric]
+                    entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("dma"):
                     days = int(op[3:])
