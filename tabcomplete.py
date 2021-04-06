@@ -6,7 +6,7 @@ import readline
 
 
 gMeta = None
-L1 = [ "load_data", "fetch_data", "search_data",
+L1 = [ "load_data", "fetch_data", "search_data", "load_data_mfs", "load_data_stocks",
         "enttypes.list", "enttypes.members",
         "procdata.ops", "procdata.mabeta", "procdata.anal_simple",
         "plot.data", "plot.show",

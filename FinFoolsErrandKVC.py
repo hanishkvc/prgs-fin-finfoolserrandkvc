@@ -354,6 +354,15 @@ def load_data(startDate, endDate = None, dataSrcType=datasrc.DSType.Any,
             print("WARN:LoadData:{}:Data missing for {}".format(ds.tag, ds.listNoDataDates))
 
 
+def load_data_mfs(startDate, endDate = None, dataSrcType=datasrc.DSType.MF,
+        bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts=None):
+    load_data(startDate, endDate, dataSrcType, bClearData, bOptimizeSize, loadFiltersName, opts)
+
+
+def load_data_stocks(startDate, endDate = None, dataSrcType=datasrc.DSType.Stock,
+        bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts=None):
+    load_data(startDate, endDate, dataSrcType, bClearData, bOptimizeSize, loadFiltersName, opts)
+
 
 def _fillin4holidays(entIndex=-1):
     """
