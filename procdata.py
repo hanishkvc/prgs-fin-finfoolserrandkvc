@@ -543,7 +543,8 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             for index in oldEntities:
                 print("DBUG:AnalSimple:{}:IgnoringOldEntity:{}, {}".format(theAnal, entDB.meta['name'][index], entDB.meta['lastSeen'][index]))
         theSaneArray[oldEntities] = iSkip
-    theRows=numpy.argsort(theSaneArray)[-numEntities:]
+    #theRows=numpy.argsort(theSaneArray)[-numEntities:]
+    theRows=numpy.argsort(theSaneArray)
     rowsLen = len(theRows)
     if numEntities > rowsLen:
         print("WARN:AnalSimple:{}:RankContenders[{}] < numEntities[{}] requested, adjusting".format(theAnal, rowsLen, numEntities))
