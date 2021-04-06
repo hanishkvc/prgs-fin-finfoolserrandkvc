@@ -8,6 +8,7 @@ import hlpr
 
 
 giLabelNameChopLen = 36
+giLabelCodeChopLen = 16
 
 
 gEntDB = None
@@ -49,9 +50,9 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
                 dataLabel = entDB.data[dataKeyMetaLabel][index]
             except:
                 dataLabel = ""
-            label = "{}:{:{width}}: {}".format(entCode, name, dataLabel, width=giLabelNameChopLen)
+            label = "{:{cwidth}}:{:{width}}: {}".format(entCode, name, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
             print("\t{}:{}".format(label, index))
-            label = "{}:{:{width}}: {:16} : {}".format(entCode, name, dataKey, dataLabel, width=giLabelNameChopLen)
+            label = "{:{cwidth}}:{:{width}}: {:16} : {}".format(entCode, name, dataKey, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
             plt.plot(entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
 
 
