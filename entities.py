@@ -195,5 +195,6 @@ class EntitiesDB:
             self.data[dataKey] = self.data[dataKey][:self.nxtEntIndex,:self.nxtDateIndex]
         for key in [ 'firstSeen', 'lastSeen', 'name', 'codeL', 'typeId' ]:
             self.meta[key] = self.meta[key][:self.nxtEntIndex]
+        self.dates = self.dates[:self.nxtDateIndex]
 
 
