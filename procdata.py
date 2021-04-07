@@ -355,6 +355,7 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal', entD
     return data
 
 
+gAnalSimpleBasePrintFormats = [ "{:<16}", "{:40}", "{:8.2f}" ]
 def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=None, numEntities=10, entCodes=None,
                         minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64, entDB=None):
     """
@@ -454,6 +455,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     entDB = _entDB(entDB)
     theAnal = "{}_{}".format(analType, order)
     print("DBUG:AnalSimple:{}:{}".format(theAnal, dataSrc))
+    printFmts = gAnalSimpleBasePrintFormats
     if order == 'top':
         iSkip = -numpy.inf
     else:
@@ -575,13 +577,18 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         curEntry[2] = numpy.round(curEntry[2],2)
         if analType == "roll_avg":
             curEntry[3:] = numpy.round(curEntry[3:],2)
-            extra = ""
         elif analType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
             extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(entDB.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
-        else:
-            extra = ""
-        print("    {} {}".format(extra, curEntry))
+            curEntry.append(extra)
+        #print("    {} {}".format(extra, curEntry))
+        print("\t",end="")
+        for i,pf in enumerate(printFmts):
+            print(pf.format(curEntry[i]), end=" ")
+        rem2Print = curEntry[i+1:]
+        for rp in rem2Print:
+            print(rp, end="")
+        print("")
     return theSelected
 
 
