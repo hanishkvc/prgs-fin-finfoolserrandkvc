@@ -657,14 +657,15 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntries=-1, entDB=None
     totalEntries = len(entCodes)
     if numEntries > totalEntries:
         numEntries = totalEntries
+    printFmt = "\t{:<16}:{:24}:"
     for dataSrc in dataSrcs:
         print("DataSrc:{}: >>showing {} of {} entries<<".format(dataSrc, numEntries, totalEntries))
         if dataSrc[0] in [ 'absRet', 'retPA' ]:
-            print("\t{:16}:{:24}: {}".format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)))
+            print((printFmt+" {}").format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)))
         elif dataSrc[0] == 'srel':
-            print("\t{:16}:{:24}:   AbsRet     RetPA   DurYrs : startVal  -  endVal".format("code", "name"))
+            print((printFmt+"   AbsRet     RetPA   DurYrs : startVal  -  endVal").format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print("\t{:16}:{:24}:     Avg     Std [ <{}% ]   MaShaMT".format("code", "name", gfRollingRetPAMinThreshold))
+            print((printFmt+"     Avg     Std [ <{}% ]   MaShaMT").format("code", "name", gfRollingRetPAMinThreshold))
             x = []
             y = []
             c = []
@@ -677,7 +678,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntries=-1, entDB=None
                 x.append(entDB.data[dataSrcMetaData][entIndex,0])
                 y.append(entDB.data[dataSrcMetaData][entIndex,1])
                 c.append(entCode)
-            print("\t{:16}:{:24}: {}".format(entCode, entName, entDB.data[dataSrc[1]][entIndex]))
+            print((printFmt+" {}").format(entCode, entName, entDB.data[dataSrc[1]][entIndex]))
             entCount += 1
             if (numEntries > 0) and (entCount > numEntries):
                 break
