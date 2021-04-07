@@ -47,6 +47,19 @@ class DataSrc:
     earliestDate = 0
 
 
+    def _load_holidays(self, fPath):
+        self.holidays = set()
+        try:
+            f = open(fPath)
+            for l in f:
+                i = int(l)
+                self.holidays.add(i)
+            f.close()
+            print("INFO:{}:Loaded holiday list {}".format(self.tag, fPath))
+        except:
+            print("INFO:{}:No holiday list".format(self.tag))
+
+
     def __init__(self, basePath, loadFilters, nameCleanupMap):
         """
         Initialise a data source instance.
@@ -72,6 +85,7 @@ class DataSrc:
             self.holiTmpl = os.path.expanduser(os.path.join(basePath, self.holiTmpl))
         print("INFO:{}:holiTmpl:{}".format(self.tag, self.holiTmpl))
         self.listNoDataDates = []
+        self._load_holidays(self.holiTmpl)
 
 
     def _valid_remotefile(self, fName):
@@ -209,6 +223,8 @@ class DataSrc:
             return
         dateInt = hlpr.dateint(y,m,d)
         if dateInt < self.earliestDate:
+            return
+        if dateInt in self.holidays:
             return
         timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
         fName = time.strftime(self.pathTmpl, timeTuple)
