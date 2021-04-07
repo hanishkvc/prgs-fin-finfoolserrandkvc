@@ -495,6 +495,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
+            printFmts.extend(["{:7.2f}", "{:7.2f}", "{:7.2f}"])
     elif analType == "block_ranked":
         metaDataAvgs = "{}Avgs".format(dataSrc)
         tNumEnts, tNumBlocks = entDB.data[metaDataAvgs].shape
@@ -587,7 +588,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             print(pf.format(curEntry[i]), end=" ")
         rem2Print = curEntry[i+1:]
         for rp in rem2Print:
-            print(rp, end="")
+            print(rp, end=" ")
         print("")
     return theSelected
 
