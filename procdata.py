@@ -455,7 +455,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     entDB = _entDB(entDB)
     theAnal = "{}_{}".format(analType, order)
     print("DBUG:AnalSimple:{}:{}".format(theAnal, dataSrc))
-    printFmts = gAnalSimpleBasePrintFormats
+    printFmts = gAnalSimpleBasePrintFormats.copy()
     if order == 'top':
         iSkip = -numpy.inf
     else:
