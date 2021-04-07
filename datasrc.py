@@ -40,6 +40,7 @@ class DataSrc:
 
     urlTmpl = None
     pathTmpl = None
+    holiTmpl = "{}.holidays"
     dataKeys = None
     tag = "DSBase"
     bSkipWeekEnds = False
@@ -57,6 +58,8 @@ class DataSrc:
             DataSrc base class saves the root loadFilters dictionary.
             The child classes can define the loadFilters they prefer.
         nameCleanupMap: will be used to cleanup the entity names.
+        NOTE: Ideally called after child class as setup tag,
+            but before setting dataSrcType.
         """
         self.dataSrcType = DSType.Any
         self.loadFilters = loadFilters
@@ -64,6 +67,10 @@ class DataSrc:
         if (self.pathTmpl != None) and (basePath != None):
             self.pathTmpl = os.path.expanduser(os.path.join(basePath, self.pathTmpl))
         print("INFO:{}:pathTmpl:{}".format(self.tag, self.pathTmpl))
+        self.holiTmpl = self.holiTmpl.format(self.tag)
+        if (self.holiTmpl != None) and (basePath != None):
+            self.holiTmpl = os.path.expanduser(os.path.join(basePath, self.holiTmpl))
+        print("INFO:{}:holiTmpl:{}".format(self.tag, self.holiTmpl))
         self.listNoDataDates = []
 
 
