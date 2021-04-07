@@ -289,6 +289,28 @@ def array_str(arr, width=5, precision=2):
     return strA
 
 
+def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None):
+    """
+    Print a list of formats and corresponding list of data.
+    lFmt is the list of formats to use wrt each element in the data list (lData).
+
+    printInBtw: The string to print inbetween each data element.
+    printPrefix: The string to print if any before the actual data elements.
+        If None, then no prefix is printed.
+    printSufix: The string to print if any after the actual data elements.
+        If None, then no sufix is printed.
+    """
+    if printPrefix != None:
+        print(printPrefix, end="")
+    for i,pf in enumerate(lFmt):
+        print(pf.format(lData[i]), end=printInBtw)
+    rem2Print = lData[i+1:]
+    for rp in rem2Print:
+        print(rp, end=printInBtw)
+    if printSufix != None:
+        print(printSufix)
+
+
 def data_metakeys(dataDst):
     """
     Returns the possible Meta Keys related to given data key.

@@ -583,13 +583,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(entDB.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
             curEntry.append(extra)
         #print("    {} {}".format(extra, curEntry))
-        print("\t",end="")
-        for i,pf in enumerate(printFmts):
-            print(pf.format(curEntry[i]), end=" ")
-        rem2Print = curEntry[i+1:]
-        for rp in rem2Print:
-            print(rp, end=" ")
-        print("")
+        hlpr.printl(printFmts, curEntry, " ", "\t", "")
     return theSelected
 
 
