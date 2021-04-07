@@ -355,7 +355,7 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal', entD
     return data
 
 
-gAnalSimpleBasePrintFormats = [ "{:<16}", "{:40}", "{:8.2f}" ]
+gAnalSimpleBasePrintFormats = [ "{:<16}", "{:40}", {'num':"{:8.2f}",'str':"{:8}"} ]
 def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=None, numEntities=10, entCodes=None,
                         minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64, entDB=None):
     """
@@ -456,12 +456,14 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     theAnal = "{}_{}".format(analType, order)
     print("DBUG:AnalSimple:{}:{}".format(theAnal, dataSrc))
     printFmts = gAnalSimpleBasePrintFormats.copy()
+    printHdr = [ "Code", "Name" ]
     if order == 'top':
         iSkip = -numpy.inf
     else:
         iSkip = numpy.inf
     theSaneArray = None
     if analType == 'normal':
+        printHdr.extend(['Value'])
         if (type(theDate) == type(None)) and (type(theIndex) == type(None)):
             for i in range(-1, -entDB.nxtDateIndex, -1):
                 if bDebug:
@@ -483,8 +485,10 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     elif analType.startswith("srel"):
         dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         if analType == 'srel_absret':
+            printHdr.extend(['AbsRet'])
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
         elif analType == 'srel_retpa':
+            printHdr.extend(['RetPA'])
             theSaneArray = entDB.data[dataSrcMetaData][:,1].copy()
         else:
             input("ERRR:AnalSimple:{}:dataSrc[{}]: unknown srel anal subType, returning...".format(theAnal, dataSrc))
@@ -492,11 +496,13 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     elif analType.startswith("roll"):
         dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         if analType == 'roll_avg':
+            printHdr.extend(['Avg', 'Std', '<minT', 'MaSha'])
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-            printFmts.extend(["{:7.2f}", "{:7.2f}", "{:7.2f}"])
+            printFmts.extend([{'num':"{:7.2f}",'str':'{:7}'}, {'num':"{:7.2f}",'str':'{:7}'}, {'num':"{:7.2f}",'str':'{:7}'}])
     elif analType == "block_ranked":
+        printHdr.extend(['AvgRank', 'blockRanks', 'blockAvgs'])
         metaDataAvgs = "{}Avgs".format(dataSrc)
         tNumEnts, tNumBlocks = entDB.data[metaDataAvgs].shape
         theRankArray = numpy.zeros([tNumEnts, tNumBlocks+1])
@@ -562,6 +568,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         lDelta = 1
     theSelected = []
     print("INFO:AnalSimple:{}:{}".format(theAnal, dataSrc))
+    hlpr.printl(printFmts, printHdr, " ", "\t", "")
     for i in range(lStart,lStop,lDelta):
         index = theRows[i]
         if (theSaneArray[index] == iSkip) or ((analType == 'block_ranked') and (theSaneArray[index] == 0)):

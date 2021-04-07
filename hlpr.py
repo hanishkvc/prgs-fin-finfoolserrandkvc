@@ -299,10 +299,19 @@ def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None):
         If None, then no prefix is printed.
     printSufix: The string to print if any after the actual data elements.
         If None, then no sufix is printed.
+
+    Each format element in the lFmt can either be a simple fmt string or a
+    dictionary containing different format string for a string element and
+    different format string for a number (or rather any other type) element.
     """
     if printPrefix != None:
         print(printPrefix, end="")
     for i,pf in enumerate(lFmt):
+        if type(pf) == dict:
+            if type(lData[i]) == str:
+                pf = pf['str']
+            else:
+                pf = pf['num']
         print(pf.format(lData[i]), end=printInBtw)
     rem2Print = lData[i+1:]
     for rp in rem2Print:
