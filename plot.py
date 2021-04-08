@@ -38,7 +38,7 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(dataKeys) == str:
         dataKeys = [ dataKeys ]
-    if type(entCodes) == int:
+    if (type(entCodes) == int) or (type(entCodes) == str):
         entCodes = [ entCodes]
     for dataKey in dataKeys:
         print("DBUG:plot_data:{}".format(dataKey))
