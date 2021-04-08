@@ -304,25 +304,20 @@ def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None):
     dictionary containing different format string for a string element and
     different format string for a number (or rather any other type) element.
     """
-    print(lFmt)
-    print(lData)
     if printPrefix != None:
         print(printPrefix, end="")
-    tFmts = ""
     for i,pf in enumerate(lFmt):
         if type(pf) == dict:
             if type(lData[i]) == str:
                 pf = pf['str']
             else:
                 pf = pf['num']
-        tFmts += pf
         print(pf.format(lData[i]), end=printInBtw)
     rem2Print = lData[i+1:]
     for rp in rem2Print:
         print(rp, end=printInBtw)
     if printSufix != None:
         print(printSufix)
-    print(tFmts)
 
 
 def data_metakeys(dataDst):
