@@ -355,7 +355,8 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal', entD
     return data
 
 
-gAnalSimpleBasePrintFormats = [ "{:<16}", "{:40}", {'num':"{:8.2f}",'str':"{:8}"} ]
+gAnalSimpleBasePrintFormats = [ "{:<{width}}", "{:{width}}", {'num':"{:{width}.2f}",'str':"{:{width}}"} ]
+gAnalSimpleBasePrintWidths =  [ 16, 40, 8 ]
 def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=None, numEntities=10, entCodes=None,
                         minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64, entDB=None):
     """
@@ -456,6 +457,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     theAnal = "{}_{}".format(analType, order)
     print("DBUG:AnalSimple:{}:{}".format(theAnal, dataSrc))
     printFmts = gAnalSimpleBasePrintFormats.copy()
+    printWidths = gAnalSimpleBasePrintWidths.copy()
     printHdr = [ "Code", "Name" ]
     if order == 'top':
         iSkip = -numpy.inf
@@ -500,7 +502,8 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-            printFmts.extend([{'num':"{:7.2f}",'str':'{:7}'}, {'num':"{:7.2f}",'str':'{:7}'}, {'num':"{:7.2f}",'str':'{:7}'}])
+            printFmts.extend([{'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.2f}",'str':'{:{width}}'}])
+            printWidths.extend([7, 7, 7])
     elif analType == "block_ranked":
         printHdr.extend(['AvgRank', 'blockRanks', 'blockAvgs'])
         metaDataAvgs = "{}Avgs".format(dataSrc)
@@ -568,7 +571,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         lDelta = 1
     theSelected = []
     print("INFO:AnalSimple:{}:{}".format(theAnal, dataSrc))
-    hlpr.printl(printFmts, printHdr, " ", "\t", "")
+    hlpr.printl(printFmts, printHdr, " ", "\t", "", printWidths)
     for i in range(lStart,lStop,lDelta):
         index = theRows[i]
         if (theSaneArray[index] == iSkip) or ((analType == 'block_ranked') and (theSaneArray[index] == 0)):
@@ -590,7 +593,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(entDB.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
             curEntry.append(extra)
         #print("    {} {}".format(extra, curEntry))
-        hlpr.printl(printFmts, curEntry, " ", "\t", "")
+        hlpr.printl(printFmts, curEntry, " ", "\t", "", printWidths)
     return theSelected
 
 

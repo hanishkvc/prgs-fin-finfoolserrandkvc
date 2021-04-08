@@ -289,7 +289,7 @@ def array_str(arr, width=5, precision=2):
     return strA
 
 
-def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None):
+def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None, lWidths=None):
     """
     Print a list of formats and corresponding list of data.
     lFmt is the list of formats to use wrt each element in the data list (lData).
@@ -299,6 +299,10 @@ def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None):
         If None, then no prefix is printed.
     printSufix: The string to print if any after the actual data elements.
         If None, then no sufix is printed.
+    lWidths: If the user wants string data elements if any while printing,
+        to be truncated before printing, then one should pass lWidths list,
+        with the info about the string width. Also the user should use
+        the keyword width as part of the lFmt formats.
 
     Each format element in the lFmt can either be a simple fmt string or a
     dictionary containing different format string for a string element and
@@ -312,7 +316,13 @@ def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None):
                 pf = pf['str']
             else:
                 pf = pf['num']
-        print(pf.format(lData[i]), end=printInBtw)
+        if lWidths == None:
+            print(pf.format(lData[i]), end=printInBtw)
+        else:
+            theData = lData[i]
+            if type(theData) == str:
+                theData = theData[:lWidths[i]]
+            print(pf.format(theData, width=lWidths[i]), end=printInBtw)
     rem2Print = lData[i+1:]
     for rp in rem2Print:
         print(rp, end=printInBtw)
