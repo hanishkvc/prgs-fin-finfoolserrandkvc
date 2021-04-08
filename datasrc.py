@@ -180,6 +180,8 @@ class DataSrc:
         dateInt = hlpr.dateint(y,m,d)
         if dateInt < self.earliestDate:
             return
+        if dateInt in self.holidays:
+            return
         url = time.strftime(self.urlTmpl, timeTuple)
         fName = time.strftime(self.pathTmpl, timeTuple)
         bParseFile=False
