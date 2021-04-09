@@ -4,7 +4,7 @@ Try look at MF/Indexes/... Nav data
 Author: HanishKVC
 Version: v20210326IST2019
 License: GPL
-Status: FULLY OUT OF SYNC with new version of PROGRAM
+Status: Majorly OUT OF SYNC with new version of PROGRAM
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -60,6 +60,9 @@ any inferences about things/... Also I am no expert in this matter, so my logics
 could be buggy and stupid in more ways than one. Also the data it works with may
 not be error free and uptodate always. So dont use this program for anything.
 
+The logic also has been updated to fetch historic/bhav data from nse website,
+so that one can look at historic stock data in blind and stupid ways.
+
 
 Calling the Program
 ======================
@@ -106,9 +109,9 @@ A sample session could involve
 
    fetch_data(2013, 2021)
    load_data(2013, 2021)
-   infoset1_prep()
-   infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
-   infoset1_result(['open equity elss', 'open hybrid aggressive'], ['direct'])
+   procdata.infoset1_prep()
+   procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
+   procdata.infoset1_result(['open equity elss', 'open hybrid aggressive'], ['direct'])
 
 
 Fetching

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# Get and work with data about MFs, indexes, stocks, etc, in a blind and stupid way
+# Get and work with data about MFs, indexes, stocks, or any other event/entity, etc,
+# in _BLIND_ AND _STUPID_ ways.
 # HanishKVC, 2021
 # GPL
 #
