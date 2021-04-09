@@ -276,17 +276,17 @@ ex: search_data(["direct bluechip -NO-dividend", "direct bluechip dividend us"])
 Processing Data
 ===================
 
-procdata_ex(<ListOfOperations>)
+procdata.ops(<ListOfOperations>)
 
-procdata_ex("srel=srel(data)")
+procdata.ops("srel=srel(data)")
 
-procdata_ex(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
+procdata.ops(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
 
-procdata_ex(["srel=srel(data)", "dma20=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+procdata.ops(["srel=srel(data)", "dma20=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
 
-procdata_ex(["srel=srel(data)", "dma20SRel=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+procdata.ops(["srel=srel(data)", "dma20SRel=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
 
-NOTE: help(procdata_ex) will give some of the details about using this.
+NOTE: help(procdata.ops) will give some of the details about using this.
 
 srel - safe relative
 ----------------------
@@ -413,8 +413,8 @@ Look at raw/processed data
 =============================
 
 
-analdata_simple
------------------
+procdata.anal_simple
+----------------------
 
 Sort/Rank the entities in the dataset based on the criteria (op + opType) given
 
@@ -423,21 +423,21 @@ Some of the operationTypes supported include
    normal: Depending on the value in the given dataSrc on the given date or index, decide
    how to rank the entities.
 
-   srel_absret: The dataSrc should be one generated using srel procdata_ex operation.
+   srel_absret: The dataSrc should be one generated using srel procdata.ops operation.
    Look at the associated absoluteReturn value for each of the specified entities, and
    rank the entities.
 
-   srel_retpa: The dataSrc should be one generated using srel procdata_ex operation.
+   srel_retpa: The dataSrc should be one generated using srel procdata.ops operation.
    Look at the associated returnPerAnnum value for each of the specified entities, and
    rank the entities.
 
-   roll_avg: The dataSrc should be one generated using roll<Days> operation of procdata_ex.
+   roll_avg: The dataSrc should be one generated using roll<Days> operation of procdata.ops.
    This looks at the full period average of the rolling returnPerAnnum over the full dateRange
    loaded, for each entity, to decide how to rank the entities.
 
       analdata_simple('roll1095', 'top', 'roll_avg')
 
-   block_ranked: The dataSrc should be one generated using block<Days> procdata_ex oepration.
+   block_ranked: The dataSrc should be one generated using block<Days> procdata.ops oepration.
    This identifies the pentile to which each entity belongs, when compared to all other
    entities loaded, wrt each block period. Inturn it calculates a naive average of the
    pentile rank across all the blocks, and uses the same to rank the specified subset of
@@ -455,8 +455,8 @@ Some of the operationTypes supported include
       entCodes).
 
 
-infoset1
-----------
+procdata.infoset1
+-------------------
 
 Print some possibly useful info about the entities in the loaded set. It prints data about
 each entity individually as well as for each type of data, it will provide comparative prints.
@@ -465,52 +465,52 @@ Wrt these comparative prints, it tries to order the entities, based on the avera
 will get bundled to the end of the ordered list, based on the last return per annum data
 available for such entities (wrt its start date).
 
-User needs to first run infoset1_prep, before calling one of the infoset1_result calls.
+User needs to first run procdata.infoset1_prep, before calling one of the procdata.infoset1_result calls.
 This will print processed data, wrt specified entities, based on what was generated during
-infoset1_prep.
+procdata.infoset1_prep.
 
-infoset1_prep()
+procdata.infoset1_prep()
 
    process the raw data using a standard set of operations like srel, roll1095, roll1825
    and reton, in order to generate useful info.
 
-infoset1_result()
+procdata.infoset1_result()
 
    Display processed data wrt all entities in the loaded dataset.
 
-infoset1_result(listOfEntityTypeMatchTemplates)
+procdata.infoset1_result(listOfEntityTypeMatchTemplates)
 
    Display processed data wrt all entities which belong to any of the matching entTypes.
 
-   ex: infoset1_result('elss')
+   ex: procdata.infoset1_result('elss')
 
-   ex: infoset1_result('open large')
+   ex: procdata.infoset1_result('open large')
 
-   ex: infoset1_result(['elss', 'open large', 'open flexi', 'open multi'])
+   ex: procdata.infoset1_result(['elss', 'open large', 'open flexi', 'open multi'])
 
-infoset1_result([], listOfEntityNameMatchTemplates)
+procdata.infoset1_result([], listOfEntityNameMatchTemplates)
 
    Display processed data wrt entities, whose name match any of the given entName matching template.
 
-   ex: infoset1_result([], 'axis')
+   ex: procdata.infoset1_result([], 'axis')
 
-   ex: infoset1_result([], 'pgim direct')
+   ex: procdata.infoset1_result([], 'pgim direct')
 
-   ex: infoset1_result([], ['nifty direct', 'nasdaq direct'])
+   ex: procdata.infoset1_result([], ['nifty direct', 'nasdaq direct'])
 
-infoset1_result(listOfEntityTypeMatchTemplates, listOfEntityNameMatchTemplates)
+procdata.infoset1_result(listOfEntityTypeMatchTemplates, listOfEntityNameMatchTemplates)
 
    Display processed data wrt entities, which belong to one of the matched entTypes and inturn
    whose name matches any of the passed entNameMatchTemplate.
 
-infoset1_result_entcodes(listOfEntCodes)
+procdata.infoset1_result1_entcodes(listOfEntCodes)
 
    Display processed data for the list of entities specified using their entCode. User can create
    the passed list of entCodes using any mechanism they find suitable and or need.
 
 
 NOTE: By default only 20 entities are printed as part of the comparitive prints, if you want to
-change this,  pass numEntities argument to infoset1_result.
+change this,  pass numEntities argument to procdata.infoset1_result.
 
 
 Processed Datas
@@ -539,12 +539,16 @@ MaBeta
 Quantile
 
 
-Others
---------
+Plot Functions
+-----------------
 
-help(plot_data)
+help(plot.data)
 
-help(show_plot)
+help(plot._linregress)
+
+help(plot.linregress)
+
+help(plot.show)
 
 
 Entity types
@@ -588,14 +592,14 @@ processed data sets and not just the initial raw data set.
 
 ./FinFoolsErrandKVC.py
 OO>load_data(2013,2021)
-OO>infoset1_prep()
-OO>infoset1_result('elss')
+OO>procdata.infoset1_prep()
+OO>procdata.infoset1_result('elss')
 OO>session_save('mysave1869')
 OO>quit()
 
 ./FinFoolsErrandKVC.py
 OO>session_restore('mysave1869')
-OO>infoset1_result('indexes')
+OO>procdata.infoset1_result('indexes')
 
 
 
