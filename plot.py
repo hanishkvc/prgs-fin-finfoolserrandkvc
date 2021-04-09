@@ -37,6 +37,7 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     """
     entDB = _entDB(entDB)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
+    x = numpy.arange(startDateIndex, endDateIndex)
     if type(dataKeys) == str:
         dataKeys = [ dataKeys ]
     if (type(entCodes) == int) or (type(entCodes) == str):
@@ -54,7 +55,7 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
             label = "{:{cwidth}}:{:{width}}: {}".format(entCode, name, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
             print("\t{}:{}".format(label, index))
             label = "{:{cwidth}}:{:{width}}: {:16} : {}".format(entCode, name, dataKey, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
-            plt.plot(entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
+            plt.plot(x, entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
 
 
 def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
