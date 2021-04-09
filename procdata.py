@@ -697,7 +697,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
             input("Press any key to continue...")
 
 
-def infoset1_result2_entcodes(entCodes=None, bPrompt=False, numEntities=20, entDB=None):
+def infoset1_result2_entcodes(entCodes=None, bPrompt=True, numEntities=20, entDB=None):
     """
     Identify the top and bottom N entities based on performance over
     last day, week, month, 3months and inturn print some processed
@@ -706,16 +706,20 @@ def infoset1_result2_entcodes(entCodes=None, bPrompt=False, numEntities=20, entD
     entCodes: If given, compare within them, else compare across all entities.
     """
     entDB = _entDB(entDB)
-    lTop = []
-    lBot = []
+    lTop = set()
+    lBot = set()
     for i in [0, 1, 2, 3]:
         print("INFO:InfoSet1Result2: Top {} entities wrt last {}".format(numEntities, gHistoricGapsHdr[i]))
         t = anal_simple('roabsMetaData', 'normal', 'top', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
-        lTop.extend([x[0] for x in t])
+        for tEnt in [x[0] for x in t]:
+            lTop.add(tEnt)
         print("INFO:InfoSet1Result2: Bottom {} entities wrt last {}".format(numEntities, gHistoricGapsHdr[i]))
         b = anal_simple('roabsMetaData', 'normal', 'bottom', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
-        lBot.extend([x[0] for x in b])
-    lAll = lTop+lBot
+        for tEnt in [x[0] for x in b]:
+            lBot.add(tEnt)
+        if bPrompt:
+            input('INFO:Press any key to continue...')
+    lAll = list(lTop.union(lBot))
     infoset1_result1_entcodes(lAll, bPrompt, len(lAll), entDB=entDB)
 
 
