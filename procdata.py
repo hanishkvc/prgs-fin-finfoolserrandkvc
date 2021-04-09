@@ -67,10 +67,12 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 MetaLabel = AbsoluteReturn, ReturnPerAnnum, durationInYears, dataSrcBaseDateVal, dataSrcEndVal
                     DurationInYears: the duration between endDate and baseDate in years.
 
-        "reton<_Type>": calculate the absolute returns or returnsPerAnnum as on endDate wrt/relative_to
+        "reton[_Type]": calculate the absolute returns and or returnsPerAnnum as on endDate wrt/relative_to
                 all the other dates.
                 reton_absret: Calculates the absolute return
                 reton_retpa: calculates the returnPerAnnum
+                reton_safe: calculates absRet for days within a year range, retPA wrt other days.
+                If type is not specified, it is assumed to be safe type.
                 MetaData  = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
                 MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 
@@ -152,7 +154,11 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             entDB.data[dataDstQntls] = numpy.zeros([entDB.nxtEntIndex,blockCnt,5])
             tResult = []
         elif op.startswith("reton"):
-            retonT, retonType = op.split('_')
+            if '_' in op:
+                retonT, retonType = op.split('_')
+            else:
+                retonT = op
+                retonType = 'safe'
             if retonT == "reton":
                 retonDateIndex = endDateIndex
             else:
@@ -207,12 +213,19 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaLabel].append(label)
                     entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 elif op.startswith("reton"):
-                    retonType = op.split('_')[1]
                     retonData = entDB.data[dataSrc][r, retonDateIndex]
+                    tROAbs = ((retonData/entDB.data[dataSrc][r,:])-1)*100
+                    tRORPA = (((retonData/entDB.data[dataSrc][r,:])**(365/histDays))-1)*100
                     if retonType == 'absret':
-                        tResult[r,:] = ((retonData/entDB.data[dataSrc][r,:])-1)*100
+                        tResult[r,:] = tROAbs
+                    elif retonType == 'retpa':
+                        tResult[r,:] = tRORPA
                     else:
-                        tResult[r,:] = (((retonData/entDB.data[dataSrc][r,:])**(365/histDays))-1)*100
+                        if len(tROAbs) > 365:
+                            tResult[r,-365:] = tROAbs[-365:]
+                            tResult[r,:-365] = tROAbs[:-365]
+                        else:
+                            tResult[r,:] = tROAbs
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("dma"):
