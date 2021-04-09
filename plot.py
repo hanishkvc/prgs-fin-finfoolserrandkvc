@@ -57,7 +57,20 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
             plt.plot(entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
+def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
+    """
+    Use linear regression to plot a fitting line along with the data it
+    tries to fit.
+
+    User can specify the subset of data that needs to be fitted, by specifying
+    a) the entCodes
+    b) the dataKeys
+    c) the date range
+    within the entDB.
+
+    The data will be plotted at the appropriate location corresponding to the
+    specified date range, in the plot.
+    """
     entDB = _entDB(entDB)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(dataKeys) == str:
@@ -68,10 +81,25 @@ def linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
         for entCode in entCodes:
             index = entDB.meta['codeD'][entCode]
             y = entDB.data[dataKey][index][startDateIndex:endDateIndex]
-            x = numpy.arange(len(y))
+            x = numpy.arange(startDateIndex, endDateIndex)
             lr = stats.linregress(x,y)
             plt.plot(x,y,'.')
             plt.plot(x,x*lr.slope+lr.intercept)
+
+
+def linregress(dataKeys, entCodes, entDB=None):
+    """
+    For the given dataKeys and entCodes, plot the corresponding data
+    as well as curve fitting lines based on linear regression for
+    1Year, 3Year and 5Years of data.
+    """
+    entDB = _entDB(entDB)
+    startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
+    for d in [1, 3, 5]:
+        endDate = entDB.dates[endDateIndex]
+        startDate = endDate-d*10000
+        if entDB.datesD.get(startDate, -1) >= 0:
+            _linregress(dataKeys, entCodes, startDate, endDate, entDB)
 
 
 def _show(entDB):

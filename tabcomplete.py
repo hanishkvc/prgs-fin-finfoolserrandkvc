@@ -9,7 +9,7 @@ gMeta = None
 L1 = [ "load_data", "fetch_data", "search_data", "load_data_mfs", "load_data_stocks",
         "enttypes.list", "enttypes.members",
         "procdata.ops", "procdata.mabeta", "procdata.anal_simple",
-        "plot.data", "plot.show",
+        "plot.data", "plot.show", "plot.linregress",
         "loadfilters.setup", "loadfilters.list", "loadfilters.get", "loadfilters.activate", "loadfilters.copy",
         "session_save", "session_restore",
         "procdata.infoset1_prep", "procdata.infoset1_result",
