@@ -3,6 +3,7 @@
 # GPL
 
 import numpy
+from scipy import stats
 import matplotlib.pyplot as plt
 import hlpr
 
@@ -54,6 +55,23 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
             print("\t{}:{}".format(label, index))
             label = "{:{cwidth}}:{:{width}}: {:16} : {}".format(entCode, name, dataKey, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
             plt.plot(entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
+
+
+def linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
+    entDB = _entDB(entDB)
+    startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
+    if type(dataKeys) == str:
+        dataKeys = [ dataKeys ]
+    if (type(entCodes) == int) or (type(entCodes) == str):
+        entCodes = [ entCodes]
+    for dataKey in dataKeys:
+        for entCode in entCodes:
+            index = entDB.meta['codeD'][entCode]
+            y = entDB.data[dataKey][index][startDateIndex:endDateIndex]
+            x = numpy.arange(len(y))
+            lr = stats.linregress(x,y)
+            plt.plot(x,y,'.')
+            plt.plot(x,x*lr.slope+lr.intercept)
 
 
 def _show(entDB):
