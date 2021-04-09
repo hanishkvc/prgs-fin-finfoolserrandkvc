@@ -74,6 +74,7 @@ def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     """
     entDB = _entDB(entDB)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
+    numDays = endDateIndex-startDateIndex
     if type(dataKeys) == str:
         dataKeys = [ dataKeys ]
     if (type(entCodes) == int) or (type(entCodes) == str):
@@ -81,11 +82,14 @@ def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     for dataKey in dataKeys:
         for entCode in entCodes:
             index = entDB.meta['codeD'][entCode]
+            name = entDB.meta['name'][index][:giLabelNameChopLen]
             y = entDB.data[dataKey][index][startDateIndex:endDateIndex]
             x = numpy.arange(startDateIndex, endDateIndex)
             lr = stats.linregress(x,y)
-            plt.plot(x,y,'.')
-            plt.plot(x,x*lr.slope+lr.intercept)
+            label = "{}:{}:Data:{}days".format(entCode,name, numDays)
+            plt.plot(x,y,'.', label=label)
+            label = "{}:{}:LinRegressLineFit".format(entCode,name)
+            plt.plot(x,x*lr.slope+lr.intercept, label=label)
 
 
 def linregress(dataKeys, entCodes, entDB=None):
