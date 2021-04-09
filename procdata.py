@@ -37,6 +37,7 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
 
+bDMAShift2End = True
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
 def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
@@ -77,10 +78,15 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 
         "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
-                of DAYSInINT. It sets the Partial calculated data regions at the beginning and end
-                of the dateRange to NaN (bcas there is not sufficient data to one of the sides,
-                in these locations, so the result wont be proper, so force it to NaN).
+                of DAYSInINT. THere will be partially calculated data regions at the beginning and
+                end of the dateRange, which dont have sufficient data to one of the sides. Inturn
+                the valid dma data is shifted to align with the end, such that each location value
+                corresponds ot average of last N days wrt that location. Inturn N days at the start
+                will be set to NaN, as they dont have sufficient historic data to calculate average
+                of last N days.
                 MetaLabel = dataSrcMetaLabel, validDmaResultBeginVal, validDmaResultEndVal
+
+                NOTE: User can set gDMAShift2End to avoid the shifting to align with end.
 
         "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
                 windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
@@ -230,10 +236,15 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("dma"):
                     days = int(op[3:])
-                    tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
                     inv = int(days/2)
-                    tResult[r,:inv] = numpy.nan
-                    tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
+                    if bDMAShift2End:
+                        tDMARes = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                        tResult[r,days:] = tDMARes[inv:-inv]
+                        tResult[r,:days] = numpy.nan
+                    else:
+                        tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                        tResult[r,:inv] = numpy.nan
+                        tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
                     if True:
                         try:
                             dataSrcLabel = entDB.data[dataSrcMetaLabel][r]
