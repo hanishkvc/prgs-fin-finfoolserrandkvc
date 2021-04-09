@@ -58,10 +58,11 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
             plt.plot(x, entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
 
 
-def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
+def _fit(dataKeys, entCodes, startDate=-1, endDate=-1, fitType='linregress', entDB=None):
     """
-    Use linear regression to plot a fitting line along with the data it
-    tries to fit.
+    Plot a fitting line along with the data it tries to fit.
+
+    It supports fitting using different logics.
 
     User can specify the subset of data that needs to be fitted, by specifying
     a) the entCodes
@@ -74,7 +75,6 @@ def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     """
     entDB = _entDB(entDB)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
-    numDays = endDateIndex-startDateIndex
     if type(dataKeys) == str:
         dataKeys = [ dataKeys ]
     if (type(entCodes) == int) or (type(entCodes) == str):
@@ -82,14 +82,23 @@ def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     for dataKey in dataKeys:
         for entCode in entCodes:
             index = entDB.meta['codeD'][entCode]
-            name = entDB.meta['name'][index][:giLabelNameChopLen]
+            entName = entDB.meta['name'][index][:giLabelNameChopLen]
             y = entDB.data[dataKey][index][startDateIndex:endDateIndex]
             x = numpy.arange(startDateIndex, endDateIndex)
-            lr = stats.linregress(x,y)
-            label = "{}:{}:Data:{}days".format(entCode,name, numDays)
-            plt.plot(x, y, label=label)
-            label = "{}:{}:LinRegressLineFit".format(entCode,name)
-            plt.plot(x, x*lr.slope+lr.intercept, label=label)
+            gFits[fitType](entCode, entName, x, y)
+
+
+def _linregress(entCode, entName, x, y):
+    """
+    Use linear regression to plot a fitting line along with the data it
+    tries to fit.
+    """
+    numDays = len(x)
+    lr = stats.linregress(x,y)
+    label = "{}:{}:Data:{}days".format(entCode, entName, numDays)
+    plt.plot(x, y, label=label)
+    label = "{}:{}:LinRegressLineFit".format(entCode, entName)
+    plt.plot(x, x*lr.slope+lr.intercept, label=label)
 
 
 def linregress(dataKeys, entCodes, entDB=None):
@@ -104,7 +113,27 @@ def linregress(dataKeys, entCodes, entDB=None):
         endDate = entDB.dates[endDateIndex]
         startDate = endDate-d*10000
         if entDB.datesD.get(startDate, -1) >= 0:
-            _linregress(dataKeys, entCodes, startDate, endDate, entDB)
+            _fit(dataKeys, entCodes, startDate, endDate, 'linregress', entDB)
+
+
+def _spline(entCode, entName, x, y):
+    """
+    Use linear regression to plot a fitting line along with the data it
+    tries to fit.
+    """
+    numDays = len(x)
+    spl = scipy.interpolate.splrep(x,y)
+    label = "{}:{}:Data:{}days".format(entCode, entName, numDays)
+    plt.plot(x, y, label=label)
+    label = "{}:{}:SplineFit".format(entCode, entName)
+    ySpl = scipy.interpolate.splev(x, spl)
+    plt.plot(x, ySpl, label=label)
+
+
+gFits = {
+    'linregress': _linregress,
+    'spline': _spline
+    }
 
 
 def _show(entDB):

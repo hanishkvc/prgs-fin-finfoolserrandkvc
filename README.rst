@@ -664,6 +664,16 @@ As readme is created on a different day compared to when the logic is/was implem
 there could be discrepencies, as I havent cross checked things, when putting what I remember
 into this document.
 
+TODO
+------
+
+Handle stock splits
+
+Handle stock dividends
+
+
+
+
 Changes
 ----------
 
