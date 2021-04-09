@@ -87,9 +87,9 @@ def _linregress(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
             x = numpy.arange(startDateIndex, endDateIndex)
             lr = stats.linregress(x,y)
             label = "{}:{}:Data:{}days".format(entCode,name, numDays)
-            plt.plot(x,y,'.', label=label)
+            plt.plot(x, y, label=label)
             label = "{}:{}:LinRegressLineFit".format(entCode,name)
-            plt.plot(x,x*lr.slope+lr.intercept, label=label)
+            plt.plot(x, x*lr.slope+lr.intercept, label=label)
 
 
 def linregress(dataKeys, entCodes, entDB=None):
