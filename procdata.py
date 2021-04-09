@@ -223,7 +223,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     else:
                         if len(tROAbs) > 365:
                             tResult[r,-365:] = tROAbs[-365:]
-                            tResult[r,:-365] = tROAbs[:-365]
+                            tResult[r,:-365] = tRORPA[:-365]
                         else:
                             tResult[r,:] = tROAbs
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
