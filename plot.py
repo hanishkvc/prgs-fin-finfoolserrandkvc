@@ -3,6 +3,7 @@
 # GPL
 
 import numpy
+import scipy
 from scipy import stats
 import matplotlib.pyplot as plt
 import hlpr
@@ -122,10 +123,11 @@ def _spline(entCode, entName, x, y):
     tries to fit.
     """
     numDays = len(x)
-    spl = scipy.interpolate.splrep(x,y)
+    spl = scipy.interpolate.splrep(x,y, k=3)
     label = "{}:{}:Data:{}days".format(entCode, entName, numDays)
-    plt.plot(x, y, label=label)
+    plt.plot(x, y*1.01, label=label)
     label = "{}:{}:SplineFit".format(entCode, entName)
+    x = numpy.append(x, numpy.arange(x[-1],x[-1]+2))
     ySpl = scipy.interpolate.splev(x, spl)
     plt.plot(x, ySpl, label=label)
 
