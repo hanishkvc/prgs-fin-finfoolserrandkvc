@@ -507,7 +507,7 @@ infoset1_result_entcodes(listOfEntCodes)
 
 
 NOTE: By default only 20 entities are printed as part of the comparitive prints, if you want to
-change this,  pass numEntries argument to infoset1_result.
+change this,  pass numEntities argument to infoset1_result.
 
 
 Processed Datas
