@@ -618,7 +618,7 @@ def infoset1_prep(entDB=None):
     entDB = _entDB(entDB)
     warnings.filterwarnings('ignore')
     ops(['srel=srel(data)', 'dma50Srel=dma50(srel)'], entDB=entDB)
-    ops(['roabs=reton_absret(data)', 'rorpa=reton_retpa(data)'], entDB=entDB)
+    ops(['roabs=reton_absret(data)', 'rosaf=reton(data)'], entDB=entDB)
     ops(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'], entDB=entDB)
     ops(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'], entDB=entDB)
     blockDays = int(entDB.nxtDateIndex/5)
@@ -645,7 +645,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
     dataSrcs = [
             ['srel', 'srelMetaLabel'],
             ['absRet', 'roabsMetaLabel'],
-            ['retPA', 'rorpaMetaLabel'],
+            ['retOn', 'rosafMetaLabel'],
             ['roll1095', 'roll1095MetaLabel'],
             ['roll1825', 'roll1825MetaLabel'],
             ]
@@ -677,7 +677,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
     printFmt = "\t{:<16}:{:24}:"
     for dataSrc in dataSrcs:
         print("DataSrc:{}: >>showing {} of {} entities<<".format(dataSrc, numEntities, totalEntities))
-        if dataSrc[0] in [ 'absRet', 'retPA' ]:
+        if dataSrc[0] in [ 'absRet', 'retOn' ]:
             print((printFmt+" {}").format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)))
         elif dataSrc[0] == 'srel':
             print((printFmt+"   AbsRet     RetPA   DurYrs : startVal  -  endVal").format("code", "name"))
