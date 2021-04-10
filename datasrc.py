@@ -293,3 +293,22 @@ class DataSrc:
                 print("ERRR:{}:FetchFTypes: Failed fetching {}".format(self.tag, tName))
 
 
+    def _load_ftype(self, theName, theFName, opts):
+        """
+        Load the specified FType.
+        NOTE: Child class needs to implement this.
+        """
+        raise NotImplementedError
+
+
+    def load_ftypes(self, edb, opts=None):
+        """
+        Load the Fixed MxN Grouping/Types if any.
+        """
+        for tName, tFName in self.listFTypes:
+            try:
+                self._load_ftype(tName, tFName)
+            except:
+                print("ERRR:{}:LoadFTypes: Failed loading {}".format(self.tag, tName))
+
+
