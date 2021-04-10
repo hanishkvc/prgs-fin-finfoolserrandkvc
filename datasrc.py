@@ -287,6 +287,9 @@ class DataSrc:
         Fetch Fixed/Rarely changing MxN Grouping/Types if any.
         """
         for tName,tFName in self.listFTypes:
-            self._fetch_ftype(tName, tFName, opts)
+            try:
+                self._fetch_ftype(tName, tFName, opts)
+            except:
+                print("ERRR:{}:FetchFTypes: Failed fetching {}".format(self.tag, tName))
 
 
