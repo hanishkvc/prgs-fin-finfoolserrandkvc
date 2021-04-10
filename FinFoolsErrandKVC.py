@@ -64,7 +64,8 @@ LOADFILTERSNAME_AUTO = '-AUTO-'
 
 gCal = calendar.Calendar()
 gEntDB = None
-gDataKeys = ['data']
+gDataKeys = ['open', 'high', 'low', 'data', 'volume']
+gDataAliases = { 'data': [ 'nav', 'close' ] }
 gDS = []
 
 
@@ -96,7 +97,7 @@ def setup_gentdb(startDate=-1, endDate=-1):
     """
     global gEntDB
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
-    gEntDB = entities.EntitiesDB(gDataKeys, 8192*4, numDates)
+    gEntDB = entities.EntitiesDB(gDataKeys, gDataAliases, 8192*4, numDates)
     modules_sync_gentdb(gEntDB)
 
 

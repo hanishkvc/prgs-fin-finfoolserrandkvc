@@ -35,7 +35,17 @@ class EntitiesDB:
         self.datesD = {}
 
 
-    def _init_ents(self, dataKeys, entCnt, dateCnt):
+    def _set_aliases(self, aliases=None):
+        if aliases == None:
+            aliases = self.aliases
+        if aliases == None:
+            return
+        for key in aliases:
+            for alias in aliases[key]:
+                self.data[alias] = self.data[key]
+
+
+    def _init_ents(self, dataKeys, aliases, entCnt, dateCnt):
         """
         Create the members required to handle the data(s) related to the entities.
         """
@@ -44,6 +54,7 @@ class EntitiesDB:
         self.meta = {}
         for dataKey in dataKeys:
             self.data[dataKey] = numpy.zeros([entCnt, dateCnt])
+        self._set_aliases(aliases)
         self.meta['name'] = numpy.empty(entCnt, dtype=object)
         self.meta['codeL'] = numpy.empty(entCnt, dtype=object)
         self.meta['codeD'] = {}
@@ -52,13 +63,18 @@ class EntitiesDB:
         self.meta['lastSeen'] = numpy.zeros(entCnt)
 
 
-    def __init__(self, dataKeys, entCnt, dateCnt):
+    def __init__(self, dataKeys, aliases, entCnt, dateCnt):
         """
         Initialise a entities object.
 
         dataKeys: specifies a list of dataKeys' that will be used
         to store different kinds of data associated with each entity
         in this entities db.
+        aliases: A dictionary of aliases, which map some of the
+            dataKeys' to aliases. For each dataKey that needs aliases
+            defined for it, should have a entry in the dictioanry,
+            with the required aliases in a list as the value for
+            that key.
         entCnt: The number of entities one expects to store in this.
         dateCnt: The number of dates for which we expect to store
         data in this entities db.
@@ -66,9 +82,10 @@ class EntitiesDB:
         if type(dataKeys) != list:
             dataKeys = [ dataKeys ]
         self.dataKeys = dataKeys
+        self.aliases = aliases
         self._init_types()
         self._init_dates(dateCnt)
-        self._init_ents(dataKeys, entCnt, dateCnt)
+        self._init_ents(dataKeys, aliases, entCnt, dateCnt)
 
 
     def add_type(self, typeName):
@@ -193,6 +210,7 @@ class EntitiesDB:
         """
         for dataKey in dataKeys:
             self.data[dataKey] = self.data[dataKey][:self.nxtEntIndex,:self.nxtDateIndex]
+        self._set_aliases()
         for key in [ 'firstSeen', 'lastSeen', 'name', 'codeL', 'typeId' ]:
             self.meta[key] = self.meta[key][:self.nxtEntIndex]
         self.dates = self.dates[:self.nxtDateIndex]
