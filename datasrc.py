@@ -44,7 +44,7 @@ class DataSrc:
     pathTmpl = None
     holiTmpl = "{}.holidays"
     urlFTypesTmpl = None
-    pathTypesTmpl = "{}.types.{}"
+    pathFTypesTmpl = "{}.ftypes.{}"
     listFTypes = None
     dataKeys = None
     tag = "DSBase"
@@ -98,8 +98,8 @@ class DataSrc:
         self.loadFilters = loadFilters
         self.nameCleanupMap = nameCleanupMap
         self.pathTmpl = self._prefix_path(basePath, self.pathTmpl, "pathTmpl")
-        self.pathTypesTmpl = self.pathTypesTmpl.format(self.tag, '{}')
-        self.pathTypesTmpl = self._prefix_path(basePath, self.pathTypesTmpl, "pathTypesTmpl")
+        self.pathFTypesTmpl = self.pathFTypesTmpl.format(self.tag, '{}')
+        self.pathFTypesTmpl = self._prefix_path(basePath, self.pathFTypesTmpl, "pathFTypesTmpl")
         self.holiTmpl = self.holiTmpl.format(self.tag)
         self.holiTmpl = self._prefix_path(basePath, self.holiTmpl, "holiTmpl")
         self.listNoDataDates = []
@@ -268,7 +268,10 @@ class DataSrc:
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 
 
-    def fetch_types(self, edb, opts):
-        pass
+    def fetch_ftypes(self, edb, opts):
+        for tname,tfname in self.listFTypes:
+            url = self.urlFTypesTmpl.format(tfname)
+            fName = self.pathFTypesTmpl.format(tfname)
+            print(url, fName)
 
 

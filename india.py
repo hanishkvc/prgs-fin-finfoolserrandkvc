@@ -131,6 +131,8 @@ STK_FNAMECSV_TMPL = "data/ISTK_%Y%m%d.zip"
 #https://archives.nseindia.com/archives/equities/bhavcopy/pr/PR010321.zip
 STK_BASEURL = "https://archives.nseindia.com/archives/equities/bhavcopy/pr/PR%d%m%y.zip"
 STK_FILEINZIP = "Pr%d%m%y.csv"
+STK_FTYPESURL = "https://www1.nseindia.com/content/indices/ind_{}list.csv"
+
 
 class IndiaSTKDS(datasrc.DataSrc):
 
@@ -140,6 +142,9 @@ class IndiaSTKDS(datasrc.DataSrc):
     tag = "IndiaSTKDS"
     bSkipWeekEnds = True
     earliestDate = 19940101
+    urlFTypesTmpl = STK_FTYPESURL
+    listFTypes = [ ['nifty 50', 'nifty50'], ['nifty 100', 'nifty100'], ['nifty 200', 'nifty200'], ['nifty 500', 'nifty500'],
+                   ['nifty midcap 150', 'niftymidcap150'], ['nifty smallcap 250', 'niftysmallcap250'] ]
 
     def __init__(self, basePath="~/", loadFilters=None, nameCleanupMap=None):
         if nameCleanupMap == None:
