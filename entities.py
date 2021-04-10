@@ -65,7 +65,7 @@ class EntitiesDB:
         """
         if type(dataKeys) != list:
             dataKeys = [ dataKeys ]
-        self.dataKey = dataKeys[0]
+        self.dataKeys = dataKeys
         self._init_types()
         self._init_dates(dateCnt)
         self._init_ents(dataKeys, entCnt, dateCnt)
@@ -174,7 +174,7 @@ class EntitiesDB:
               else if one is trying to get the entIndex, these are ignored.
         """
         if type(entData) != dict:
-            entData = { self.dataKey: entData }
+            entData = { self.dataKeys[0]: entData }
         entIndex = self.get_entindex(entCode, entName, entTypeId)
         if self.nxtDateIndex == 0:
             input("DBUG:Entities:AddData: Trying to add entity data, before date is specified")
