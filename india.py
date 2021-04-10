@@ -197,10 +197,10 @@ class IndiaSTKDS(datasrc.DataSrc):
                 code = la[2]
                 name = la[3]
                 if curType.lower() == 'y':
-                    curType = 'Index'
+                    curType = '{} Index'.format(self.name)
                     code = name
                 else:
-                    curType = 'Stock'
+                    curType = '{} Stock'.format(self.name)
                     if series.lower() != 'eq':
                         continue
                 try:
