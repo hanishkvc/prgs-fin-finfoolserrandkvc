@@ -34,7 +34,7 @@ class IndiaMFDS(datasrc.DataSrc):
 
     urlTmpl = MFS_BASEURL
     pathTmpl = MFS_FNAMECSV_TMPL
-    dataKeys = [ 'data' ]
+    dataKeys = [ 'nav' ]
     tag = "IndiaMFDS"
     earliestDate = 20060401
 
@@ -138,7 +138,7 @@ class IndiaSTKDS(datasrc.DataSrc):
 
     urlTmpl = STK_BASEURL
     pathTmpl = STK_FNAMECSV_TMPL
-    dataKeys = [ 'data' ]
+    dataKeys = [ 'open', 'high', 'low', 'close', 'volume' ]
     tag = "IndiaSTKDS"
     name = "NSE"
     bSkipWeekEnds = True
@@ -204,12 +204,17 @@ class IndiaSTKDS(datasrc.DataSrc):
                     if series.lower() != 'eq':
                         continue
                 try:
-                    val  = float(la[8])
+                    vOpen  = float(la[5])
+                    vHigh  = float(la[6])
+                    vLow   = float(la[7])
+                    vClose = float(la[8])
+                    volume = int(la[10])
+                    values = [vOpen, vHigh, vLow, vClose, volume]
                 except:
-                    val = 0
+                    values = [0, 0, 0, 0, 0]
                 date = hlpr.dateint(dateT.tm_year,dateT.tm_mon,dateT.tm_mday)
                 #print(code, name, nav, date)
-                todayfile.add_ent(today, code, name, [val], curType, date)
+                todayfile.add_ent(today, code, name, values, curType, date)
             except:
                 print("ERRR:IndiaSTKDS:parse_csv:{}".format(l))
                 traceback.print_exc()
