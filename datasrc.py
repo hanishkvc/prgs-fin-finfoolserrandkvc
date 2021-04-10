@@ -269,6 +269,17 @@ class DataSrc:
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 
 
+    def _ftype_fname(self, theFName):
+        """
+        The default FileName for a given FixedType.
+
+        NOTE: THis is used by default _fetch_ftype, so a child class implementing
+        _load_ftype can call this to get the local filename corresponding to ftype,
+        i.e if it has not overridden _fetch_ftype.
+        """
+        return self.pathFTypesTmpl.format(theFName)
+
+
     def _fetch_ftype(self, theName, theFName, opts):
         """
         Fetch a given fixed type data file from a remote server.
@@ -277,7 +288,7 @@ class DataSrc:
         or fetching in a different way, then it can override this function.
         """
         url = self.urlFTypesTmpl.format(theFName)
-        fName = self.pathFTypesTmpl.format(theFName)
+        fName = self._ftype_fname(theFName)
         print(url, fName)
         hlpr.wget_better(url, fName)
 
@@ -293,7 +304,7 @@ class DataSrc:
                 print("ERRR:{}:FetchFTypes: Failed fetching {}".format(self.tag, tName))
 
 
-    def _load_ftype(self, theName, theFName, opts):
+    def _load_ftype(self, theName, theFName, edb, opts):
         """
         Load the specified FType.
         NOTE: Child class needs to implement this.
@@ -307,7 +318,7 @@ class DataSrc:
         """
         for tName, tFName in self.listFTypes:
             try:
-                self._load_ftype(tName, tFName)
+                self._load_ftype(tName, tFName, edb, opts)
             except:
                 print("ERRR:{}:LoadFTypes: Failed loading {}".format(self.tag, tName))
 
