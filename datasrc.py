@@ -269,10 +269,24 @@ class DataSrc:
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 
 
-    def fetch_ftypes(self, edb, opts):
-        for tname,tfname in self.listFTypes:
-            url = self.urlFTypesTmpl.format(tfname)
-            fName = self.pathFTypesTmpl.format(tfname)
-            print(url, fName)
+    def _fetch_ftype(self, theName, theFName, opts):
+        """
+        Fetch a given fixed type data file from a remote server.
+
+        NOTE: If a given data source requires to handle url template
+        or fetching in a different way, then it can override this function.
+        """
+        url = self.urlFTypesTmpl.format(theFName)
+        fName = self.pathFTypesTmpl.format(theFName)
+        print(url, fName)
+        hlpr.wget_better(url, fName)
+
+
+    def fetch_ftypes(self, opts=None):
+        """
+        Fetch Fixed/Rarely changing MxN Grouping/Types if any.
+        """
+        for tName,tFName in self.listFTypes:
+            self._fetch_ftype(tName, tFName, opts)
 
 
