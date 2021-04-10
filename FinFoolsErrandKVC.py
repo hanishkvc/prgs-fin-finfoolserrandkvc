@@ -301,6 +301,19 @@ def load4daterange(startDate, endDate, opts=None):
     fillin4holidays()
 
 
+def load_ftypes(opts):
+    """
+    Load rarely changing fixed grouping/types if any wrt any of the data sources.
+    """
+    dataSrcTypeReqd = opts['dataSrcType']
+    for ds in gDS:
+        if dataSrcTypeReqd != ds.dataSrcType:
+            if dataSrcTypeReqd != datasrc.DSType.Any:
+                continue
+        if 'load_ftypes' in dir(ds):
+            ds.load_ftypes(gEntDB, opts)
+
+
 def load_data(startDate, endDate = None, dataSrcType=datasrc.DSType.Any,
         bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts=None):
     """
@@ -350,6 +363,7 @@ def load_data(startDate, endDate = None, dataSrcType=datasrc.DSType.Any,
     load4daterange(startDate, endDate, opts)
     if bOptimizeSize:
         gEntDB.optimise_size(gDataKeys)
+    load_ftypes(opts)
     for ds in gDS:
         if len(ds.listNoDataDates) > 0:
             print("WARN:LoadData:{}:Data missing for {}".format(ds.tag, ds.listNoDataDates))

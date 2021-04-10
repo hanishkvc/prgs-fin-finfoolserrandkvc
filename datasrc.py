@@ -297,6 +297,9 @@ class DataSrc:
         """
         Fetch Fixed/Rarely changing MxN Grouping/Types if any.
         """
+        if self.listFTypes == None:
+            print("INFO:{}:FetchFTypes: No FTypes to fetch".format(self.tag))
+            return
         for tName,tFName in self.listFTypes:
             try:
                 self._fetch_ftype(tName, tFName, opts)
@@ -316,6 +319,9 @@ class DataSrc:
         """
         Load the Fixed MxN Grouping/Types if any.
         """
+        if self.listFTypes == None:
+            print("INFO:{}:LoadFTypes: No FTypes to load".format(self.tag))
+            return
         for tName, tFName in self.listFTypes:
             try:
                 self._load_ftype(tName, tFName, edb, opts)
