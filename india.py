@@ -140,6 +140,7 @@ class IndiaSTKDS(datasrc.DataSrc):
     pathTmpl = STK_FNAMECSV_TMPL
     dataKeys = [ 'data' ]
     tag = "IndiaSTKDS"
+    name = "NSE"
     bSkipWeekEnds = True
     earliestDate = 19940101
     urlFTypesTmpl = STK_FTYPESURL
@@ -219,18 +220,27 @@ class IndiaSTKDS(datasrc.DataSrc):
     def _load_ftype(self, theName, theFName, edb, opts, hdrLines=1):
         """
         Load the Fixed/Rarely changing types available from this data source (NSEIndia)
+
+        This includes the explicitly defined Categories/Grouping like Nifty 50, Nifty xyz, ...
+        This also includes the industry categorisation wrt the entities.
         """
         fName = self._ftype_fname(theFName)
         f = open(fName)
         for i in range(hdrLines):
             f.readline() # Skip the header
-        entTypeId = edb.add_type(theName)
+        entTypeName = "{} {}".format(self.name, theName)
+        entTypeId = edb.add_type(entTypeName)
         for l in f:
             l = l.strip()
             if l == '':
                 continue
             la = l.split(',')
-            edb.add_type_member(entTypeId, la[2])
+            indName = la[1]
+            entName = la[2]
+            edb.add_type_member(entTypeId, entName)
+            indName = "{} {}".format(self.name, indName)
+            indId = edb.add_type(indName)
+            edb.add_type_member(indId, entName)
         f.close()
 
 
