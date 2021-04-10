@@ -20,6 +20,8 @@ class DataSrc:
         Fetch and save a local pickled copy of the fetched data.
         Load the pickled data into Entities DB. In turn if a local copy
             is not available, then fetch from remote server.
+        Load a predefined list of holidays, if available. These dates
+            will be skipped when fetching and or loading.
 
     Expects the following templates to be defined by the child class for creating
     suitable url and local file path (including file name).
@@ -41,7 +43,9 @@ class DataSrc:
     urlTmpl = None
     pathTmpl = None
     holiTmpl = "{}.holidays"
+    urlFTypesTmpl = None
     pathTypesTmpl = "{}.types.{}"
+    listFTypes = None
     dataKeys = None
     tag = "DSBase"
     bSkipWeekEnds = False
@@ -49,10 +53,19 @@ class DataSrc:
 
 
     def _load_holidays(self, fPath):
+        """
+        Load the holidays list associated with this data source.
+        Each line should contain one holiday date in YYYYMMDD format.
+        Skip lines that start with #
+        Skip lines that are empty
+        """
         self.holidays = set()
         try:
             f = open(fPath)
             for l in f:
+                l = l.strip()
+                if (l == '') or (l[0] == '#'):
+                    continue
                 i = int(l)
                 self.holidays.add(i)
             f.close()
