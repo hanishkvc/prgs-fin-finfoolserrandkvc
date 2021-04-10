@@ -41,6 +41,7 @@ class DataSrc:
     urlTmpl = None
     pathTmpl = None
     holiTmpl = "{}.holidays"
+    pathTypesTmpl = "{}.types.{}"
     dataKeys = None
     tag = "DSBase"
     bSkipWeekEnds = False
@@ -60,6 +61,12 @@ class DataSrc:
             print("INFO:{}:No holiday list".format(self.tag))
 
 
+    def _prefix_path(self, basePath, thePath, theMsg=""):
+        if (thePath != None) and (basePath != None):
+            thePath = os.path.expanduser(os.path.join(basePath, thePath))
+        print("INFO:{}:{}:{}".format(self.tag, theMsg, thePath))
+
+
     def __init__(self, basePath, loadFilters, nameCleanupMap):
         """
         Initialise a data source instance.
@@ -77,13 +84,11 @@ class DataSrc:
         self.dataSrcType = DSType.Any
         self.loadFilters = loadFilters
         self.nameCleanupMap = nameCleanupMap
-        if (self.pathTmpl != None) and (basePath != None):
-            self.pathTmpl = os.path.expanduser(os.path.join(basePath, self.pathTmpl))
-        print("INFO:{}:pathTmpl:{}".format(self.tag, self.pathTmpl))
+        self.pathTmpl = self._prefix_path(basePath, self.pathTmpl, "pathTmpl")
+        self.pathTypesTmpl = self.pathTypesTmpl.format(self.tag, '{}')
+        self.pathTypesTmpl = self._prefix_path(basePath, self.pathTypesTmpl, "pathTypesTmpl")
         self.holiTmpl = self.holiTmpl.format(self.tag)
-        if (self.holiTmpl != None) and (basePath != None):
-            self.holiTmpl = os.path.expanduser(os.path.join(basePath, self.holiTmpl))
-        print("INFO:{}:holiTmpl:{}".format(self.tag, self.holiTmpl))
+        self.holiTmpl = self._prefix_path(basePath, self.holiTmpl, "holiTmpl")
         self.listNoDataDates = []
         self._load_holidays(self.holiTmpl)
 
@@ -249,5 +254,8 @@ class DataSrc:
             self.listNoDataDates.append(dateInt)
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
 
+
+    def fetch_types(self, edb, opts):
+        pass
 
 
