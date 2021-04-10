@@ -5,6 +5,7 @@
 import numpy
 import scipy
 from scipy import stats
+import matplotlib
 import matplotlib.pyplot as plt
 import hlpr
 
@@ -38,7 +39,7 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     """
     entDB = _entDB(entDB)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
-    x = numpy.arange(startDateIndex, endDateIndex)
+    x = numpy.arange(startDateIndex, endDateIndex+1)
     if type(dataKeys) == str:
         dataKeys = [ dataKeys ]
     if (type(entCodes) == int) or (type(entCodes) == str):
@@ -148,12 +149,16 @@ def _show(entDB):
         line.set_linewidth(8)
     plt.grid(True)
     startDateIndex, endDateIndex = entDB.daterange2index(-1,-1)
-    curDates = entDB.dates[startDateIndex:endDateIndex+1]
+    curDates = entDB.dates[startDateIndex:endDateIndex+1].astype('int')
+    """
     numX = len(curDates)
     xTicks = (numpy.linspace(0,1,9)*numX).astype(int)
     xTicks[-1] -= 1
     xTickLabels = numpy.array(curDates)[xTicks]
     plt.xticks(xTicks, xTickLabels, rotation='vertical')
+    """
+    ax = plt.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.IndexFormatter(curDates))
     plt.show()
 
 
