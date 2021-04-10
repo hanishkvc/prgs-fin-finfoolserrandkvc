@@ -78,6 +78,7 @@ class DataSrc:
         if (thePath != None) and (basePath != None):
             thePath = os.path.expanduser(os.path.join(basePath, thePath))
         print("INFO:{}:{}:{}".format(self.tag, theMsg, thePath))
+        return thePath
 
 
     def __init__(self, basePath, loadFilters, nameCleanupMap):
