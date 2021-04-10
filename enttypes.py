@@ -40,7 +40,9 @@ def _add_member(self, entTypeId, entCode):
     """
     Add a entity to the members list associated with its entityType.
     """
-    self.typeMembers[self.typesL[entTypeId]].append(entCode)
+    entType = self.typesL[entTypeId]
+    if entCode not in self.typeMembers[entType]:
+        self.typeMembers[entType].append(entCode)
 
 
 def _members(self, entTypeTmpls, entNameTmpls=[]):
