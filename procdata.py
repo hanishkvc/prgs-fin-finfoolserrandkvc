@@ -685,7 +685,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
     totalEntities = len(entCodes)
     if numEntities > totalEntities:
         numEntities = totalEntities
-    printFmt = "\t{:<16}:{:24}:"
+    printFmt = "\t{:<20}:{:24}:"
     for dataSrc in dataSrcs:
         print("DataSrc:{}: >>showing {} of {} entities<<".format(dataSrc, numEntities, totalEntities))
         if dataSrc[0] in [ 'absRet', 'retOn' ]:

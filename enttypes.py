@@ -80,7 +80,7 @@ def _members(self, entTypeTmpls, entNameTmpls=[]):
                 else:
                     bEntSelect = False
             if bEntSelect:
-                print("\t", entCode, entName)
+                print("\t{:20} {}".format(entCode, entName))
                 entCodes.append(entCode)
     return entCodes
 
