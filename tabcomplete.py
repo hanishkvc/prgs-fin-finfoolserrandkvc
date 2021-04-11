@@ -8,11 +8,11 @@ import readline
 gMeta = None
 L1 = [ "edb.load", "edb.fetch", "edb.search", "edb.load_mfs", "edb.load_stocks",
         "edb.enttypes", "edb.enttype_members",
-        "procdata.ops", "procdata.mabeta", "procdata.anal_simple",
+        "procedb.ops", "procedb.mabeta", "procedb.anal_simple",
         "plot.data", "plot.show", "plot.linregress",
         "loadfilters.setup", "loadfilters.list", "loadfilters.get", "loadfilters.activate", "loadfilters.copy",
         "session_save", "session_restore",
-        "procdata.infoset1_prep", "procdata.infoset1_result",
+        "procedb.infoset1_prep", "procedb.infoset1_result",
         "quit"
         ]
 

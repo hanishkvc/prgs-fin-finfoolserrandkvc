@@ -107,11 +107,11 @@ may not give the full picture, depending on how one looks at things.
 
 A sample session could involve
 
-   fetch_data(2013, 2021)
-   load_data(2013, 2021)
-   procdata.infoset1_prep()
-   procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
-   procdata.infoset1_result(['open equity elss', 'open hybrid aggressive'], ['direct'])
+   edb.fetch(2013, 2021)
+   edb.load(2013, 2021)
+   procedb.infoset1_prep()
+   procedb.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
+   procedb.infoset1_result(['open equity elss', 'open hybrid aggressive'], ['direct'])
 
 
 Fetching
@@ -276,17 +276,17 @@ ex: search_data(["direct bluechip -NO-dividend", "direct bluechip dividend us"])
 Processing Data
 ===================
 
-procdata.ops(<ListOfOperations>)
+procedb.ops(<ListOfOperations>)
 
-procdata.ops("srel=srel(data)")
+procedb.ops("srel=srel(data)")
 
-procdata.ops(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
+procedb.ops(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
 
-procdata.ops(["srel=srel(data)", "dma20=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+procedb.ops(["srel=srel(data)", "dma20=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
 
-procdata.ops(["srel=srel(data)", "dma20SRel=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+procedb.ops(["srel=srel(data)", "dma20SRel=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
 
-NOTE: help(procdata.ops) will give some of the details about using this.
+NOTE: help(procedb.ops) will give some of the details about using this.
 
 srel - safe relative
 ----------------------
@@ -413,7 +413,7 @@ Look at raw/processed data
 =============================
 
 
-procdata.anal_simple
+procedb.anal_simple
 ----------------------
 
 Sort/Rank the entities in the dataset based on the criteria (op + opType) given
@@ -423,21 +423,21 @@ Some of the operationTypes supported include
    normal: Depending on the value in the given dataSrc on the given date or index, decide
    how to rank the entities.
 
-   srel_absret: The dataSrc should be one generated using srel procdata.ops operation.
+   srel_absret: The dataSrc should be one generated using srel procedb.ops operation.
    Look at the associated absoluteReturn value for each of the specified entities, and
    rank the entities.
 
-   srel_retpa: The dataSrc should be one generated using srel procdata.ops operation.
+   srel_retpa: The dataSrc should be one generated using srel procedb.ops operation.
    Look at the associated returnPerAnnum value for each of the specified entities, and
    rank the entities.
 
-   roll_avg: The dataSrc should be one generated using roll<Days> operation of procdata.ops.
+   roll_avg: The dataSrc should be one generated using roll<Days> operation of procedb.ops.
    This looks at the full period average of the rolling returnPerAnnum over the full dateRange
    loaded, for each entity, to decide how to rank the entities.
 
       analdata_simple('roll1095', 'top', 'roll_avg')
 
-   block_ranked: The dataSrc should be one generated using block<Days> procdata.ops oepration.
+   block_ranked: The dataSrc should be one generated using block<Days> procedb.ops oepration.
    This identifies the pentile to which each entity belongs, when compared to all other
    entities loaded, wrt each block period. Inturn it calculates a naive average of the
    pentile rank across all the blocks, and uses the same to rank the specified subset of
@@ -455,7 +455,7 @@ Some of the operationTypes supported include
       entCodes).
 
 
-procdata.infoset1
+procedb.infoset1
 -------------------
 
 Print some possibly useful info about the entities in the loaded set. It prints data about
@@ -465,52 +465,52 @@ Wrt these comparative prints, it tries to order the entities, based on the avera
 will get bundled to the end of the ordered list, based on the last return per annum data
 available for such entities (wrt its start date).
 
-User needs to first run procdata.infoset1_prep, before calling one of the procdata.infoset1_result calls.
+User needs to first run procedb.infoset1_prep, before calling one of the procedb.infoset1_result calls.
 This will print processed data, wrt specified entities, based on what was generated during
-procdata.infoset1_prep.
+procedb.infoset1_prep.
 
-procdata.infoset1_prep()
+procedb.infoset1_prep()
 
    process the raw data using a standard set of operations like srel, roll1095, roll1825
    and reton, in order to generate useful info.
 
-procdata.infoset1_result()
+procedb.infoset1_result()
 
    Display processed data wrt all entities in the loaded dataset.
 
-procdata.infoset1_result(listOfEntityTypeMatchTemplates)
+procedb.infoset1_result(listOfEntityTypeMatchTemplates)
 
    Display processed data wrt all entities which belong to any of the matching entTypes.
 
-   ex: procdata.infoset1_result('elss')
+   ex: procedb.infoset1_result('elss')
 
-   ex: procdata.infoset1_result('open large')
+   ex: procedb.infoset1_result('open large')
 
-   ex: procdata.infoset1_result(['elss', 'open large', 'open flexi', 'open multi'])
+   ex: procedb.infoset1_result(['elss', 'open large', 'open flexi', 'open multi'])
 
-procdata.infoset1_result([], listOfEntityNameMatchTemplates)
+procedb.infoset1_result([], listOfEntityNameMatchTemplates)
 
    Display processed data wrt entities, whose name match any of the given entName matching template.
 
-   ex: procdata.infoset1_result([], 'axis')
+   ex: procedb.infoset1_result([], 'axis')
 
-   ex: procdata.infoset1_result([], 'pgim direct')
+   ex: procedb.infoset1_result([], 'pgim direct')
 
-   ex: procdata.infoset1_result([], ['nifty direct', 'nasdaq direct'])
+   ex: procedb.infoset1_result([], ['nifty direct', 'nasdaq direct'])
 
-procdata.infoset1_result(listOfEntityTypeMatchTemplates, listOfEntityNameMatchTemplates)
+procedb.infoset1_result(listOfEntityTypeMatchTemplates, listOfEntityNameMatchTemplates)
 
    Display processed data wrt entities, which belong to one of the matched entTypes and inturn
    whose name matches any of the passed entNameMatchTemplate.
 
-procdata.infoset1_result1_entcodes(listOfEntCodes)
+procedb.infoset1_result1_entcodes(listOfEntCodes)
 
    Display processed data for the list of entities specified using their entCode. User can create
    the passed list of entCodes using any mechanism they find suitable and or need.
 
 
 NOTE: By default only 20 entities are printed as part of the comparitive prints, if you want to
-change this,  pass numEntities argument to procdata.infoset1_result.
+change this,  pass numEntities argument to procedb.infoset1_result.
 
 
 Processed Datas
@@ -591,15 +591,15 @@ sessions in a relatively fast way. Note that this also saves and restores any of
 processed data sets and not just the initial raw data set.
 
 ./FinFoolsErrandKVC.py
-OO>load_data(2013,2021)
-OO>procdata.infoset1_prep()
-OO>procdata.infoset1_result('elss')
+OO>edb.load(2013,2021)
+OO>procedb.infoset1_prep()
+OO>procedb.infoset1_result('elss')
 OO>session_save('mysave1869')
 OO>quit()
 
 ./FinFoolsErrandKVC.py
 OO>session_restore('mysave1869')
-OO>procdata.infoset1_result('indexes')
+OO>procedb.infoset1_result('index')
 
 
 
@@ -696,6 +696,6 @@ MaShaMinT added to ProcDataEx RollingRet meta data/label.
 
 20210331IST0404
 
-MaBeta added as a additional procdata function.
+MaBeta added as a additional procedb function.
 
 

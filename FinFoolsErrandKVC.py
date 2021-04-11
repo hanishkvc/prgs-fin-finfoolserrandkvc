@@ -18,7 +18,7 @@ import tabcomplete as tc
 import hlpr
 import datasrc
 import loadfilters
-import procdata
+import procedb
 import plot
 import edb
 
@@ -28,14 +28,14 @@ Usage scenario
     edb.fetch(2010, 2021)
     edb.load(2013, 20190105)
     # explore option 1
-    procdata.infoset1_prep()
-    procdata.infoset1_result(['open elss'], ['direct'])
-    procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
+    procedb.infoset1_prep()
+    procedb.infoset1_result(['open elss'], ['direct'])
+    procedb.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
     # explore option 2
-    procdata.ops(['srel=srel(data)', 'roll3Y=roll1095(data)'])
+    procedb.ops(['srel=srel(data)', 'roll3Y=roll1095(data)'])
     edb.search(['match name tokens1', 'match name tokens2'])
-    procdata.anal_simple('srel', 'srel_retpa', 'top')
-    procdata.anal_simple('roll3Y', 'roll_avg', 'top')
+    procedb.anal_simple('srel', 'srel_retpa', 'top')
+    procedb.anal_simple('roll3Y', 'roll_avg', 'top')
     plot.data('srel', [ entCode1, entCode2 ])
     plot.show()
     quit()
@@ -186,8 +186,8 @@ def handle_args():
     else:
         edb.fetch_data(sys.argv[1], sys.argv[2])
         edb.load_data(sys.argv[1], sys.argv[2])
-        procdata.ops('roll1095=roll1095(data)')
-        procdata.anal_simple('roll1095', 'roll_avg')
+        procedb.ops('roll1095=roll1095(data)')
+        procedb.anal_simple('roll1095', 'roll_avg')
 
 
 #
