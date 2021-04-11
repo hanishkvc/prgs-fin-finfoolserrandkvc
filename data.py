@@ -7,21 +7,15 @@ import sys
 import calendar
 import os
 import numpy
-import matplotlib.pyplot as plt
 import time
 import traceback
 import readline
 import warnings
-import tabcomplete as tc
 import hlpr
 import datasrc
 import india
-import enttypes
-import indexes
 import entities
 import loadfilters
-import procdata
-import plot
 
 
 gbDEBUG = False
@@ -49,26 +43,16 @@ gDS = []
 
 
 
-def modules_sync_gentdb(entDB):
-    """
-    Setup the helper modules' gEntDB
-    """
-    enttypes.gEntDB = entDB
-    procdata.gEntDB = entDB
-    plot.gEntDB = entDB
-
-
 def setup_gentdb(startDate=-1, endDate=-1):
     """
     Initialise the gEntDB
 
-    NumOfRows (corresponding to MFs) is set to a fixed value.
+    NumOfRows (corresponding to Entities) is set to a fixed value.
     NumOfCols (corresponding to Dates) is set based on date range.
     """
     global gEntDB
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
     gEntDB = entities.EntitiesDB(gDataKeys, gDataAliases, 8192*4, numDates)
-    modules_sync_gentdb(gEntDB)
 
 
 def setup_modules():
@@ -461,6 +445,5 @@ def session_restore(sessionName):
     global gEntDB
     fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
     ok, gEntDB, tIgnore = hlpr.load_pickle(fName)
-    modules_sync_gentdb(gEntDB)
 
 

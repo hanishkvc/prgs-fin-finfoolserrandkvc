@@ -8,20 +8,20 @@ from scipy import stats
 import matplotlib
 import matplotlib.pyplot as plt
 import hlpr
+import data
 
 
 giLabelNameChopLen = 36
 giLabelCodeChopLen = 16
 
 
-gEntDB = None
 def _entDB(entDB=None):
     """
     Either use the passed entDB or else the gEntDB, which might
     have been set by the user previously.
     """
     if entDB == None:
-        return gEntDB
+        return data.gEntDB
     return entDB
 
 

@@ -15,6 +15,7 @@ import hlpr
 import enttypes
 import indexes
 import entities
+import data
 
 
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
@@ -22,14 +23,13 @@ gHistoricGaps = numpy.array([1, 7, 30, 92, 183, 365, 1095, 1825, 3650])
 gHistoricGapsHdr = numpy.array(["1D", "7D", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
 
 
-gEntDB = None
 def _entDB(entDB=None):
     """
     Either use the passed entDB or else the gEntDB, which might
     have been set by the user previously.
     """
     if entDB == None:
-        return gEntDB
+        return data.gEntDB
     return entDB
 
 
