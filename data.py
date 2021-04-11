@@ -40,6 +40,7 @@ gEntDB = None
 gDataKeys = ['open', 'high', 'low', 'data', 'volume']
 gDataAliases = { 'data': [ 'nav', 'close' ] }
 gDS = []
+gBasePath = "./ffe.data/"
 
 
 
@@ -55,15 +56,16 @@ def setup_gentdb(startDate=-1, endDate=-1):
     gEntDB = entities.EntitiesDB(gDataKeys, gDataAliases, 8192*4, numDates)
 
 
-def setup_modules():
-    gDS.append(india.IndiaMFDS(FINFOOLSERRAND_BASE))
-    gDS.append(india.IndiaSTKDS(FINFOOLSERRAND_BASE))
+def setup_modules(basePath):
+    gDS.append(india.IndiaMFDS(basePath))
+    gDS.append(india.IndiaSTKDS(basePath))
 
 
-def setup():
+def setup(basePath):
+    global gBasePath
+    gBasePath = basePath
     setup_gentdb()
-    setup_paths()
-    setup_modules()
+    setup_modules(basePath)
     loadfilters.list()
 
 
@@ -433,8 +435,8 @@ def session_save(sessionName):
     """
     Save current gEntDB.data-gEntDB.meta into a pickle, so that it can be restored fast later.
     """
-    fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
-    hlpr.save_pickle(fName, gEntDB, None, "Main:SessionSave")
+    fName = os.path.join(gBasePath, "SSN_{}".format(sessionName))
+    hlpr.save_pickle(fName, gEntDB, None, "Data:SessionSave")
 
 
 def session_restore(sessionName):
@@ -443,7 +445,7 @@ def session_restore(sessionName):
     Also setup the modules used by the main logic.
     """
     global gEntDB
-    fName = os.path.join(FINFOOLSERRAND_BASE, "SSN_{}".format(sessionName))
+    fName = os.path.join(gBasePath, "SSN_{}".format(sessionName))
     ok, gEntDB, tIgnore = hlpr.load_pickle(fName)
 
 
