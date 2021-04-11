@@ -329,11 +329,19 @@ def load_data(startDate, endDate = None, dataSrcType=datasrc.DSType.Any,
 
 def load_data_mfs(startDate, endDate = None, dataSrcType=datasrc.DSType.MF,
         bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts=None):
+    """
+    Load data from MF related data sources. This is a wrapper around load_data.
+    Look at load_data for details.
+    """
     load_data(startDate, endDate, dataSrcType, bClearData, bOptimizeSize, loadFiltersName, opts)
 
 
 def load_data_stocks(startDate, endDate = None, dataSrcType=datasrc.DSType.Stock,
         bClearData=True, bOptimizeSize=True, loadFiltersName=LOADFILTERSNAME_AUTO, opts=None):
+    """
+    Load data from Stocks related data sources. This is a wrapper around load_data.
+    Look at load_data for details.
+    """
     load_data(startDate, endDate, dataSrcType, bClearData, bOptimizeSize, loadFiltersName, opts)
 
 
@@ -436,14 +444,14 @@ def list_enttypes(entTypeTmpls=et.TYPE_MATCH_ALL):
     """
     Get list of entTypes in the entities db.
     """
-    gEntDB.list_types(entTypeTmpls)
+    return gEntDB.list_types(entTypeTmpls)
 
 
 def list_enttype_members(entTypeTmpls=et.TYPE_MATCH_ALL, entNameTmpls=et.NAME_MATCH_ALL):
     """
     Get list of matching entities in the matching entTypes.
     """
-    gEntDB.list_type_members(entTypeTmpls, entNameTmpls)
+    return gEntDB.list_type_members(entTypeTmpls, entNameTmpls)
 
 
 def session_save(sessionName):
