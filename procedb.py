@@ -77,13 +77,16 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 MetaData  = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
                 MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 
-        "mas<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
+        "ma<s|e><DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. THere will be partially calculated data regions at the beginning and
                 end of the dateRange, which dont have sufficient data to one of the sides. Inturn
                 the valid mas data is shifted to align with the end, such that each location value
                 corresponds ot average of last N days wrt that location. Inturn N days at the start
                 will be set to NaN, as they dont have sufficient historic data to calculate average
                 of last N days.
+                mas: moving average simple (equal weightage to all in window)
+                mae: moving average exponential (latest data in window has double weightage as others)
+
                 MetaLabel = dataSrcMetaLabel, validMAResultBeginVal, validMAResultEndVal
 
                 NOTE: User can set gbMAShift2End to avoid the shifting to align with end.
@@ -234,15 +237,21 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                             tResult[r,:] = tROAbs
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
-                elif op.startswith("mas"):
+                elif op.startswith("ma"):
                     days = int(op[3:])
                     inv = int(days/2)
+                    if op[2] == 's':
+                        winWeights = numpy.ones(days)/days
+                    else:
+                        winWeights = numpy.ones(days)
+                        winWeights[-1] = 2
+                        winWeights = winWeights/days
                     if gbMAShift2End:
-                        tMARes = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                        tMARes = numpy.convolve(entDB.data[dataSrc][r,:], winWeights, 'same')
                         tResult[r,days:] = tMARes[inv:-inv]
                         tResult[r,:days] = numpy.nan
                     else:
-                        tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                        tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], winWeights, 'same')
                         tResult[r,:inv] = numpy.nan
                         tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
                     if True:
