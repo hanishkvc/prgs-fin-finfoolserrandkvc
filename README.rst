@@ -1,10 +1,10 @@
 ####################################
-Try look at MF/Indexes/... Nav data
+Try look at MF/Indexes/Stock... data
 ####################################
 Author: HanishKVC
-Version: v20210326IST2019
+Version: v20210411IST1600
 License: GPL
-Status: Majorly OUT OF SYNC with new version of PROGRAM
+Status: Not fully updated wrt new version of PROGRAM
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ GNU General Public License for more details.
 Overview
 #########
 
-This is a relative look across multiple data sets.
+This is a relative look across multiple data sets having data over a period
+of time.
 
 As I didnt find any opensource program to look at the historical data of MF navs,
 so created a simple one to try and look at the same in some simple, silly and
@@ -34,20 +35,21 @@ I wanted to have a stupid look across entities (MFs/indexes/...) in stupid/silly
 ways.
 
 This tries to fetch the Indian MFs nav data from the AMFI website and Index data
-from bse website. As one can look at this data from their website for personal use,
+from nse website. As one can look at this data from their website for personal use,
 so I am assuming that it should be fine to fetch the data again for personal use,
 but if you plan to access the data from these sources for any other use, do cross
 check with the data sources once, before fetching and using the data from them.
 Also avoid overloading their servers when trying to fetch, by fetching spread over
 a long time and not at once.
 
-NOTE: Rating/Ranking provided by independent 3rd parties will be based on collating
-a score over multiple parameters and or some more additional validation/crosscheck.
-AND this program DOESNT have intelligence for either of it, So the sorted list
+NOTE:
+Rating/Ranking provided by knowledgable independent 3rd parties will be based on
+collating a score over multiple parameters and or some more additional validation
+/crosscheck. THIS PROGRAM DOESNT have intelligence for either of it, So sorted list
 this prg generates/shows is not accurate at all and can potentially be misleading
 for n number of reasons.
 
-NOTE: Even the sites will show more as well as relavant parameters to get a guage
+NOTE: Financial sites will show more as well as relavant parameters to get a guage
 of how the entity is performing wrt different important aspects. So please do
 look at those along with the ratings from independent agencies to get the better
 picture of how the entity is performing. This program doesnt do any of these more
@@ -58,9 +60,10 @@ NOTE: This is a purely experimental program to explore somethings, which I had i
 mind. And is not suitable for making any investment or divestment decisions and or
 any inferences about things/... Also I am no expert in this matter, so my logics
 could be buggy and stupid in more ways than one. Also the data it works with may
-not be error free and uptodate always. So dont use this program for anything.
+not be error free and may not be uptodate always. So dont use this program for
+anything.
 
-The logic also has been updated to fetch historic/bhav data from nse website,
+The logic has also been updated to fetch historic/bhav data from nse website,
 so that one can look at historic stock data in blind and stupid ways.
 
 
@@ -83,7 +86,7 @@ user can enter standard python statements as well as the functions provided by t
       A empty line or a line with lesser indentation than what was at the begining of the
       multiline block, will terminate the multiline block logic.
 
-However if the program is called with a single argument which is a file with extension ".mf",
+However if the program is called with a single argument which is a file with extension ".ffe",
 then the program will assume that it is a script file which contains commands for the program.
 They will be executed as if the user had entered them directly into the program one after the
 other.
@@ -95,10 +98,11 @@ Usage
 
 Some of the functions supported by the program are specified in the sections below.
 
-NOTE: calling help on any of the function will get some basic usage info about them.
+Calling help on any of the function will get some basic usage info about them.
 
    help(function_name)
 
+The main data base / dataset maintained by this program is called edb (entities db).
 A Entity could refer to a mutual fund or index or ... one may load into this program.
 
 NOTE: When comparing entities, if they have been active for different amount of time
@@ -110,20 +114,23 @@ A sample session could involve
    edb.fetch(2013, 2021)
    edb.load(2013, 2021)
    procedb.infoset1_prep()
+   edb.enttypes();
    procedb.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
    procedb.infoset1_result(['open equity elss', 'open hybrid aggressive'], ['direct'])
+   edb.enttype_members('nse index')
+   plot.data('srel', 'nse index', ['-RE-Nifty 50', 'smlcap'])
 
 
 Fetching
 ==========
 
-One can use fetch_data to fetch historical data.
+One can use edb.fetch_data (edb.fetch will also do) to fetch historical data.
 
-fetch_data(YYYY[MM[DD]])
+edb.fetch_data(YYYY[MM[DD]])
 
-fetch_data(YYYY[MM[DD]], YYYY[MM[DD]])
+edb.fetch_data(YYYY[MM[DD]], YYYY[MM[DD]])
 
-fetch_data(YYYY[MM[DD]], YYYY[MM[DD]], opts)
+edb.fetch_data(YYYY[MM[DD]], YYYY[MM[DD]], opts)
 
    opts argument is a dictionary which can one of the two booleans
 
@@ -140,19 +147,19 @@ fetch_data(YYYY[MM[DD]], YYYY[MM[DD]], opts)
 
 Some sample usage:
 
-   fetch_data(2020)
+   edb.fetch_data(2020)
 
       This will try to fetch data from 1st Jan 2020 to 31st Dec 2020.
 
-   fetch_data(2020, 202101)
+   edb.fetch_data(2020, 202101)
 
       This will try to fetch data from 1st Jan 2020 to 31st Jan 2021.
 
-   fetch_data(20100501, 2018)
+   edb.fetch_data(20100501, 2018)
 
       This will try fetch data from 2010 May 1st to 2018 Dec 31st.
 
-   fetch_data(202103, opts={ 'ForceRemote': True })
+   edb.fetch_data(202103, opts={ 'ForceRemote': True })
 
       This will try refetch the data for 2021 March from the internet again,
       even if it is already downloaded, ie if there is any change in size of
@@ -161,7 +168,7 @@ Some sample usage:
 NOTE: If the given range goes into the future, then it wont try to fetch data belonging
 to the future.
 
-NOTE: As NAV data for yesterday, could get updated anytime during the current day and
+NOTE: Wrt MF as NAV data for yesterday, could get updated anytime during current day and
 sometimes even beyond in some worst cases. So data fetched by this program need not be
 accurate in some cases. If one tries to refetch the same date range as before, at a later
 date, then it tries to see if there is any update to the nav data, and if it appears so,
@@ -170,9 +177,8 @@ file and that too only if the length is larger than what it had downloaded previ
 so it need not download the uptodate historical data in some cases. SO DONT DEPEND ON
 THIS PROGRAM for any decisions or inferences or ...
 
-   Rather one requires to remove the data pickle files for the new logic to try and
-   recheck with the internet for previously downloaded data. May add a force argument
-   to fetch or so in future.
+NOTE: There could be bug wrt parsing downloaded data csv files and or issues with saving
+and restoring pickle. So also the things done/shown by the program could be wrong.
 
 NOTE: Program checks for and then if required introduces a minimum gap in time between
 successive downloads during fetching, so that one doesnt overload internet and or servers.
@@ -181,18 +187,22 @@ successive downloads during fetching, so that one doesnt overload internet and o
 Loading
 ==========
 
-Once the historical nav data has been fetched. One can load a specific date range of this
-data to have a look at it.
+Once the historical data has been fetched. One can load a specific date range of this data
+to have a look at it.
 
-load_data(YYYY[MM[DD]])
+edb.load_data(YYYY[MM[DD]])
 
-load_data(YYYY[MM[DD]], YYYY[MM[DD]])
+edb.load_data(YYYY[MM[DD]], YYYY[MM[DD]])
 
-load_data(YYYY[MM[DD]], YYYY[MM[DD]], loadFiltersName=theLoadFiltersName)
+edb.load_data(YYYY[MM[DD]], YYYY[MM[DD]], loadFiltersName=theLoadFiltersName)
 
-NOTE: load_data will try and fetch the data, if its not already fetched. However if you
-want to force a redownload etc, then you have to call fetch_data directly with appropraite
-arguments.
+TOTHINK: edb.load_data can be configured to try and fetch the data, if its not already fetched.
+Need to think, if I will re-enable this logic again. However if you want to force a redownload
+etc, then you have to call edb.fetch_data directly with appropraite arguments.
+
+The edb.load_data (edb.load can also be used), will download from all types of data sources by
+default. However if one wants to download only MF or only Stock related data, then one can pass
+dataSrcType argument as required. Or else call edb.load_mfs or edb.load_stocks.
 
 
 LoadFilters
@@ -215,7 +225,7 @@ loadfilters.setup(loadFiltersName, whiteListEntTypes, whiteListEntNames, blackLi
 
 One can use loadfilters.list to look at the currently defined loadfilters.
 
-Inturn while calling load_data, one can pass the optional loadFiltersName argument, to
+Inturn while calling edb.load_data, one can pass the optional loadFiltersName argument, to
 filter entities based on the corresponding list of filters.
 
    If user doesnt specify this argument, then the program will set this to a special
@@ -229,22 +239,26 @@ filter entities based on the corresponding list of filters.
 Search
 ========
 
-Search through the loaded data set to see if it contains MFs with matching names.
+Search through the loaded data set to see if it contains entities with matching names.
 
-search_data("match template tokens set1 ")
+edb.search_data("match template tokens set1 ")
 
-search_data(["match template tokens set1", "match tokens set2", ...])
+edb.search_data(["match template tokens set1", "match tokens set2", ...])
 
 The user can specify one or more match templates to this function/command. If one
 wants to check wrt multiple match templates, then pass it has a list of strings.
+
+NOTE: This searches for entities with matching name, across all the entity types in the
+entities database. However if one wants to find entities with matching name belonging
+to a subset of the entTypes, then use edb.enttype_members.
 
 
 Match Tempaltes
 =================
 
 For each match template specified, the program will search through the currently
-loaded entities. If any match is found the same will be selected and used as
-appropriate based on the command.
+loaded entities database. If any match is found the same will be selected and used
+as appropriate based on the command.
 
 The program tries to check if each of the word/token in the given template is present
 in the names in its dataset. If all tokens in a match template are present in a given
@@ -263,9 +277,13 @@ part of a bigger token. Otherwise normally each token/word should match fully.
 
 If the matching template itself is prefixed with -RE- then it is interpreted as a
 regular expression based matching template, instead of the programs internal logic.
+In this case to ignore case, one will have to use -RE-(?i).
 
 NOTE: a token is a alphanumeric word with spaces around it, so each word in a string
 is a token.
+
+entTypeTmpls correspond to matching templates used wrt finding suitable entity types.
+While entNameTmpls correspond to finding matching entity names.
 
 ex: search_data("direct index fund tata")
 ex: search_data("fund tata index direct")
@@ -350,7 +368,6 @@ ex: dma50Data=dma50(data)
 It calculates the moving average over a specified number of days, for the full dataset.
 
 Some common window size one could use for moving average are 20, 50, 200, ...
-
 
 
 roll - rolling return
@@ -501,16 +518,26 @@ procedb.infoset1_result([], listOfEntityNameMatchTemplates)
 procedb.infoset1_result(listOfEntityTypeMatchTemplates, listOfEntityNameMatchTemplates)
 
    Display processed data wrt entities, which belong to one of the matched entTypes and inturn
-   whose name matches any of the passed entNameMatchTemplate.
+   whose name matches any of the passed entNameMatchTemplate. The user can select between
+   resultType 'result1' and or 'result2', this decides how the subset of entities displayed
+   are identified.
 
 procedb.infoset1_result1_entcodes(listOfEntCodes)
 
    Display processed data for the list of entities specified using their entCode. User can create
    the passed list of entCodes using any mechanism they find suitable and or need.
 
+procedb.infoset1_result2_entcodes(listOfEntCodes)
+
+   This identifies the top N and bottom N entities based on absolute return wrt last 1 day, 7 days,
+   1 month and 3 month and inturn show some of the data corresponding to all the entities identified
+   till then.
+
+   If no entCodes list passed, then it looks at all the entities, when identifying the top/bottom N
+   entities. Else it identifies the top/bottom N entities from within the passed list of entities.
 
 NOTE: By default only 20 entities are printed as part of the comparitive prints, if you want to
-change this,  pass numEntities argument to procedb.infoset1_result.
+change this, pass numEntities argument to procedb.infoset1_result.
 
 
 Processed Datas
@@ -544,6 +571,8 @@ Plot Functions
 
 help(plot.data)
 
+help(plot._data)
+
 help(plot._linregress)
 
 help(plot.linregress)
@@ -557,18 +586,29 @@ Entity types
 The entities (MFs/stocks/indexes/...) maintained by the program could belong to different
 categories/types.
 
-enttypes.list()
+edb.enttypes()
 -----------------
 
 Will list all the types currently known to the program. Loading of data will set this list.
 
-   for example wrt MFs, it could be
+for example:
+
+   wrt MFs, it could be
 
       open ended equity
       money market
       hybrid etc
 
-enttypes.members(entTypeTmpls, entNameTmpls)
+   wrt Stocks, it could be
+
+      Index
+      Nifty 50
+      Nifty smallcap
+      NSE Pharma
+      ...
+
+
+edb.enttype_members(entTypeTmpls, entNameTmpls)
 ------------------------------------------------
 
 List all the entities belonging to the given entTypes. If entNameTmpls is also provided,
@@ -579,7 +619,7 @@ then only list those entities, whose name matches one of the passed entName matc
 Saving and Restoring Session
 ==============================
 
-One can use session_save to save gData-gMeta combo corresponding to the currently loaded data,
+One can use session_save to save entities db which corresponds to the currently loaded data,
 into disk. Inturn one can use session_restore to restore a previously saved session back into
 runtime memory.
 
@@ -603,58 +643,18 @@ OO>procedb.infoset1_result('index')
 
 
 
-Older logic, Not yet updated, wrt new logics/flows (i.e if reqd)
-#################################################################
-
-LookAt
-=======
-
-Basic use
-----------
-
-One can look at the data belonging to the specified list of MFs.
-
-THe list of MFs to look at is specified as a list of strings. The program will
-try to see if any of the MFs in the dataset contain all the tokens in any of the
-given strings. If so, the corresponding MF name will be selected, and its data
-can be looked at.
-
-One can either look at
-
-   the raw data or
-
-   relative to start date or
-
-   as a moving average over specified number of days or
-
-   as a rolling return across specified number of days.
-
-It will also print the absolute and per annum return.
-
-lookat_data(<ListOfMFNameMatchTokens>, dataProcs=<ListOfDataProcs>)
-
-ONe specifies the type of data to look at by setting the dataProcs, suitably into either
-
-   "raw" and or "rel" and or "dma_N" and or "roll_N"; where N specifies the number of days.
-
-One can call lookat_data multiple times, to build up the set of MFs and their data one
-is interested in looking at and then at the end call show_plot, to get a plot all the
-data in one shot.
-
-If called multiple times, it should always be wrt to the same date range.
-
-Calling load_data or show_plot will clear the date range, so that the user is free to
-work with a new date range.
+Misc 
+######
 
 
 DateRange
-----------
+==========
 
 User can optionally specify startDate and endDate as arguments.
 
-If startDate is not specified, it will be mapped to the startDate specified during load_data.
+If startDate is not specified, it will be mapped to the startDate specified during edb.load_data.
 
-If endDate is not specified, it will be mapped to the endDate specified during load_data.
+If endDate is not specified, it will be mapped to the endDate specified during edb.load_data.
 
 
 Misc Notes
@@ -686,7 +686,7 @@ THe logic updated to take care of recreating the data pickles, wrt fetched data,
 due to the restructuring involving splitting of gData into gData and gMeta.
 
 In case this doesnt seem to work for you, you can always force things by calling
-fetch_data and passing ForceRemote=True opts to it.
+edb.fetch_data and passing ForceRemote=True opts to it.
 
 20210328IST1722
 
@@ -697,5 +697,10 @@ MaShaMinT added to ProcDataEx RollingRet meta data/label.
 20210331IST0404
 
 MaBeta added as a additional procedb function.
+
+202104XYISTABCD
+
+the logic has been divided into few classes and modules, and the program flow is build
+around this now.
 
 
