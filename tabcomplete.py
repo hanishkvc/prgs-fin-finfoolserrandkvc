@@ -6,8 +6,8 @@ import readline
 
 
 gMeta = None
-L1 = [ "data.load", "data.fetch", "data.search", "data.load_mfs", "data.load_stocks",
-        "data.enttypes", "data.enttype_members",
+L1 = [ "edb.load", "edb.fetch", "edb.search", "edb.load_mfs", "edb.load_stocks",
+        "edb.enttypes", "edb.enttype_members",
         "procdata.ops", "procdata.mabeta", "procdata.anal_simple",
         "plot.data", "plot.show", "plot.linregress",
         "loadfilters.setup", "loadfilters.list", "loadfilters.get", "loadfilters.activate", "loadfilters.copy",

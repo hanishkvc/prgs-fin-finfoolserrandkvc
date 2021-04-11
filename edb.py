@@ -1,4 +1,4 @@
-# Handle the data related operations
+# Handle the data (entities db) related operations
 # HanishKVC, 2021
 # GPL
 #
