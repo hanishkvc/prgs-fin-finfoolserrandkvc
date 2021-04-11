@@ -4,13 +4,17 @@
 
 
 
+import time
 import edb
 import plot as mPlot
 import procedb
 
 
 
-def load(startDate, endDate=None):
+def load(startDate=None, endDate=None):
+    if startDate == None:
+        endDate = time.gmtime().tm_year
+        startDate = endDate - 7
     edb.load_data_stocks(startDate, endDate)
 
 
