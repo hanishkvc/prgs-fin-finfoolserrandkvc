@@ -120,9 +120,9 @@ def _linregress(entCode, entName, x, y):
     numDays = len(x)
     lr = stats.linregress(x,y)
     if gbLineRegressPlotData:
-        label = "{}:{}:Data:{}days".format(entCode, entName, numDays)
+        label = "{:<20}:{}:Data:{}days".format(entCode, entName, numDays)
         plt.plot(x, y, label=label)
-    label = "{}:{}:LinRegressLineFit".format(entCode, entName)
+    label = "{:<20}:{}:LinRegressLineFit:{}".format(entCode, entName, numDays)
     plt.plot(x, x*lr.slope+lr.intercept, label=label)
 
 
