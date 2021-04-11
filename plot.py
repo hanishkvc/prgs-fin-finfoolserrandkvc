@@ -25,7 +25,7 @@ def _entDB(entDB=None):
     return entDB
 
 
-def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
+def _data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
     """
     Plot specified datas for the specified entities from entDB, over the specified
     date range.
@@ -54,10 +54,28 @@ def data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None):
                 dataLabel = entDB.data[dataKeyMetaLabel][index]
             except:
                 dataLabel = ""
-            label = "{:{cwidth}}:{:{width}}: {}".format(entCode, name, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
+            label = "{:<{cwidth}}:{:{width}}: {}".format(entCode, name, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
             print("\t{}:{}".format(label, index))
-            label = "{:{cwidth}}:{:{width}}: {:16} : {}".format(entCode, name, dataKey, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
+            label = "{:<{cwidth}}:{:{width}}: {:16} : {}".format(entCode, name, dataKey, dataLabel, cwidth=giLabelCodeChopLen, width=giLabelNameChopLen)
             plt.plot(x, entDB.data[dataKey][index, startDateIndex:endDateIndex+1], label=label)
+
+
+def data(dataKeys, entTypeTmpls, entNameTmpls, startDate=-1, endDate=-1, entDB=None):
+    """
+    Plot specified datas for the specified entities from entDB, over the specified
+    date range.
+
+    dataKeys: Is a key or a list of keys used to retreive the data from entDB.data.
+    entTypeTmpls: matching templates used to identify entTypes.
+    entNameTmpls: matching templates used to identify entities within selected entTypes.
+    startDate and endDate: specify the date range over which the data should be
+        retreived and plotted.
+
+    Remember to call show func, when you want to see plots, accumulated till then.
+    """
+    entDB = _entDB(entDB)
+    entCodes = entDB.list_type_members(entTypeTmpls, entNameTmpls)
+    _data(dataKeys, entCodes, startDate, endDate, entDB)
 
 
 def _fit(dataKeys, entCodes, startDate=-1, endDate=-1, fitType='linregress', entDB=None):
