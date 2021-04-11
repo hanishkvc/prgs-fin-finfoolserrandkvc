@@ -222,7 +222,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         z.close()
 
 
-    def _load_ftype(self, theName, theFName, edb, opts, hdrLines=1):
+    def _load_ftype(self, theName, theFName, entDB, opts, hdrLines=1):
         """
         Load the Fixed/Rarely changing types available from this data source (NSEIndia)
 
@@ -234,7 +234,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         for i in range(hdrLines):
             f.readline() # Skip the header
         entTypeName = "{} {}".format(self.name, theName)
-        entTypeId = edb.add_type(entTypeName)
+        entTypeId = entDB.add_type(entTypeName)
         for l in f:
             l = l.strip()
             if l == '':
@@ -242,10 +242,10 @@ class IndiaSTKDS(datasrc.DataSrc):
             la = l.split(',')
             indName = la[1]
             entName = la[2]
-            edb.add_type_member(entTypeId, entName)
+            entDB.add_type_member(entTypeId, entName)
             indName = "{} {}".format(self.name, indName)
-            indId = edb.add_type(indName)
-            edb.add_type_member(indId, entName)
+            indId = entDB.add_type(indName)
+            entDB.add_type_member(indId, entName)
         f.close()
 
 

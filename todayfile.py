@@ -64,12 +64,12 @@ def valid_today(today):
         return False, False
 
 
-def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None, caller="TodayFile"):
+def load2edb(today, entDB, loadFilters=None, nameCleanupMap=None, filterName=None, caller="TodayFile"):
     """
-    Load data in today dictionary into the given entities db (edb).
+    Load data in today dictionary into the given entities db (entDB).
 
     Apply the specified filters if any wrt entType or entName. Inturn the
-    filtered data which passes the check will only be loaded into edb.
+    filtered data which passes the check will only be loaded into entDB.
 
     Name of entities will be cleaned up using nameCleanupMap, if any.
 
@@ -98,7 +98,7 @@ def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None,
     # Handle entTypes and their entities
     for curEntType in today['entTypes']:
         entCodes = today['entTypes'][curEntType]
-        curEntTypeId = edb.add_type(curEntType)
+        curEntTypeId = entDB.add_type(curEntType)
         if loadFilters['whiteListEntTypes'] == None:
             bSkipCurType = False
         else:
@@ -132,6 +132,6 @@ def load2edb(today, edb, loadFilters=None, nameCleanupMap=None, filterName=None,
             for i in range(len(today['dataKeys'])):
                 dataKey = today['dataKeys'][i]
                 datas[dataKey] = values[i]
-            edb.add_data(entCode, datas, name, curEntTypeId)
+            entDB.add_data(entCode, datas, name, curEntTypeId)
 
 

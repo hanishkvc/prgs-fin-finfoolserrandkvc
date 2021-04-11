@@ -228,7 +228,7 @@ class DataSrc:
                 print(sys.exc_info())
 
 
-    def load4date(self, y, m, d, edb, opts):
+    def load4date(self, y, m, d, entDB, opts):
         """
         Load data for the given date into Entities DB.
 
@@ -263,7 +263,7 @@ class DataSrc:
                 optsFD = { 'ForceLocal': True }
             self.fetch4date(y, m, d, optsFD)
         if ok:
-            todayfile.load2edb(today, edb, self.loadFilters, self.nameCleanupMap, 'active', self.tag)
+            todayfile.load2edb(today, entDB, self.loadFilters, self.nameCleanupMap, 'active', self.tag)
         else:
             self.listNoDataDates.append(dateInt)
             print("WARN:{}:Load4Date:No data wrt {}, so skipping".format(self.tag, fName))
@@ -307,7 +307,7 @@ class DataSrc:
                 print("ERRR:{}:FetchFTypes: Failed fetching {}".format(self.tag, tName))
 
 
-    def _load_ftype(self, theName, theFName, edb, opts):
+    def _load_ftype(self, theName, theFName, entDB, opts):
         """
         Load the specified FType.
         NOTE: Child class needs to implement this.
@@ -315,7 +315,7 @@ class DataSrc:
         raise NotImplementedError
 
 
-    def load_ftypes(self, edb, opts=None):
+    def load_ftypes(self, entDB, opts=None):
         """
         Load the Fixed MxN Grouping/Types if any.
         """
@@ -324,7 +324,7 @@ class DataSrc:
             return
         for tName, tFName in self.listFTypes:
             try:
-                self._load_ftype(tName, tFName, edb, opts)
+                self._load_ftype(tName, tFName, entDB, opts)
             except:
                 print("ERRR:{}:LoadFTypes: Failed loading {}".format(self.tag, tName))
 
