@@ -37,7 +37,7 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
 
-bDMAShift2End = True
+gbMAShift2End = True
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
 def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
@@ -77,16 +77,16 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 MetaData  = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
                 MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 
-        "dma<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
+        "mas<DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. THere will be partially calculated data regions at the beginning and
                 end of the dateRange, which dont have sufficient data to one of the sides. Inturn
-                the valid dma data is shifted to align with the end, such that each location value
+                the valid mas data is shifted to align with the end, such that each location value
                 corresponds ot average of last N days wrt that location. Inturn N days at the start
                 will be set to NaN, as they dont have sufficient historic data to calculate average
                 of last N days.
-                MetaLabel = dataSrcMetaLabel, validDmaResultBeginVal, validDmaResultEndVal
+                MetaLabel = dataSrcMetaLabel, validMAResultBeginVal, validMAResultEndVal
 
-                NOTE: User can set gDMAShift2End to avoid the shifting to align with end.
+                NOTE: User can set gbMAShift2End to avoid the shifting to align with end.
 
         "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
                 windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
@@ -234,12 +234,12 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                             tResult[r,:] = tROAbs
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
-                elif op.startswith("dma"):
+                elif op.startswith("mas"):
                     days = int(op[3:])
                     inv = int(days/2)
-                    if bDMAShift2End:
-                        tDMARes = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
-                        tResult[r,days:] = tDMARes[inv:-inv]
+                    if gbMAShift2End:
+                        tMARes = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
+                        tResult[r,days:] = tMARes[inv:-inv]
                         tResult[r,:days] = numpy.nan
                     else:
                         tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], numpy.ones(days)/days, 'same')
@@ -628,10 +628,10 @@ def infoset1_prep(entDB=None):
     """
     entDB = _entDB(entDB)
     warnings.filterwarnings('ignore')
-    ops(['srel=srel(data)', 'dma50Srel=dma50(srel)'], entDB=entDB)
+    ops(['srel=srel(data)', 'mas50Srel=mas50(srel)'], entDB=entDB)
     ops(['roabs=reton_absret(data)', 'rosaf=reton(data)'], entDB=entDB)
-    ops(['roll1095=roll1095(data)', 'dma50Roll1095=dma50(roll1095)'], entDB=entDB)
-    ops(['roll1825=roll1825(data)', 'dma50Roll1825=dma50(roll1825)'], entDB=entDB)
+    ops(['roll1095=roll1095(data)', 'mas50Roll1095=mas50(roll1095)'], entDB=entDB)
+    ops(['roll1825=roll1825(data)', 'mas50Roll1825=mas50(roll1825)'], entDB=entDB)
     blockDays = int(entDB.nxtDateIndex/5)
     ops(['blockNRoll1095=block{}(roll1095)'.format(blockDays)], entDB=entDB)
     warnings.filterwarnings('default')

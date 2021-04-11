@@ -298,11 +298,11 @@ procedb.ops(<ListOfOperations>)
 
 procedb.ops("srel=srel(data)")
 
-procedb.ops(["srel=srel(data)", "dma20=dma20(data)", "roll1Y=roll365(data)"])
+procedb.ops(["srel=srel(data)", "mas20=mas20(data)", "roll1Y=roll365(data)"])
 
-procedb.ops(["srel=srel(data)", "dma20=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+procedb.ops(["srel=srel(data)", "mas20=mas20(srel)", "roll1Y=roll365(data)", "mas50Roll1Y=mas50(roll1Y)"])
 
-procedb.ops(["srel=srel(data)", "dma20SRel=dma20(srel)", "roll1Y=roll365(data)", "dma50Roll1Y=dma50(roll1Y)"])
+procedb.ops(["srel=srel(data)", "mas20SRel=mas20(srel)", "roll1Y=roll365(data)", "mas50Roll1Y=mas50(roll1Y)"])
 
 NOTE: help(procedb.ops) will give some of the details about using this.
 
@@ -358,16 +358,18 @@ date relative to all other dates in the dataset, for each entity.
 NOTE: calculate based on ValueOnGivenDate/ValueOnEachDay
 
 
-dma - moving average
-----------------------
+mas - moving average simple
+-----------------------------
 
-dstDataKey=dma<Days>(srcDataKey)
+dstDataKey=mas<Days>(srcDataKey)
 
-ex: dma50Data=dma50(data)
+ex: mas50Data=mas50(data)
 
 It calculates the moving average over a specified number of days, for the full dataset.
 
 Some common window size one could use for moving average are 20, 50, 200, ...
+
+All data points in the window are given same weightage.
 
 
 roll - rolling return
