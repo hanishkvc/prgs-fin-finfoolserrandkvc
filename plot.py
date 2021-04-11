@@ -108,15 +108,20 @@ def _fit(dataKeys, entCodes, startDate=-1, endDate=-1, fitType='linregress', ent
             gFits[fitType](entCode, entName, x, y)
 
 
+gbLineRegressPlotData = False
 def _linregress(entCode, entName, x, y):
     """
     Use linear regression to plot a fitting line along with the data it
     tries to fit.
+
+    By default the actual data is not plotted. Set gbLineRegressPlotData,
+    if you want this logic to plot data.
     """
     numDays = len(x)
     lr = stats.linregress(x,y)
-    label = "{}:{}:Data:{}days".format(entCode, entName, numDays)
-    plt.plot(x, y, label=label)
+    if gbLineRegressPlotData:
+        label = "{}:{}:Data:{}days".format(entCode, entName, numDays)
+        plt.plot(x, y, label=label)
     label = "{}:{}:LinRegressLineFit".format(entCode, entName)
     plt.plot(x, x*lr.slope+lr.intercept, label=label)
 
