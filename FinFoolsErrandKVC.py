@@ -21,6 +21,7 @@ import loadfilters
 import procedb
 import plot
 import edb
+import stocks
 
 
 """
