@@ -27,6 +27,7 @@ def prep():
     Calculate some of the data required for later.
     """
     procedb.ops(['mas50=mas50(data)', 'mas200=mas200(data)'])
+    procedb.ops(['mae25=mae25(data)', 'mae50=mae50(data)'])
 
 
 def _plot(entCodes):
@@ -37,7 +38,7 @@ def _plot(entCodes):
         raw, mas50 and mas200 data as well as
         linear regression based lines wrt 1Y, 3Y and 5Y.
     """
-    mPlot._data(['data', 'mas50', 'mas200'], entCodes)
+    mPlot._data(['data', 'mas50', 'mas200', 'mae25', 'mae50'], entCodes)
     mPlot.linregress('data', entCodes)
 
 
