@@ -5,6 +5,9 @@
 import hlpr
 
 
+MATCH_ALL='-RE-.*'
+
+
 def _init(self):
     """
     Initialise the entity types related members of passed self.
@@ -29,11 +32,19 @@ def _add(self, typeName):
     return self.typesD[typeName]
 
 
-def _list(self):
+def _list(self, entTypeTmpls):
     """
-    List entity types found in the passed entities db.
+    List entity types which match any one of the given match templates,
+    from the passed entities db.
     """
-    return self.typesL
+    if type(entTypeTmpls) == str:
+        entTypeTmpls = [ entTypeTmpls ]
+    entTypesList = []
+    for entType in self.typesD:
+        fm,pm = hlpr.matches_templates(entType, entTypeTmpls)
+        if len(fm) > 0:
+            entTypesList.append(entType)
+    return entTypesList
 
 
 def _add_member(self, entTypeId, entCode):
@@ -58,13 +69,9 @@ def _members(self, entTypeTmpls, entNameTmpls=[]):
     through the entNameTmpls. If entNameTmpls is empty, then all
     members of the selected entTypes will be selected.
     """
-    if type(entTypeTmpls) == str:
-        entTypeTmpls = [ entTypeTmpls ]
-    entTypesList = []
-    for entType in self.typesD:
-        fm,pm = hlpr.matches_templates(entType, entTypeTmpls)
-        if len(fm) > 0:
-            entTypesList.append(entType)
+    if type(entNameTmpls) == str:
+        entNameTmpls = [ entNameTmpls ]
+    entTypesList = _list(self, entTypeTmpls)
     entCodes = []
     for entType in entTypesList:
         print("INFO:EntType: [{}] members:".format(entType))
@@ -110,12 +117,12 @@ def _entDB(entDB):
     return entDB
 
 
-def list(entDB=None):
+def list(entTypeTmpls=MATCH_ALL, entDB=None):
     """
     List all the types in entDB
     """
     entDB = _entDB(entDB)
-    lTypes = _list(entDB)
+    lTypes = _list(entDB, entTypeTmpls)
     for t in lTypes:
         print(t)
     return lTypes

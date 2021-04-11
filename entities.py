@@ -103,6 +103,22 @@ class EntitiesDB:
         enttypes._add_member(self, entTypeId, entCode)
 
 
+    def list_types(self, entTypeTmpls=enttypes.MATCH_ALL):
+        """
+        List all matching entTypes.
+        """
+        return enttypes.list(entTypeTmpls, self)
+
+
+    def list_type_members(self, entTypeTmpls=enttypes.MATCH_ALL, entNameTmpls=[]):
+        """
+        List matching members in all matching entTypes.
+
+        entNameTmpls: If [], matchs all members within each matched entType.
+        """
+        return enttypes._members(self, entTypeTmpls, entNameTmpls)
+
+
     def add_date(self, dateInt):
         """
         It is assumed that the date is added in chronological sequence.
