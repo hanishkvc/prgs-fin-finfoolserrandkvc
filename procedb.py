@@ -90,6 +90,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 MetaLabel = dataSrcMetaLabel, validMAResultBeginVal, validMAResultEndVal
 
                 NOTE: User can set gbMAShift2End to avoid the shifting to align with end.
+                NOTE: DAYSInINT needs to be a even number.
 
         "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
                 windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
