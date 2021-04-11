@@ -17,7 +17,6 @@ import warnings
 import tabcomplete as tc
 import hlpr
 import datasrc
-import entities
 import loadfilters
 import procdata
 import plot
@@ -26,15 +25,15 @@ import data
 
 """
 Usage scenario
-    fetch_data(2010, 2021)
-    load_data(2013, 20190105)
+    data.fetch(2010, 2021)
+    data.load(2013, 20190105)
     # explore option 1
     procdata.infoset1_prep()
     procdata.infoset1_result(['open elss'], ['direct'])
     procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
     # explore option 2
     procdata.ops(['srel=srel(data)', 'roll3Y=roll1095(data)'])
-    search_data(['match name tokens1', 'match name tokens2'])
+    data.search(['match name tokens1', 'match name tokens2'])
     procdata.anal_simple('srel', 'srel_retpa', 'top')
     procdata.anal_simple('roll3Y', 'roll_avg', 'top')
     plot.data('srel', [ entCode1, entCode2 ])
@@ -180,7 +179,7 @@ def handle_args():
     """
     Logic to handle the commandline arguments
     """
-    if sys.argv[1].endswith(".mf"):
+    if sys.argv[1].endswith(".ffe"):
         print("INFO:Running ", sys.argv[1])
         f = open(sys.argv[1])
         do_run(f)
@@ -196,6 +195,7 @@ def handle_args():
 #
 print("FinFoolsErrandKVC: A stupid exploration of multiple sets of numbers (MFs/Indexes/...) data")
 print("License: GPL")
+print("This is ONLY for EXPERIMENTING and WASTING some FREE TIME and NOTHING MORE...")
 input("PLEASE DO NOT USE THIS PROGRAM TO MAKE ANY DECISIONS OR INFERENCES OR ...")
 
 setup()

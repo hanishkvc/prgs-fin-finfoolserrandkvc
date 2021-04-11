@@ -88,7 +88,7 @@ def _members(self, entTypeTmpls, entNameTmpls=NAME_MATCH_ALL):
                 else:
                     bEntSelect = False
             if bEntSelect:
-                print("\t{:20} {}".format(entCode, entName))
+                print("\t{:<20} {}".format(entCode, entName))
                 entCodes.append(entCode)
     return entCodes
 
