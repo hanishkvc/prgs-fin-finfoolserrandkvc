@@ -38,7 +38,7 @@ def _plot(entCodes):
         raw, mas50 and mas200 data as well as
         linear regression based lines wrt 1Y, 3Y and 5Y.
     """
-    mPlot._data(['data', 'mas50', 'mas200', 'mae24', 'mae50'], entCodes)
-    mPlot.linregress('data', entCodes)
+    mPlot._data(['data', 'mas200', 'mae24', 'mae50'], entCodes)
+    mPlot.linregress('data', entCodes, days=[90,180,365,1095,1825])
 
 
