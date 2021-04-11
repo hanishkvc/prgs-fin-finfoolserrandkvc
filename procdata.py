@@ -15,7 +15,7 @@ import hlpr
 import enttypes
 import indexes
 import entities
-import data
+import edb
 
 
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
@@ -29,7 +29,7 @@ def _entDB(entDB=None):
     have been set by the user previously.
     """
     if entDB == None:
-        return data.gEntDB
+        return edb.gEntDB
     return entDB
 
 

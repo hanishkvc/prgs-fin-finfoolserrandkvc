@@ -20,20 +20,20 @@ import datasrc
 import loadfilters
 import procdata
 import plot
-import data
+import edb
 
 
 """
 Usage scenario
-    data.fetch(2010, 2021)
-    data.load(2013, 20190105)
+    edb.fetch(2010, 2021)
+    edb.load(2013, 20190105)
     # explore option 1
     procdata.infoset1_prep()
     procdata.infoset1_result(['open elss'], ['direct'])
     procdata.infoset1_result(['open equity large', 'open equity large mid', 'open equity flexi', 'open equity multi', 'open equity elss'], ['direct'])
     # explore option 2
     procdata.ops(['srel=srel(data)', 'roll3Y=roll1095(data)'])
-    data.search(['match name tokens1', 'match name tokens2'])
+    edb.search(['match name tokens1', 'match name tokens2'])
     procdata.anal_simple('srel', 'srel_retpa', 'top')
     procdata.anal_simple('roll3Y', 'roll_avg', 'top')
     plot.data('srel', [ entCode1, entCode2 ])
@@ -56,7 +56,7 @@ def setup_paths():
 
 
 def setup_modules():
-    data.setup(FINFOOLSERRAND_BASE)
+    edb.setup(FINFOOLSERRAND_BASE)
 
 
 def setup():
@@ -68,7 +68,7 @@ def session_save(sessionName):
     """
     Save current gEntDB.data-gEntDB.meta into a pickle, so that it can be restored fast later.
     """
-    data.session_save(sessionName)
+    edb.session_save(sessionName)
 
 
 def session_restore(sessionName):
@@ -76,7 +76,7 @@ def session_restore(sessionName):
     Restore a previously saved gEntDB.data-gEntDB.meta fast from a pickle.
     Also setup the modules used by the main logic.
     """
-    data.session_restore(sessionName)
+    edb.session_restore(sessionName)
 
 
 def input_multi(prompt="OO>", altPrompt="...", theFile=None):
@@ -184,8 +184,8 @@ def handle_args():
         f = open(sys.argv[1])
         do_run(f)
     else:
-        data.fetch_data(sys.argv[1], sys.argv[2])
-        data.load_data(sys.argv[1], sys.argv[2])
+        edb.fetch_data(sys.argv[1], sys.argv[2])
+        edb.load_data(sys.argv[1], sys.argv[2])
         procdata.ops('roll1095=roll1095(data)')
         procdata.anal_simple('roll1095', 'roll_avg')
 

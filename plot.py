@@ -8,7 +8,7 @@ from scipy import stats
 import matplotlib
 import matplotlib.pyplot as plt
 import hlpr
-import data
+import edb
 
 
 giLabelNameChopLen = 36
@@ -21,7 +21,7 @@ def _entDB(entDB=None):
     have been set by the user previously.
     """
     if entDB == None:
-        return data.gEntDB
+        return edb.gEntDB
     return entDB
 
 
