@@ -5,7 +5,8 @@
 import hlpr
 
 
-MATCH_ALL='-RE-.*'
+TYPE_MATCH_ALL='-RE-.*'
+NAME_MATCH_ALL=[]
 
 
 def _init(self):
@@ -56,7 +57,7 @@ def _add_member(self, entTypeId, entCode):
         self.typeMembers[entType].append(entCode)
 
 
-def _members(self, entTypeTmpls, entNameTmpls=[]):
+def _members(self, entTypeTmpls, entNameTmpls=NAME_MATCH_ALL):
     """
     List the members of the specified entity types
 
@@ -117,7 +118,7 @@ def _entDB(entDB):
     return entDB
 
 
-def list(entTypeTmpls=MATCH_ALL, entDB=None):
+def list(entTypeTmpls=TYPE_MATCH_ALL, entDB=None):
     """
     List all the types in entDB
     """
@@ -126,22 +127,5 @@ def list(entTypeTmpls=MATCH_ALL, entDB=None):
     for t in lTypes:
         print(t)
     return lTypes
-
-
-def members(entTypeTmpls, entNameTmpls=[], entDB=None):
-    """
-    List the members of the specified entity types
-
-    entTypeTmpls could either be a string or a list of strings.
-    Each of these strings will be treated as a matching template
-    to help identify the entity types one should get the members
-    for.
-
-    The entities belonging to the selected entTypes will be filtered
-    through the entNameTmpls. If entNameTmpls is empty, then all
-    members of the selected entTypes will be selected.
-    """
-    entDB = _entDB(entDB)
-    return _members(entDB, entTypeTmpls, entNameTmpls)
 
 

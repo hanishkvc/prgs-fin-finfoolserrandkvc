@@ -16,6 +16,7 @@ import datasrc
 import india
 import entities
 import loadfilters
+import enttypes as et
 
 
 gbDEBUG = False
@@ -431,6 +432,20 @@ def search_data(findNameTmpls, bFullMatch=False, bPartialTokens=False, bIgnoreCa
     return fullMatch, partMatch
 
 
+def list_enttypes(entTypeTmpls=et.TYPE_MATCH_ALL):
+    """
+    Get list of entTypes in the entities db.
+    """
+    gEntDB.list_types(entTypeTmpls)
+
+
+def list_enttype_members(entTypeTmpls=et.TYPE_MATCH_ALL, entNameTmpls=et.NAME_MATCH_ALL):
+    """
+    Get list of matching entities in the matching entTypes.
+    """
+    gEntDB.list_type_members(entTypeTmpls, entNameTmpls)
+
+
 def session_save(sessionName):
     """
     Save current gEntDB.data-gEntDB.meta into a pickle, so that it can be restored fast later.
@@ -447,5 +462,14 @@ def session_restore(sessionName):
     global gEntDB
     fName = os.path.join(gBasePath, "SSN_{}".format(sessionName))
     ok, gEntDB, tIgnore = hlpr.load_pickle(fName)
+
+
+fetch=fetch_data
+load=load_data
+search=search_data
+load_mfs=load_data_mfs
+load_stocks=load_data_stocks
+enttypes=list_enttypes
+enttype_members=list_enttype_members
 
 

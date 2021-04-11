@@ -103,14 +103,14 @@ class EntitiesDB:
         enttypes._add_member(self, entTypeId, entCode)
 
 
-    def list_types(self, entTypeTmpls=enttypes.MATCH_ALL):
+    def list_types(self, entTypeTmpls=enttypes.TYPE_MATCH_ALL):
         """
         List all matching entTypes.
         """
         return enttypes.list(entTypeTmpls, self)
 
 
-    def list_type_members(self, entTypeTmpls=enttypes.MATCH_ALL, entNameTmpls=[]):
+    def list_type_members(self, entTypeTmpls=enttypes.TYPE_MATCH_ALL, entNameTmpls=enttypes.NAME_MATCH_ALL):
         """
         List matching members in all matching entTypes.
 
