@@ -37,7 +37,10 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
 
-def _movavg(data, weight):
+def _ssconvolve(data, weight):
+    """
+    A simple stupid convolve, which gives the valid set plus zeros.
+    """
     resLen = len(data)-len(weight)+1
     #tResult = numpy.zeros(resLen)
     tResult = numpy.zeros(len(data))
@@ -263,12 +266,12 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         tMARes = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
                         tResult[r,maDays:] = tMARes[inv:-inv]
                         tResult[r,:maDays] = numpy.nan
-                        tMARes = _movavg(entDB.data[dataSrc][r,:], maWinWeights)
+                        tMARes = _ssconvolve(entDB.data[dataSrc][r,:], maWinWeights)
                         tResult[r,maDays:] = tMARes[:-maDays]
                         tResult[r,:maDays] = numpy.nan
                     else:
                         tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
-                        tResult[r,:] = _movavg(entDB.data[dataSrc][r,:], maWinWeights)
+                        tResult[r,:] = _ssconvolve(entDB.data[dataSrc][r,:], maWinWeights)
                         tResult[r,:inv] = numpy.nan
                         tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
                     if True:
