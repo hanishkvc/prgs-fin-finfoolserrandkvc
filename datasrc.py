@@ -10,8 +10,16 @@ import hlpr
 import todayfile
 
 
+# The Enums used to identify the type of data source
+# It could be a Stocks related data source or
+# It could be a Mutual funds related data source
+# or Either of them.
 DSType = enum.Enum('DSType', 'Any MF Stock')
 
+# Enable this to ensure that weekends and holidays
+# are skipped from the entities db.
+# This is disabled currently, as some MFs have data
+# during weekends.
 gbSkipSkippedDateInEntDBAlso = False
 
 

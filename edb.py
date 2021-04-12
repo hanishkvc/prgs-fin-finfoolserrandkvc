@@ -365,6 +365,7 @@ def fillin4holidays():
     As there may not be any data for holidays including weekends,
     so fill them with the data from the prev working day for the corresponding entity.
     """
+    print("INFO:EDB: Fill in Holidays (including Weekends) with prev data ...")
     for r in range(gEntDB.nxtEntIndex):
         _fillin4holidays(r)
 

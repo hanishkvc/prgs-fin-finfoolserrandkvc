@@ -109,6 +109,12 @@ NOTE: When comparing entities, if they have been active for different amount of 
 within the current date range that has been loaded and looked at, then the results
 may not give the full picture, depending on how one looks at things.
 
+NOTE: Currently, by default it duplicates the respective last valid data for holidays
+(including weekends). So there will be some variation wrt measures/data which depends
+on historic data. [[[ One can change this behavior by setting appropriate variable in
+datasrc module. However other logics like rolling ops etc dont account for differences
+due to this.]]]
+
 A sample session could involve
 
    edb.fetch(2013, 2021)
@@ -370,6 +376,19 @@ It calculates the moving average over a specified number of days, for the full d
 Some common window size one could use for moving average are 20, 50, 200, ...
 
 All data points in the window are given same weightage.
+
+
+mae - moving average exponential
+----------------------------------
+
+dstDataKey = mae<Days>(srcDataKey)
+
+ex: mae50Data = mae50(data)
+
+Calculates exponential moving average wrt the specified number of days, for the full dataset.
+
+For each date, the nearest date data will have higher weightage compared to older/farther date
+data.
 
 
 roll - rolling return
@@ -642,6 +661,30 @@ OO>quit()
 ./FinFoolsErrandKVC.py
 OO>session_restore('mysave1869')
 OO>procedb.infoset1_result('index')
+
+
+
+Helper Modules
+================
+
+Stocks
+---------
+
+THis provides some simple helper functions to look at stocks.
+
+stocks.load()
+
+   THis loads last 7 years of stocks related data.
+
+stocks.prep()
+
+   This calculates certain things like mas50, mas200, mae24, mae 50 and so on.
+
+stocks._plot('STOCK_SYMBOL')
+
+   Look at the data and corresponding moving averages and linear regression line
+   fit wrt the given stock.
+
 
 
 
