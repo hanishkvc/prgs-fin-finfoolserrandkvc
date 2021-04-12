@@ -38,7 +38,7 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
 
 
 def _movavg(data, weight):
-    resLen = len(data)-len(weight)
+    resLen = len(data)-len(weight)+1
     #tResult = numpy.zeros(resLen)
     tResult = numpy.zeros(len(data))
     for i in range(len(weight)):
