@@ -37,6 +37,15 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
 
+def _movavg(data, weight):
+    resLen = len(data)-len(weight)
+    #tResult = numpy.zeros(resLen)
+    tResult = numpy.zeros(len(data))
+    for i in range(len(weight)):
+        tResult[:resLen] += data[i:resLen+i]*weight[i]
+    return tResult
+
+
 gbMAShift2End = True
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
@@ -151,8 +160,8 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             if op[2] == 's':
                 maWinWeights = numpy.ones(maDays)/maDays
             else:
-                baseWeight = 2/(maDays+1)
                 baseWeight = 1/maDays
+                baseWeight = 2/(maDays+1)
                 maWinWeights = numpy.arange(maDays-1,-1,-1)
                 maWinWeights = (1-baseWeight)**maWinWeights
                 maWinWeights = maWinWeights/sum(maWinWeights)
@@ -254,8 +263,12 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         tMARes = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
                         tResult[r,maDays:] = tMARes[inv:-inv]
                         tResult[r,:maDays] = numpy.nan
+                        tMARes = _movavg(entDB.data[dataSrc][r,:], maWinWeights)
+                        tResult[r,maDays:] = tMARes[:-maDays]
+                        tResult[r,:maDays] = numpy.nan
                     else:
                         tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
+                        tResult[r,:] = _movavg(entDB.data[dataSrc][r,:], maWinWeights)
                         tResult[r,:inv] = numpy.nan
                         tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
                     if True:
