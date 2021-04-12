@@ -130,6 +130,16 @@ class EntitiesDB:
         self.nxtDateIndex += 1
 
 
+    def skip_date(self, dateInt):
+        """
+        Skip the latest date, by overwriting into it next time around.
+        dateInt: Needs to match lastAddedDate (rather date at self.nxtDateIndex-1)
+        NOTE: lastAddedDate is not adjusted.
+        """
+        if self.dates[self.nxtDateIndex-1] == dateInt:
+            self.nxtDateIndex -= 1
+
+
     def daterange2index(self, startDate, endDate):
         """
         Get the indexes corresponding to the start and end date

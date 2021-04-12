@@ -12,6 +12,8 @@ import todayfile
 
 DSType = enum.Enum('DSType', 'Any MF Stock')
 
+gbSkipSkippedDateInEntDBAlso = False
+
 
 class DataSrc:
     """
@@ -240,12 +242,17 @@ class DataSrc:
         NOTE: This logic wont fill in missing data wrt holidays,
         you will have to call fillin4holidays explicitly.
         """
+        bSkip = False
         if self.bSkipWeekEnds and (calendar.weekday(y,m,d) > 4):
-            return
+            bSkip = True
         dateInt = hlpr.dateint(y,m,d)
         if dateInt < self.earliestDate:
-            return
+            bSkip = True
         if dateInt in self.holidays:
+            bSkip = True
+        if bSkip:
+            if gbSkipSkippedDateInEntDBAlso:
+                entDB.skip_date(dateInt)
             return
         timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
         fName = time.strftime(self.pathTmpl, timeTuple)
