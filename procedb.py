@@ -146,6 +146,16 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("rel"):
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
+        elif op.startswith("ma"):
+            maDays = int(op[3:])
+            if op[2] == 's':
+                maWinWeights = numpy.ones(maDays)/maDays
+            else:
+                baseWeight = 2/(maDays+1)
+                baseWeight = 1/maDays
+                maWinWeights = numpy.arange(maDays-1,-1,-1)
+                maWinWeights = (1-baseWeight)**maWinWeights
+                maWinWeights = maWinWeights/sum(maWinWeights)
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
@@ -239,20 +249,13 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("ma"):
-                    days = int(op[3:])
-                    inv = int(days/2)
-                    if op[2] == 's':
-                        winWeights = numpy.ones(days)/days
-                    else:
-                        winWeights = numpy.ones(days)
-                        winWeights[-1] = 2
-                        winWeights = winWeights/days
+                    inv = int(maDays/2)
                     if gbMAShift2End:
-                        tMARes = numpy.convolve(entDB.data[dataSrc][r,:], winWeights, 'same')
-                        tResult[r,days:] = tMARes[inv:-inv]
-                        tResult[r,:days] = numpy.nan
+                        tMARes = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
+                        tResult[r,maDays:] = tMARes[inv:-inv]
+                        tResult[r,:maDays] = numpy.nan
                     else:
-                        tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], winWeights, 'same')
+                        tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
                         tResult[r,:inv] = numpy.nan
                         tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
                     if True:
