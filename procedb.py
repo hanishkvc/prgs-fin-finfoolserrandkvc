@@ -40,6 +40,8 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
 def _ssconvolve(data, weight):
     """
     A simple stupid convolve, which returns the valid set.
+    NOTE: This doesnt mirror the weight before using it.
+          Which is what makes sense for its use here.
     """
     resLen = len(data)-len(weight)+1
     #tResult = numpy.zeros(resLen)
@@ -49,7 +51,6 @@ def _ssconvolve(data, weight):
     return tResult[:resLen]
 
 
-gbMAShift2End = True
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
 def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
@@ -90,18 +91,16 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 
         "ma<s|e><DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
-                of DAYSInINT. THere will be partially calculated data regions at the beginning and
-                end of the dateRange, which dont have sufficient data to one of the sides. Inturn
-                the valid mas data is shifted to align with the end, such that each location value
-                corresponds ot average of last N days wrt that location. Inturn N days at the start
-                will be set to NaN, as they dont have sufficient historic data to calculate average
-                of last N days.
+                of DAYSInINT. As there wont be sufficient historic data to calculate ma wrt the begin
+                of the dateRange, so it will be set to NaN. Value at each location corresponds ot average
+                of last N days wrt that location. Inturn N days at the start will be set to NaN, as they
+                dont have sufficient historic data to calculate average of last N days.
                 mas: moving average simple (equal weightage to all in window)
-                mae: moving average exponential (latest data in window has double weightage as others)
+                mae: moving average exponential (latest data in window has double weightage as others,
+                     add-infinetum during sliding - thus a exponential weightage)
 
                 MetaLabel = dataSrcMetaLabel, validMAResultBeginVal, validMAResultEndVal
 
-                NOTE: User can set gbMAShift2End to avoid the shifting to align with end.
                 NOTE: DAYSInINT needs to be a even number.
 
         "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
@@ -261,19 +260,10 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("ma"):
-                    inv = int(maDays/2)
-                    if gbMAShift2End:
-                        tMARes = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
-                        tResult[r,maDays:] = tMARes[inv:-inv]
-                        tResult[r,:maDays] = numpy.nan
-                        tMARes = _ssconvolve(entDB.data[dataSrc][r,:], maWinWeights)
-                        tResult[r,maDays:] = tMARes[:-maDays]
-                        tResult[r,:maDays] = numpy.nan
-                    else:
-                        tResult[r,:] = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'same')
-                        tResult[r,:] = _ssconvolve(entDB.data[dataSrc][r,:], maWinWeights)
-                        tResult[r,:inv] = numpy.nan
-                        tResult[r,entDB.nxtDateIndex-inv:] = numpy.nan
+                    tMARes = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'valid')
+                    tMARes = _ssconvolve(entDB.data[dataSrc][r,:], maWinWeights)
+                    tResult[r,maDays-1:] = tMARes
+                    tResult[r,:maDays-1] = numpy.nan
                     if True:
                         try:
                             dataSrcLabel = entDB.data[dataSrcMetaLabel][r]
