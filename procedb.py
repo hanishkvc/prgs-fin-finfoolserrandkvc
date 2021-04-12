@@ -39,14 +39,14 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
 
 def _ssconvolve(data, weight):
     """
-    A simple stupid convolve, which gives the valid set plus zeros.
+    A simple stupid convolve, which returns the valid set.
     """
     resLen = len(data)-len(weight)+1
     #tResult = numpy.zeros(resLen)
     tResult = numpy.zeros(len(data))
     for i in range(len(weight)):
         tResult[:resLen] += data[i:resLen+i]*weight[i]
-    return tResult
+    return tResult[:resLen]
 
 
 gbMAShift2End = True
