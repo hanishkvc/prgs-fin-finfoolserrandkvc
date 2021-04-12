@@ -13,7 +13,7 @@ L1 = [ "edb.load", "edb.fetch", "edb.search", "edb.load_mfs", "edb.load_stocks",
         "loadfilters.setup", "loadfilters.list", "loadfilters.get", "loadfilters.activate", "loadfilters.copy",
         "session_save", "session_restore",
         "procedb.infoset1_prep", "procedb.infoset1_result",
-        "stocks.load", "stocks.prep", "stocks._plot",
+        "stocks.load", "stocks.prep", "stocks._plot", "stocks.topbottom",
         "quit"
         ]
 

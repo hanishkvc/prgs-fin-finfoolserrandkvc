@@ -678,14 +678,19 @@ stocks.load()
 
 stocks.prep()
 
-   This calculates certain things like mas50, mas200, mae24, mae 50 and so on.
+   This calculates certain things like mas50, mas200, mae24, mae 50, roll1095,
+   roll1825, and so on.
 
 stocks._plot('STOCK_SYMBOL')
 
    Look at the data and corresponding moving averages and linear regression line
    fit wrt the given stock.
 
+stocks.topbottom()
 
+   Look at the stocks which were the top or bottom N over the last day, week, month.
+   Be warned that this is based on simple absolute return. Inturn it will show some
+   related data wrt these stocks.
 
 
 Misc 

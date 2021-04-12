@@ -22,7 +22,7 @@ def load(startDate=None, endDate=None):
     edb.load_data_stocks(startDate, endDate)
 
 
-def prep():
+def _plot_prep():
     """
     Calculate some of the data required for later.
     """
@@ -41,5 +41,16 @@ def _plot(entCodes, bLinRegress=False):
     mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
     if bLinRegress:
         mPlot.linregress('data', entCodes, days=[90,180,365,1095])
+
+
+def prep():
+    _plot_prep()
+    procedb.infoset1_prep()
+
+
+def topbottom():
+    for sType in [ 'nse nifty 50', 'nse nifty 100' ]:
+        input("About to look at Top and Bottom N stocks wrt {}".format(sType))
+        procedb.infoset1_result(sType, resultType='result2', bPrompt=True)
 
 

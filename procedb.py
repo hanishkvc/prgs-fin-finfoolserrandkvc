@@ -496,7 +496,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     """
     entDB = _entDB(entDB)
     theAnal = "{}_{}".format(analType, order)
-    print("DBUG:AnalSimple:{}:{}".format(theAnal, dataSrc))
+    #print("DBUG:AnalSimple:{}:{}".format(theAnal, dataSrc))
     printFmts = gAnalSimpleBasePrintFormats.copy()
     printWidths = gAnalSimpleBasePrintWidths.copy()
     printHdr = [ "Code", "Name" ]
@@ -521,7 +521,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         else:
             if (type(theIndex) == type(None)) and (type(theDate) != type(None)):
                 startDateIndex, theIndex = entDB.daterange2index(theDate, theDate)
-            print("INFO:AnalSimple:{}:theIndex:{}".format(theAnal, theIndex))
+            #print("DBUG:AnalSimple:{}:theIndex:{}".format(theAnal, theIndex))
             theSaneArray = entDB.data[dataSrc][:,theIndex].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
