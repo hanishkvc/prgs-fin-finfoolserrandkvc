@@ -27,18 +27,19 @@ def prep():
     Calculate some of the data required for later.
     """
     procedb.ops(['mas50=mas50(data)', 'mas200=mas200(data)'])
-    procedb.ops(['mae24=mae24(data)', 'mae50=mae50(data)'])
+    procedb.ops(['mae9=mae9(data)', 'mae26=mae26(data)', 'mae50=mae50(data)'])
 
 
-def _plot(entCodes):
+def _plot(entCodes, bLinRegress=False):
     """
     Plot data related to the given set of entCodes.
 
     This includes the close related
         raw, mas50 and mas200 data as well as
-        linear regression based lines wrt 1Y, 3Y and 5Y.
+        linear regression based lines wrt 3M, 6M, 1Y and 3Y.
     """
-    mPlot._data(['data', 'mas200', 'mae24', 'mae50'], entCodes)
-    mPlot.linregress('data', entCodes, days=[90,180,365,1095,1825])
+    mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
+    if bLinRegress:
+        mPlot.linregress('data', entCodes, days=[90,180,365,1095])
 
 
