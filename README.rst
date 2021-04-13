@@ -2,7 +2,7 @@
 Try look at MF/Indexes/Stock... data
 ####################################
 Author: HanishKVC
-Version: v20210411IST1600
+Version: v20210414IST0126
 License: GPL
 Status: Not fully updated wrt new version of PROGRAM
 
@@ -762,5 +762,9 @@ MaBeta added as a additional procedb function.
 the logic has been divided into few classes and modules, and the program flow is build
 around this now.
 
-The path used by program has been changed.
+20210414ISTABCD_HappyVishuUgadhiRelease
+
+The default path used by program has been changed.
+
+Date handling as been partly simplified and also now based on python datetime.
 

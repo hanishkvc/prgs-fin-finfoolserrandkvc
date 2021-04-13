@@ -6,6 +6,7 @@ import sys
 import time
 import calendar
 import enum
+import datetime
 import hlpr
 import todayfile
 
@@ -59,6 +60,7 @@ class DataSrc:
     dataKeys = None
     tag = "DSBase"
     bSkipWeekEnds = False
+    bSkipToday = True
     earliestDate = 0
 
 
@@ -203,6 +205,8 @@ class DataSrc:
         if dateInt < self.earliestDate:
             return False
         if dateInt in self.holidays:
+            return False
+        if self.bSkipToday and (theDate == datetime.date.today()):
             return False
         return True
 
