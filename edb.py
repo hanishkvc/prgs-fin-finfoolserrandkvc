@@ -114,12 +114,15 @@ def fetch4date(curDate, opts):
 def proc_date_startend(startDate, endDate):
     """
     Convert the start and end dates given as integer/string notation of YYYYMMDD
-    into this programs internal date dictionary representation.
-
+    into a standard datetime.date object.
     The dates should follow the YYYY[MM[DD]] format, where [] means optional.
+    If Only YYYY or YYYYMM is given, then depending on whether it is start or end,
+    a sensible MM and or DD will be used.
     """
-    start = date2datedict(startDate, 1)
-    end = date2datedict(endDate, 12)
+    startDate = int(startDate)
+    endDate = int(endDate)
+    start = dateint2date(startDate, bStart=True)
+    end = dateint2date(endDate, bStart=False)
     return start, end
 
 
@@ -157,14 +160,14 @@ def fetch_data(startDate, endDate=None, opts={'ForceRemote': True}):
     return fetch4daterange(startDate, endDate, opts)
 
 
-def load4date(y, m, d, opts):
+def load4date(curDate, opts):
     """
     Load data for the given date.
 
     NOTE: This logic wont fill in prev nav for holidays,
     you will have to call fillin4holidays explicitly.
     """
-    gEntDB.add_date(hlpr.dateint(y,m,d))
+    gEntDB.add_date(hlpr.dateint(curDate.year, curDate.month, curDate.day))
     dataSrcTypeReqd = opts['dataSrcType']
     for ds in gDS:
         if dataSrcTypeReqd != ds.dataSrcType:
@@ -177,7 +180,7 @@ def load4date(y, m, d, opts):
             loadFiltersName = ds.tag
         loadfilters.activate(loadFiltersName)
         if 'load4date' in dir(ds):
-            ds.load4date(y, m, d, gEntDB, opts)
+            ds.load4date(curDate, gEntDB, opts)
 
 
 def load4daterange(startDate, endDate, opts=None):
