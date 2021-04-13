@@ -189,6 +189,24 @@ class DataSrc:
         return False, False, None
 
 
+    def _valid_date(self, theDate):
+        """
+        Check if given date is valid for given data source.
+        The checks include:
+            If its a week end and bSkipWeekEnds is Enabled,
+            If its earlier than earliestDate specified.
+            If its in data sources holiday list.
+        """
+        if self.bSkipWeekEnds and (theDate.isoweekday() > 5):
+            return False
+        dateInt = hlpr.dateint(theDate.year, theDate.month, theDate.day)
+        if dateInt < self.earliestDate:
+            return False
+        if dateInt in self.holidays:
+            return False
+        return True
+
+
     def fetch4date(self, theDate, opts):
         """
         Fetch data for the given date.
@@ -203,13 +221,9 @@ class DataSrc:
                 of the local data pickle file is ok or not.
             NOTE: ForceRemote takes precedence over ForceLocal.
         """
-        if self.bSkipWeekEnds and (theDate.isoweekday() > 5):
+        if not self._valid_date(theDate):
             return
         dateInt = hlpr.dateint(theDate.year, theDate.month, theDate.day)
-        if dateInt < self.earliestDate:
-            return
-        if dateInt in self.holidays:
-            return
         url = time.strftime(self.urlTmpl, theDate.timetuple())
         fName = time.strftime(self.pathTmpl, theDate.timetuple())
         bParseFile=False
@@ -249,15 +263,8 @@ class DataSrc:
         NOTE: This logic wont fill in missing data wrt holidays,
         you will have to call fillin4holidays explicitly.
         """
-        bSkip = False
-        if self.bSkipWeekEnds and (theDate.isoweekday() > 5):
-            bSkip = True
         dateInt = hlpr.dateint(theDate.year, theDate.month, theDate.day)
-        if dateInt < self.earliestDate:
-            bSkip = True
-        if dateInt in self.holidays:
-            bSkip = True
-        if bSkip:
+        if not self._valid_date(theDate):
             if gbSkipSkippedDateInEntDBAlso:
                 entDB.skip_date(dateInt)
             return

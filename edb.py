@@ -122,8 +122,8 @@ def proc_date_startend(startDate, endDate):
     """
     startDate = int(startDate)
     endDate = int(endDate)
-    start = dateint2date(startDate, bStart=True)
-    end = dateint2date(endDate, bStart=False)
+    start = hlpr.dateint2date(startDate, bStart=True)
+    end = hlpr.dateint2date(endDate, bStart=False)
     return start, end
 
 
