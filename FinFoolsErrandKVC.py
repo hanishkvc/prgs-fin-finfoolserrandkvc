@@ -52,7 +52,12 @@ def setup_paths():
     Account for FINFOOLSERRAND_BASE env variable if set
     """
     global FINFOOLSERRAND_BASE
-    FINFOOLSERRAND_BASE = os.environ.get('FINFOOLSERRAND_BASE',"~/")
+    FINFOOLSERRAND_BASE = os.path.expanduser(os.environ.get('FINFOOLSERRAND_BASE',"~/.cache/ffe"))
+    FFE_DATA_DIR="{}/data".format(FINFOOLSERRAND_BASE)
+    FFE_TYPES_DIR="{}/types".format(FINFOOLSERRAND_BASE)
+    for sDir in [ FINFOOLSERRAND_BASE, FFE_DATA_DIR, FFE_TYPES_DIR]:
+        if not os.path.exists(sDir):
+            os.mkdir(sDir)
     print("INFO:Main:setup_paths:", FINFOOLSERRAND_BASE)
 
 

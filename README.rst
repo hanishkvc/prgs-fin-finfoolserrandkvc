@@ -92,6 +92,15 @@ They will be executed as if the user had entered them directly into the program 
 other.
 
 
+Paths used
+============
+
+The program by default stores downloaded files into ~/.cache/ffe folder.
+
+User can change this by setting a environment variable called FINFOOLSERRAND_BASE.
+
+The program will show the paths being used, when it is run.
+
 
 Usage
 #######
@@ -753,4 +762,5 @@ MaBeta added as a additional procedb function.
 the logic has been divided into few classes and modules, and the program flow is build
 around this now.
 
+The path used by program has been changed.
 

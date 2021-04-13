@@ -54,7 +54,7 @@ class DataSrc:
     pathTmpl = None
     holiTmpl = "{}.holidays"
     urlFTypesTmpl = None
-    pathFTypesTmpl = "{}.ftypes.{}"
+    pathFTypesTmpl = "types/{}.ftypes.{}"
     listFTypes = None
     dataKeys = None
     tag = "DSBase"
