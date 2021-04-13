@@ -124,6 +124,8 @@ on historic data. [[[ One can change this behavior by setting appropriate variab
 datasrc module. However other logics like rolling ops etc dont account for differences
 due to this.]]]
 
+NOTE: By default it fetchs/loads data only till yesterday.
+
 A sample session could involve
 
    edb.fetch(2013, 2021)

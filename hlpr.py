@@ -162,11 +162,13 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
-def not_beyond_today(date):
+def not_beyond_today(date, bSkipTodayAlso=True):
     """
     If passed date is beyond today, then return today, else return passed date.
     """
     today = datetime.date.today()
+    if bSkipTodayAlso:
+        today = today - datetime.timedelta(1)
     if date > today:
         return today
     return date
