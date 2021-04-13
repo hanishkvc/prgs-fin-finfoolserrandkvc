@@ -189,7 +189,7 @@ class DataSrc:
         return False, False, None
 
 
-    def fetch4date(self, y, m, d, opts):
+    def fetch4date(self, theDate, opts):
         """
         Fetch data for the given date.
 
@@ -203,16 +203,15 @@ class DataSrc:
                 of the local data pickle file is ok or not.
             NOTE: ForceRemote takes precedence over ForceLocal.
         """
-        if self.bSkipWeekEnds and (calendar.weekday(y,m,d) > 4):
+        if self.bSkipWeekEnds and (theDate.isoweekday() > 5):
             return
-        timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
-        dateInt = hlpr.dateint(y,m,d)
+        dateInt = hlpr.dateint(theDate.year, theDate.month, theDate.day)
         if dateInt < self.earliestDate:
             return
         if dateInt in self.holidays:
             return
-        url = time.strftime(self.urlTmpl, timeTuple)
-        fName = time.strftime(self.pathTmpl, timeTuple)
+        url = time.strftime(self.urlTmpl, theDate.timetuple())
+        fName = time.strftime(self.pathTmpl, theDate.timetuple())
         bParseFile=False
         if opts == None:
             opts = {}
@@ -238,7 +237,7 @@ class DataSrc:
                 print(sys.exc_info())
 
 
-    def load4date(self, y, m, d, entDB, opts):
+    def load4date(self, theDate, entDB, opts):
         """
         Load data for the given date into Entities DB.
 
@@ -251,9 +250,9 @@ class DataSrc:
         you will have to call fillin4holidays explicitly.
         """
         bSkip = False
-        if self.bSkipWeekEnds and (calendar.weekday(y,m,d) > 4):
+        if self.bSkipWeekEnds and (theDate.isoweekday() > 5):
             bSkip = True
-        dateInt = hlpr.dateint(y,m,d)
+        dateInt = hlpr.dateint(theDate.year, theDate.month, theDate.day)
         if dateInt < self.earliestDate:
             bSkip = True
         if dateInt in self.holidays:
@@ -262,8 +261,7 @@ class DataSrc:
             if gbSkipSkippedDateInEntDBAlso:
                 entDB.skip_date(dateInt)
             return
-        timeTuple = (y, m, d, 0, 0, 0, 0, 0, 0)
-        fName = time.strftime(self.pathTmpl, timeTuple)
+        fName = time.strftime(self.pathTmpl, theDate.timetuple())
         ok = False
         for i in range(3):
             ok, bUpToDate, today = self._valid_picklefile(fName)
@@ -276,7 +274,7 @@ class DataSrc:
                     break
             else:
                 optsFD = { 'ForceLocal': True }
-            self.fetch4date(y, m, d, optsFD)
+            self.fetch4date(theDate, optsFD)
         if ok:
             todayfile.load2edb(today, entDB, self.loadFilters, self.nameCleanupMap, 'active', self.tag)
         else:
