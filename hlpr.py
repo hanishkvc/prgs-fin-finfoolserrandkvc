@@ -161,9 +161,19 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
-def dateintparts(theDate, bStart=True, bNotInFuture=True):
+def not_beyond_today(date):
     """
-    Convert the full date YYYYMMDD int to its constituent parts i.e year, month and day.
+    If passed date is beyond today, then return today, else return passed date.
+    """
+    today = datetime.date.today()
+    if date > today:
+        return today
+    return date
+
+
+def dateint2date(theDate, bStart=True, bNotInFuture=True):
+    """
+    Convert the full date YYYYMMDD int to a datetime date object.
 
     If the user passes only YYYY or YYYYMM, then it will assign a suitable month and
     day as required.
@@ -190,15 +200,10 @@ def dateintparts(theDate, bStart=True, bNotInFuture=True):
     t = theDate%10000
     m = int(t/100)
     d = t%100
+    date = datetime.date(y,m,d)
     if bNotInFuture:
-        today = time.localtime()
-        if today.tm_year == y:
-            if m > today.tm_mon:
-                m = today.tm_mon
-            elif m == today.tm_mon:
-                if d > today.tm_mday:
-                    d = today.tm_mday
-    return y,m,d
+        date = not_beyond_today(date)
+    return date
 
 
 def pickle_ok(fName, minSize=16e3):

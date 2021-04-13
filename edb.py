@@ -70,16 +70,6 @@ def setup(basePath):
     loadfilters.list()
 
 
-def not_beyond_today(date):
-    """
-    If passed date is beyond today, then return today, else return passed date.
-    """
-    today = datetime.date.today()
-    if date > today:
-        return today
-    return date
-
-
 def proc_days(startDate, endDate, handle_date_func, opts=None, bNotBeyondToday=True, bDebug=False):
     """
     Call the passed function for each date with the given start and end range.
@@ -88,7 +78,7 @@ def proc_days(startDate, endDate, handle_date_func, opts=None, bNotBeyondToday=T
     """
     print("INFO:proc_days:from {} to {}".format(startDate, endDate))
     if bNotBeyondToday:
-        endDate = not_beyond_today(endDate)
+        endDate = hlpr.not_beyond_today(endDate)
     oneDay = datetime.timedelta(days=1)
     curDate = startDate - oneDay
     prevMonth = -1
@@ -119,31 +109,6 @@ def fetch4date(curDate, opts):
     for ds in gDS:
         if 'fetch4date' in dir(ds):
             ds.fetch4date(curDate, opts)
-
-
-def date2datedict(date, fallBackMonth=1):
-    """
-    Convert a date specified in YYYYMMDD format into internal date dictionary format
-        MM and DD are optional.
-        MM if not specified fallsback to the value passed through fallBackMonth arg.
-        If DD is needed, then MM needs to be used.
-    NOTE: date could be either a interger or string in YYYY[MM[DD]] format.
-    """
-    dateStr = str(date)
-    year = dateStr[:4]
-    month = dateStr[4:6]
-    day = dateStr[6:8]
-    if (year == '') or (len(year) != 4):
-        exit()
-    date = {}
-    date['y'] = int(year)
-    if month != '':
-        date['m'] = int(month)
-    else:
-        date['m'] = fallBackMonth
-    if day != '':
-        date['d'] = int(day)
-    return date
 
 
 def proc_date_startend(startDate, endDate):
