@@ -70,77 +70,55 @@ def setup(basePath):
     loadfilters.list()
 
 
-def proc_days(start, end, handle_date_func, opts=None, bNotBeyondYesterday=True, bDebug=False):
+def not_beyond_today(date):
     """
-    call the passed function for each date with the given start and end range.
-        The date will be passed to the passed function as year, month, date
-        as integers.
-
-    start and end need to be dictionaries {'y': year_int, 'm': month_int, 'd': date_int}
-        month_int should be from 1 to 12
-        date_int should be from 1 to 31; 'd' and thus inturn date_int is optional
+    If passed date is beyond today, then return today, else return passed date.
     """
-    print("INFO:proc_days:from {} to {}".format(start, end))
-    now = time.localtime(time.time())
-    if bNotBeyondYesterday:
-        bChanged = False
-        if end['y'] > now.tm_year:
-            end['y'] = now.tm_year
-            bChanged = True
-        elif end['y'] == now.tm_year:
-            if end['m'] > now.tm_mon:
-                end['m'] = now.tm_mon
-                bChanged = True
-        if bChanged:
-            print("WARN:proc_days:end adjusted to be within today")
-    for y in range(start['y'], end['y']+1):
-        for m in range(1,13):
-            startDate = None
-            endDate = None
-            if (y == start['y']):
-                if (m < start['m']):
-                    continue
-                elif (m == start['m']):
-                    startDate = start.get('d', None)
-            if (y == end['y']):
-                if (m > end['m']):
-                    continue
-                elif (m == end['m']):
-                    endDate = end.get('d', None)
-            print("INFO:proc_days:handlingmonth:{}{:02}:DayLimitsIfAny [{} to {}]".format(y,m,startDate, endDate))
-            for d in gCal.itermonthdays(y,m):
-                if d == 0:
-                    continue
-                if (startDate != None) and (d < startDate):
-                    continue
-                if (endDate != None) and (d > endDate):
-                    continue
-                if gbSkipWeekEnds and (calendar.weekday(y,m,d) in [5, 6]):
-                    continue
-                if bNotBeyondYesterday and (y == now.tm_year) and (m == now.tm_mon) and (d >= now.tm_mday):
-                    continue
-                if bDebug:
-                    print("INFO:proc_days:handledate:{}{:02}{:02}".format(y,m,d))
-                try:
-                    handle_date_func(y,m,d,opts)
-                except:
-                    traceback.print_exc()
+    today = datetime.date.today()
+    if date > today:
+        return today
+    return date
 
 
-def fetch4date(y, m, d, opts):
+def proc_days(startDate, endDate, handle_date_func, opts=None, bNotBeyondToday=True, bDebug=False):
+    """
+    Call the passed function for each date with the given start and end range.
+    startDate and endDate should be datetime.date objects.
+    A datetime.date object will be passed to the handle_date_func.
+    """
+    print("INFO:proc_days:from {} to {}".format(startDate, endDate))
+    if bNotBeyondToday:
+        endDate = not_beyond_today(endDate)
+    oneDay = datetime.timedelta(days=1)
+    curDate = startDate - oneDay
+    prevMonth = -1
+    while curDate < endDate:
+        curDate += oneDay
+        if gbSkipWeekEnds and (curDate.isoweekday() > 5):
+            continue
+        if prevMonth != curDate.month:
+            prevMonth = curDate.month
+            print("INFO:proc_days:handlingmonth:{}".format(curDate))
+        if bDebug:
+            print("INFO:proc_days:handlingdate:{}".format(curDate))
+        try:
+            handle_date_func(curDate, opts)
+        except:
+            traceback.print_exc()
+
+
+def fetch4date(curDate, opts):
     """
     Fetch data for the given date.
 
     This is the default handler function passed to proc_days.
 
-    One can call this directly by passing the year, month and date one is interested in.
-        month should be one of 1 to 12
-        day (month day) should be one of 1 to 31, as appropriate for month specified.
+    One can call this directly by passing the year, month and date one is interested in
+    as a datetime.date object.
     """
-    #print(y,m,d)
     for ds in gDS:
         if 'fetch4date' in dir(ds):
-            ds.fetch4date(y, m, d, opts)
+            ds.fetch4date(curDate, opts)
 
 
 def date2datedict(date, fallBackMonth=1):
