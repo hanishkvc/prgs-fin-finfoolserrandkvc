@@ -186,6 +186,18 @@ def days_in(sDuration, bSkipWeekends):
     return int(iDur)
 
 
+def days2year(days, bSkipWeekends):
+    """
+    Convert num of days into equivalent years.
+    This accounts for bSkipWeekends, when calculating the years.
+    """
+    if bSkipWeekends:
+        years = days/260
+    else:
+        years = days/365
+    return years
+
+
 def dateint(y, m, d):
     """
     Convert year, month and day into a numeric YYYYMMDD format.

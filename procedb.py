@@ -227,13 +227,13 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                             tResult[r,:] = ((entDB.data[dataSrc][r,:]/dStart)-1)*100
                         tResult[r,:iStart] = numpy.nan
                         dAbsRet = tResult[r, -1]
-                        durationInYears = ((endDateIndex-startDateIndex+1)-iStart)/365
+                        durationInYears = hlpr.days2year((endDateIndex-startDateIndex+1)-iStart)
                         dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
                         label = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
                         entDB.data[dataDstMetaLabel].append(label)
                         entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                     else:
-                        durationInYears = (endDateIndex-startDateIndex+1)/365
+                        durationInYears = hlpr.days2year(endDateIndex-startDateIndex+1)
                         entDB.data[dataDstMetaLabel].append("")
                         entDB.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
                 elif op.startswith("rel"):
@@ -318,10 +318,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         trStd = numpy.nan
                         trMaSharpeMinT = numpy.nan
                     trYears = entDB.datesD[entDB.meta['lastSeen'][r]] - entDB.datesD[entDB.meta['firstSeen'][r]]
-                    if entDB.bSkipWeekends:
-                        trYears = trYears/260
-                    else:
-                        trYears = trYears/365
+                    trYears = hlpr.days2year(trYears, entDB.bSkipWeekends)
                     entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT, trYears]
                     label = "{:7.2f} {:7.2f} {} {:7.2f} {:4.1f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT, trYears)
                     entDB.data[dataDstMetaLabel].append(label)
