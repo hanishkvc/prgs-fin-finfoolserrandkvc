@@ -292,7 +292,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         label = "{} : {}".format(dataSrcLabel, label)
                         entDB.data[dataDstMetaLabel].append(label)
                 elif op.startswith("roll"):
-                    durationForPA = rollDays/365
+                    durationForPA = rollDays/daysInAYear
                     if '_' in op:
                         opType = op.split('_')[1]
                         if opType == 'abs':
