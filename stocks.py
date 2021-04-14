@@ -47,9 +47,20 @@ def plot(entCodes, bLinRegress=False):
     """
     Plot a predefined set of data wrt each entCode in the given list.
     """
+    datas = [
+        ['srel', 'srelMetaLabel'],
+        ['roll3Y', 'roll3YMetaLabel'],
+        ['retOn', 'rosafMetaLabel']
+        ]
+    entDB = edb.gEntDB
     if type(entCodes) == str:
         entCodes = [ entCodes ]
     for entCode in entCodes:
+        entIndex = entDB.meta['codeD'][entCode]
+        entName = entDB.meta['name'][entIndex]
+        print("\n\nEntity: {:20} {}".format(entCode, entName))
+        for d in datas:
+            print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
         _plot(entCode, bLinRegress)
         mPlot.show()
 
