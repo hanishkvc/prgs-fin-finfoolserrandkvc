@@ -167,7 +167,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
         elif op.startswith("rel"):
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("ma"):
-            maDays = hlpr.days_in(op[3:])
+            maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)
             if op[2] == 's':
                 maWinWeights = numpy.ones(maDays)/maDays
             else:
@@ -180,10 +180,10 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
-            rollDays = hlpr.days_in(op[4:].split('_')[0])
+            rollDays = hlpr.days_in(op[4:].split('_')[0], entDB.bSkipWeekends)
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 4])
         elif op.startswith("block"):
-            blockDays = hlpr.days_in(op[5:])
+            blockDays = hlpr.days_in(op[5:], entDB.bSkipWeekends)
             blockTotalDays = endDateIndex - startDateIndex + 1
             blockCnt = int(blockTotalDays/blockDays)
             dataDstAvgs = "{}Avgs".format(dataDst)

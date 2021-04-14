@@ -136,7 +136,7 @@ def linregress(dataKeys, entCodes, days=[7, '1M', '6M', '1Y', '3Y', '5Y'], entDB
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     for d in days:
         if type(d) == str:
-            d = hlpr.days_in(d)
+            d = hlpr.days_in(d, entDB.bSkipWeekends)
         endDate = entDB.dates[endDateIndex]
         startDate = entDB.dates[endDateIndex-d]
         if entDB.datesD.get(startDate, -1) >= 0:
