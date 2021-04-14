@@ -14,6 +14,7 @@ L1 = [ "edb.load", "edb.fetch", "edb.search", "edb.load_mfs", "edb.load_stocks",
         "session_save", "session_restore",
         "procedb.infoset1_prep", "procedb.infoset1_result",
         "stocks.load", "stocks.prep", "stocks._plot", "stocks.plot", "stocks.topbottom",
+        "stupid.above_ndays",
         "quit"
         ]
 

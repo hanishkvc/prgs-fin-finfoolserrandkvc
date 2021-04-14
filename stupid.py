@@ -2,6 +2,7 @@
 # HanishKVC, 2021
 # GPL
 
+
 import numpy
 import edb
 import procedb
@@ -15,10 +16,10 @@ def _entDB(entDB=None):
     return entDB
 
 
-def above_2wh():
+def above_ndays(dataKey='close', dataIndex=-1, cmpKey='high', cmpStartDateIndex=-14, cmpEndDateIndex=-1):
     entDB = _entDB()
-    tHigh = numpy.max(entDB.data['high'][:,-14:-1], axis=1)
-    tAbove = tHigh < entDB.data['close'][:,-1]
+    tCmp = numpy.max(entDB.data[cmpKey][:,cmpStartDateIndex:cmpEndDateIndex], axis=1)
+    tAbove = tCmp < entDB.data[dataKey][:,dataIndex]
     print(entDB.meta['name'][tAbove])
 
 
