@@ -19,8 +19,9 @@ import edb
 
 
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
-gHistoricGaps = numpy.array([1, 7, 30, 92, 183, 365, 1095, 1825, 3650])
-gHistoricGapsHdr = numpy.array(["1D", "7D", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
+gHistoricGapsWithWeekends = numpy.array([1, 7, 30, 91, 182, 365, 1095, 1825, 3650])
+gHistoricGapsNoWeekends =   numpy.array([1, 5, 21, 65, 130, 260, 782, 1303, 2607])
+gHistoricGapsHdr = numpy.array(["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
 
 
 def _entDB(entDB=None):
@@ -87,8 +88,8 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 reton_retpa: calculates the returnPerAnnum
                 reton_safe: calculates absRet for days within a year range, retPA wrt other days.
                 If type is not specified, it is assumed to be safe type.
-                MetaData  = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
-                MetaLabel = Ret for 1D, 5D, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+                MetaData  = Ret for 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+                MetaLabel = Ret for 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
 
         "ma<s|e><DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. As there wont be sufficient historic data to calculate ma wrt the begin
@@ -131,6 +132,10 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     dont account for them being different from the default.
     """
     entDB = _entDB(entDB)
+    if entDB.bSkipWeekend:
+        gHistoricGaps = gHistoricGapsNoWeekends
+    else:
+        gHistoricGaps = gHistoricGapsWithWeekends
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(opsList) == str:
         opsList = [ opsList ]
