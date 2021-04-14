@@ -381,15 +381,21 @@ def printl(lFmt, lData, printInBtw=" ", printPrefix=None, printSufix=None, lWidt
         print(printSufix)
 
 
-def print_list(lData, width1=16):
+def print_list(lData, width1st=16, widthRem=32):
     """
     Print a list of data, one item in a line.
     If each item in the list is inturn a list/tuple, then the
         1st element in each of it is given a minimum width
+        Remaining elements are given a different minimum width
     """
     for data in lData:
         if type(data) in [ tuple, set, list]:
-            print("{:{width}} {}".format(data[0], data[1:], width=width1))
+            ele1st = data[0]
+            eleRem = data[1:]
+            sEleRem = ""
+            for ele in eleRem:
+                sEleRem = "{}, {:{width}}".format(sEleRem, ele, width=widthRem)
+            print("{:{width}} {}".format(ele1st, sEleRem, width=width1st))
         else:
             print(data)
 
