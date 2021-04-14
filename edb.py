@@ -28,7 +28,7 @@ gbDEBUG = False
 # Should proc_days process beyond yesterday (i.e into today or future)
 gbNotBeyondYesterday = True
 # Should proc_days ignore weekends.
-gbSkipWeekEnds = False
+gbSkipWeekends = False
 
 #
 # Misc
@@ -55,7 +55,7 @@ def setup_gentdb(startDate=-1, endDate=-1):
     """
     global gEntDB
     numDates = ((int(str(endDate)[:4]) - int(str(startDate)[:4]))+2)*365
-    gEntDB = entities.EntitiesDB(gDataKeys, gDataAliases, 8192*4, numDates)
+    gEntDB = entities.EntitiesDB(gDataKeys, gDataAliases, 8192*4, numDates, gbSkipWeekends)
 
 
 def setup_modules(basePath):
@@ -85,7 +85,7 @@ def proc_days(startDate, endDate, handle_date_func, opts=None, bNotBeyondToday=T
     prevMonth = -1
     while curDate < endDate:
         curDate += oneDay
-        if gbSkipWeekEnds and (curDate.isoweekday() > 5):
+        if gEntDB.bSkipWeekends and (curDate.isoweekday() > 5):
             continue
         if prevMonth != curDate.month:
             prevMonth = curDate.month
@@ -415,9 +415,10 @@ def session_restore(sessionName):
     Restore a previously saved gEntDB.data-gEntDB.meta fast from a pickle.
     Also setup the modules used by the main logic.
     """
-    global gEntDB
+    global gEntDB, gbSkipWeekends
     fName = os.path.join(gBasePath, "SSN_{}".format(sessionName))
     ok, gEntDB, tIgnore = hlpr.load_pickle(fName)
+    gbSkipWeekends = gEntDB.bSkipWeekends
 
 
 fetch=fetch_data

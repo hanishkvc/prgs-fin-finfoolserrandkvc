@@ -63,7 +63,7 @@ class EntitiesDB:
         self.meta['lastSeen'] = numpy.zeros(entCnt)
 
 
-    def __init__(self, dataKeys, aliases, entCnt, dateCnt):
+    def __init__(self, dataKeys, aliases, entCnt, dateCnt, bSkipWeekends=True):
         """
         Initialise a entities object.
 
@@ -78,9 +78,12 @@ class EntitiesDB:
         entCnt: The number of entities one expects to store in this.
         dateCnt: The number of dates for which we expect to store
         data in this entities db.
+        bSkipWeekends: If true, its assumed that weekends is not
+            maintained by this database.
         """
         if type(dataKeys) != list:
             dataKeys = [ dataKeys ]
+        self.bSkipWeekends = bSkipWeekends
         self.dataKeys = dataKeys
         self.aliases = aliases
         self._init_types()
