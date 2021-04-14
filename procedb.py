@@ -34,6 +34,15 @@ def _entDB(entDB=None):
     return entDB
 
 
+def _gHistoricGaps(entDB=None):
+    entDB = _entDB(entDB)
+    if entDB.bSkipWeekends:
+        gHistoricGaps = gHistoricGapsNoWeekends
+    else:
+        gHistoricGaps = gHistoricGapsWithWeekends
+    return gHistoricGaps
+
+
 def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
@@ -132,10 +141,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     dont account for them being different from the default.
     """
     entDB = _entDB(entDB)
-    if entDB.bSkipWeekends:
-        gHistoricGaps = gHistoricGapsNoWeekends
-    else:
-        gHistoricGaps = gHistoricGapsWithWeekends
+    gHistoricGaps = _gHistoricGaps(entDB)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(opsList) == str:
         opsList = [ opsList ]
