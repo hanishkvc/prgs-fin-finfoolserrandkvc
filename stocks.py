@@ -43,6 +43,15 @@ def _plot(entCodes, bLinRegress=False):
         mPlot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 
 
+def plot(entCodes, bLinRegress=False):
+    """
+    Plot a predefined set of data wrt each entCode in the given list.
+    """
+    for entCode in entCodes:
+        _plot(entCode, bLinRegress)
+        mPlot.show()
+
+
 def prep():
     _plot_prep()
     procedb.infoset1_prep()
