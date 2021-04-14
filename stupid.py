@@ -17,9 +17,19 @@ def _entDB(entDB=None):
 
 
 def above_ndays(dataKey='close', dataIndex=-1, cmpKey='high', cmpStartDateIndex=-14, cmpEndDateIndex=-1):
+    """
+    Find entities whose specified attribute's value on a given date is above the
+    max value found for another of its attribute, over a given time period.
+
+    The default argument values are setup to find entities whose last close is
+    higher than the high seen over last 2 weeks.
+    """
     entDB = _entDB()
     tCmp = numpy.max(entDB.data[cmpKey][:,cmpStartDateIndex:cmpEndDateIndex], axis=1)
     tAbove = tCmp < entDB.data[dataKey][:,dataIndex]
-    print(entDB.meta['name'][tAbove])
+    tNames = entDB.meta['name'][tAbove]
+    tCodes = entDB.meta['codeL'][tAbove]
+    tEntities = list(zip(tCodes, tNames))
+    return tEntities
 
 
