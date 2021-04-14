@@ -142,6 +142,9 @@ A sample session could involve
    stocks.prep()
    stocks.topbottom()
    stocks.plot(['STOCKSYMBOL1', 'STOCKSYMBOL2'])
+   import crazy;
+   crazy.above_ndays()
+   hlpr.print_list(crazy.below_ndays())
 
 
 Fetching
@@ -729,6 +732,22 @@ stocks.topbottom()
    related data wrt these stocks.
 
 
+
+Crazy
+-------
+
+Remember to load data such that it ends on a working day and not a holiday/weekend,
+so that there is valid data on the last date in the date range currently loaded.
+Or else control dataIndex and cmpEndDateIndex such that they dont fall on a
+holiday/weekend.
+
+crazy.above_ndays()
+
+crazy.below_ndays()
+
+
+
+
 Misc 
 ######
 
@@ -796,5 +815,7 @@ The default path used by program has been changed.
 Date handling as been partly simplified and also now based on python datetime.
 
 Add string based duration notation of ?W/?M/?Y
+
+crazy module added, but not imported by default.
 
 
