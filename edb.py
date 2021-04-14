@@ -25,8 +25,10 @@ gbDEBUG = False
 #
 # proc_days related controls
 #
-# Should proc_days process beyond yesterday (i.e into today or future)
-gbNotBeyondYesterday = True
+# Should proc_days process beyond today into future or not
+gbNotBeyondToday = True
+# Should proc_days skip today also or not
+gbSkipTodayAlso = True
 # Should proc_days ignore weekends.
 gbSkipWeekends = False
 
@@ -79,7 +81,7 @@ def proc_days(startDate, endDate, handle_date_func, opts=None, bNotBeyondToday=T
     """
     print("INFO:proc_days:from {} to {}".format(startDate, endDate))
     if bNotBeyondToday:
-        endDate = hlpr.not_beyond_today(endDate)
+        endDate = hlpr.not_beyond_today(endDate, gbSkipTodayAlso)
     oneDay = datetime.timedelta(days=1)
     curDate = startDate - oneDay
     prevMonth = -1
@@ -134,7 +136,7 @@ def fetch4daterange(startDate, endDate, opts):
     The dates should follow one of these formats YYYY or YYYYMM or YYYYMMDD i.e YYYY[MM[DD]]
     """
     start, end = proc_date_startend(startDate, endDate)
-    proc_days(start, end, fetch4date, opts, gbNotBeyondYesterday)
+    proc_days(start, end, fetch4date, opts, gbNotBeyondToday)
 
 
 def fetch_data(startDate, endDate=None, opts={'ForceRemote': True}):
@@ -199,7 +201,7 @@ def load4daterange(startDate, endDate, opts=None):
     """
     start, end = proc_date_startend(startDate, endDate)
     try:
-        proc_days(start, end, load4date, opts, gbNotBeyondYesterday)
+        proc_days(start, end, load4date, opts, gbNotBeyondToday)
     except:
         excInfo = sys.exc_info()
         print(excInfo)
