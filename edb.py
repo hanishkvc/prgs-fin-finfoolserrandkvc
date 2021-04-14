@@ -42,7 +42,8 @@ LOADFILTERSNAME_AUTO = '-AUTO-'
 gCal = calendar.Calendar()
 gEntDB = None
 gDataKeys = ['open', 'high', 'low', 'data', 'volume']
-gDataAliases = { 'data': [ 'nav', 'close' ] }
+gRootDataKey = 'data'
+gDataAliases = { gRootDataKey: [ 'nav', 'close' ] }
 gDS = []
 gBasePath = "./ffe.data/"
 
@@ -294,10 +295,11 @@ def load_data_stocks(startDate, endDate = None, dataSrcType=datasrc.DSType.Stock
     load_data(startDate, endDate, dataSrcType, bClearData, bOptimizeSize, loadFiltersName, opts)
 
 
-def _fillin4holidays(entIndex=-1):
+def _fillin4holidays_individual(entIndex=-1):
     """
     As there may not be any data for holidays including weekends,
     so fill them with the data from the prev working day for the corresponding entity.
+    NOTE: THis version looks at each data key, on its own.
     """
     for key in gDataKeys:
         lastData = -1
@@ -309,14 +311,33 @@ def _fillin4holidays(entIndex=-1):
                 lastData = gEntDB.data[key][entIndex,c]
 
 
+def _fillin4holidays(entIndex=-1):
+    """
+    As there may not be any data for holidays including weekends,
+    so fill them with the data from the prev working day for the corresponding entity.
+    NOTE: THis version decides on things based on RootDataKey related content.
+    """
+    lastDataIndex = -1
+    for c in range(gEntDB.nxtDateIndex):
+        if gEntDB.data[gRootDataKey][entIndex,c] == 0:
+            if lastDataIndex > 0:
+                for key in gDataKeys:
+                    gEntDB.data[key][entIndex,c] = gEntDB.data[key][entIndex,lastDataIndex]
+        else:
+            lastDataIndex = c
+
+
 def fillin4holidays():
     """
     As there may not be any data for holidays including weekends,
     so fill them with the data from the prev working day for the corresponding entity.
     """
     print("INFO:EDB: Fill in Holidays (including Weekends) with prev data ...")
+    time1=time.time()
     for r in range(gEntDB.nxtEntIndex):
         _fillin4holidays(r)
+    time2=time.time()
+    print("INFO:EDB:FillIn4Holidays: Took {:8.4f} seconds".format(time2-time1))
 
 
 def _findmatching(searchTmpl, dataSet, fullMatch=False, partialTokens=False, ignoreCase=True):
