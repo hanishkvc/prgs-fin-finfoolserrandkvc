@@ -122,7 +122,8 @@ NOTE: Currently, by default it duplicates the respective last valid data for hol
 (including weekends). So there will be some variation wrt measures/data which depends
 on historic data. [[[ One can change this behavior by setting appropriate variable in
 datasrc module. However other logics like rolling ops etc dont account for differences
-due to this.]]]
+due to this. Partly updated now, need to cross check things once and add additional
+logic if any required]]]
 
 NOTE: By default it fetchs/loads data only till yesterday.
 
@@ -136,6 +137,11 @@ A sample session could involve
    procedb.infoset1_result(['open equity elss', 'open hybrid aggressive'], ['direct'])
    edb.enttype_members('nse index')
    plot.data('srel', 'nse index', ['-RE-Nifty 50', 'smlcap'])
+   # A simple look at stocks only
+   stocks.load()
+   stocks.prep()
+   stocks.topbottom()
+   stocks.plot(['STOCKSYMBOL1', 'STOCKSYMBOL2'])
 
 
 Fetching
@@ -428,9 +434,14 @@ It also stores the following additional meta data:
    Adjusted Average of Rolling return (wrt MinThreshold) divided by StdDev of Rolling return
    [ MaShaMT = (Avg-MinT)/Std ]
 
+   For how many years we have data about the entity.
+
 NOTE: If comparing entities which have been active for different amounts of time, then the
 results may not be directly comparable, do remember that, as they all wouldn't have gone through
-the same cycle of events.
+the same cycle of events. Also because the MetaData stored accounts for its active period only,
+and ignores any time duration at begin or end, when there is no data (ie not alive/active/...).
+The logic does save the years active info, so one can use it when comparing other attributes,
+to get a rough sense of things.
 
 
 block - avg,std wrt each block
@@ -705,9 +716,11 @@ stocks.prep()
    roll5Y, and so on.
 
 stocks._plot('STOCK_SYMBOL')
+stocks.plot(['STOCK_SYMBOL1', 'STOCK_SYMBOL2', ...])
 
    Look at the data and corresponding moving averages and linear regression line
-   fit wrt the given stock.
+   fit wrt the given stock(s).
+
 
 stocks.topbottom()
 
