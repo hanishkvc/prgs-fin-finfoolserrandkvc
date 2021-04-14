@@ -126,7 +126,7 @@ def _linregress(entCode, entName, x, y):
     plt.plot(x, x*lr.slope+lr.intercept, label=label)
 
 
-def linregress(dataKeys, entCodes, days=[7, 30, 180, 365, 1095, 1825], entDB=None):
+def linregress(dataKeys, entCodes, days=[7, '1M', '6M', '1Y', '3Y', '5Y'], entDB=None):
     """
     For the given dataKeys and entCodes, plot the corresponding data
     as well as curve fitting lines based on linear regression for
@@ -135,6 +135,8 @@ def linregress(dataKeys, entCodes, days=[7, 30, 180, 365, 1095, 1825], entDB=Non
     entDB = _entDB(entDB)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     for d in days:
+        if type(d) == str:
+            d = hlpr.days_in(d)
         endDate = entDB.dates[endDateIndex]
         startDate = entDB.dates[endDateIndex-d]
         if entDB.datesD.get(startDate, -1) >= 0:

@@ -132,7 +132,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     dont account for them being different from the default.
     """
     entDB = _entDB(entDB)
-    if entDB.bSkipWeekend:
+    if entDB.bSkipWeekends:
         gHistoricGaps = gHistoricGapsNoWeekends
     else:
         gHistoricGaps = gHistoricGapsWithWeekends
@@ -652,10 +652,10 @@ def infoset1_prep(entDB=None):
     warnings.filterwarnings('ignore')
     ops(['srel=srel(data)', 'mas50Srel=mas50(srel)'], entDB=entDB)
     ops(['roabs=reton_absret(data)', 'rosaf=reton(data)'], entDB=entDB)
-    ops(['roll1095=roll1095(data)', 'mas50Roll1095=mas50(roll1095)'], entDB=entDB)
-    ops(['roll1825=roll1825(data)', 'mas50Roll1825=mas50(roll1825)'], entDB=entDB)
+    ops(['roll3Y=roll3Y(data)', 'mas50Roll3Y=mas50(roll3Y)'], entDB=entDB)
+    ops(['roll5Y=roll5Y(data)', 'mas50Roll5Y=mas50(roll5Y)'], entDB=entDB)
     blockDays = int(entDB.nxtDateIndex/5)
-    ops(['blockNRoll1095=block{}(roll1095)'.format(blockDays)], entDB=entDB)
+    ops(['blockNRoll3Y=block{}(roll3Y)'.format(blockDays)], entDB=entDB)
     warnings.filterwarnings('default')
 
 
@@ -666,7 +666,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
 
     NOTE: As 2nd part of the result dump, where it prints data across all specified
     entities, wrt each data aspect that was processed during prep, it tries to sort
-    them based on the average meta data info from roll1095 (3Y). And entities which
+    them based on the average meta data info from roll3Y (3Y). And entities which
     are less than 3 years will get collated to the end of the sorted list, based on
     the last RetPA from srel operation. If there are entities which get dropped by
     both the sort operations, then they will get collated to the end.
@@ -679,8 +679,8 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
             ['srel', 'srelMetaLabel'],
             ['absRet', 'roabsMetaLabel'],
             ['retOn', 'rosafMetaLabel'],
-            ['roll1095', 'roll1095MetaLabel'],
-            ['roll1825', 'roll1825MetaLabel'],
+            ['roll3Y', 'roll3YMetaLabel'],
+            ['roll5Y', 'roll5YMetaLabel'],
             ]
     for entCode in entCodes:
         entIndex = entDB.meta['codeD'][entCode]
@@ -692,17 +692,17 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
     if dateDuration > 1.5:
         dateDuration = 1.5
     print("INFO:dateDuration:", dateDuration)
-    analR1095 = anal_simple('roll1095', 'roll_avg', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
-    analR1095EntCodes = [ x[0] for x in analR1095 ]
+    analR3Y = anal_simple('roll3Y', 'roll_avg', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    analR3YEntCodes = [ x[0] for x in analR3Y ]
     s1 = set(entCodes)
-    s2 = set(analR1095EntCodes)
+    s2 = set(analR3YEntCodes)
     otherEntCodes = s1-s2
     analSRelRPA = anal_simple('srel', 'srel_retpa', 'top', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
     analSRelRPAEntCodes = [ x[0] for x in analSRelRPA ]
     s3 = set(analSRelRPAEntCodes)
-    entCodes = analR1095EntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))
+    entCodes = analR3YEntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))
 
-    anal_simple('blockNRoll1095', 'block_ranked', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    anal_simple('blockNRoll3Y', 'block_ranked', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
 
     totalEntities = len(entCodes)
     if numEntities > totalEntities:

@@ -40,7 +40,7 @@ def _plot(entCodes, bLinRegress=False):
     """
     mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
     if bLinRegress:
-        mPlot.linregress('data', entCodes, days=[90,180,365,1095])
+        mPlot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 
 
 def prep():
