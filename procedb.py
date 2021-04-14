@@ -142,6 +142,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     """
     entDB = _entDB(entDB)
     gHistoricGaps = _gHistoricGaps(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(opsList) == str:
         opsList = [ opsList ]
@@ -227,13 +228,13 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                             tResult[r,:] = ((entDB.data[dataSrc][r,:]/dStart)-1)*100
                         tResult[r,:iStart] = numpy.nan
                         dAbsRet = tResult[r, -1]
-                        durationInYears = hlpr.days2year((endDateIndex-startDateIndex+1)-iStart)
+                        durationInYears = hlpr.days2year((endDateIndex-startDateIndex+1)-iStart, entDB.bSkipWeekends)
                         dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
                         label = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
                         entDB.data[dataDstMetaLabel].append(label)
                         entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                     else:
-                        durationInYears = hlpr.days2year(endDateIndex-startDateIndex+1)
+                        durationInYears = hlpr.days2year(endDateIndex-startDateIndex+1, entDB.bSkipWeekends)
                         entDB.data[dataDstMetaLabel].append("")
                         entDB.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
                 elif op.startswith("rel"):
@@ -247,7 +248,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     dEnd = entDB.data[dataSrc][r, endDateIndex]
                     tResult[r,:] = (((entDB.data[dataSrc][r,:])/baseData)-1)*100
                     dAbsRet = tResult[r, -1]
-                    durationInYears = (endDateIndex-baseDateIndex+1)/365
+                    durationInYears = hlpr.days2year(endDateIndex-baseDateIndex+1, entDB.bSkipWeekends)
                     dRetPA = ((((dAbsRet/100)+1)**(1/durationInYears))-1)*100
                     label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
                     entDB.data[dataDstMetaLabel].append(label)
@@ -255,15 +256,15 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 elif op.startswith("reton"):
                     retonData = entDB.data[dataSrc][r, retonDateIndex]
                     tROAbs = ((retonData/entDB.data[dataSrc][r,:])-1)*100
-                    tRORPA = (((retonData/entDB.data[dataSrc][r,:])**(365/histDays))-1)*100
+                    tRORPA = (((retonData/entDB.data[dataSrc][r,:])**(daysInAYear/histDays))-1)*100
                     if retonType == 'absret':
                         tResult[r,:] = tROAbs
                     elif retonType == 'retpa':
                         tResult[r,:] = tRORPA
                     else:
-                        if len(tROAbs) > 365:
-                            tResult[r,-365:] = tROAbs[-365:]
-                            tResult[r,:-365] = tRORPA[:-365]
+                        if len(tROAbs) > daysInAYear:
+                            tResult[r,-daysInAYear:] = tROAbs[-daysInAYear:]
+                            tResult[r,:-daysInAYear] = tRORPA[:-daysInAYear]
                         else:
                             tResult[r,:] = tROAbs
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
