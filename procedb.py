@@ -118,7 +118,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 If _abs is specified, it calculates absolute return.
                     If Not (i.e by default) it calculates the ReturnPerAnnum.
                 DAYSInINT: The gap in days over which the return is calculated.
-                MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT
+                MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT, YearsActive
                 MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT, YearsActive
                 NOTE: MaSharpeMinT = (RollRetAvg-MinThreshold)/RollRetStd
 
@@ -181,7 +181,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = hlpr.days_in(op[4:].split('_')[0], entDB.bSkipWeekends)
-            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 4])
+            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 5])
         elif op.startswith("block"):
             blockDays = hlpr.days_in(op[5:], entDB.bSkipWeekends)
             blockTotalDays = endDateIndex - startDateIndex + 1
@@ -317,12 +317,12 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         trAvg = numpy.nan
                         trStd = numpy.nan
                         trMaSharpeMinT = numpy.nan
-                    entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
                     trYears = entDB.datesD[entDB.meta['lastSeen'][r]] - entDB.datesD[entDB.meta['firstSeen'][r]]
                     if entDB.bSkipWeekends:
                         trYears = trYears/260
                     else:
                         trYears = trYears/365
+                    entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT, trYears]
                     label = "{:7.2f} {:7.2f} {} {:7.2f} {:4.1f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT, trYears)
                     entDB.data[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
@@ -555,12 +555,13 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     elif analType.startswith("roll"):
         dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         if analType == 'roll_avg':
-            printHdr.extend(['Avg', 'Std', '<minT', 'MaSha'])
+            printHdr.extend(['Avg', 'Std', '<minT', 'MaSha', 'Yrs'])
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
-            printFmts.extend([{'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.2f}",'str':'{:{width}}'}])
-            printWidths.extend([7, 7, 7])
+            printFmts.extend([{'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.2f}",'str':'{:{width}}'},
+                {'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.1f}",'str':'{:{width}}'}])
+            printWidths.extend([7, 7, 7, 4])
     elif analType == "block_ranked":
         printHdr.extend(['AvgRank', 'blockRanks', 'blockAvgs'])
         metaDataAvgs = "{}Avgs".format(dataSrc)
@@ -726,7 +727,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
         elif dataSrc[0] == 'srel':
             print((printFmt+"   AbsRet     RetPA   DurYrs : startVal  -  endVal").format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print((printFmt+"     Avg     Std [ <{}% ]   MaShaMT Yrs").format("code", "name", gfRollingRetPAMinThreshold))
+            print((printFmt+"     Avg     Std [ <{}% ]  MaShaMT Yrs").format("code", "name", gfRollingRetPAMinThreshold))
             x = []
             y = []
             c = []
