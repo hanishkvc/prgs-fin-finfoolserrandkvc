@@ -119,7 +119,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     If Not (i.e by default) it calculates the ReturnPerAnnum.
                 DAYSInINT: The gap in days over which the return is calculated.
                 MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT
-                MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT
+                MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT, YearsActive
                 NOTE: MaSharpeMinT = (RollRetAvg-MinThreshold)/RollRetStd
 
         "block<BlockDaysInt>: Divide the given dataSrc content into multiple blocks, where each
@@ -318,7 +318,12 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         trStd = numpy.nan
                         trMaSharpeMinT = numpy.nan
                     entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT]
-                    label = "{:7.2f} {:7.2f} {} {:7.2f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT)
+                    trYears = entDB.datesD[entDB.meta['lastSeen'][r]] - entDB.datesD[entDB.meta['firstSeen'][r]]
+                    if entDB.bSkipWeekends:
+                        trYears = trYears/260
+                    else:
+                        trYears = trYears/365
+                    label = "{:7.2f} {:7.2f} {} {:7.2f} {:4.1f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT, trYears)
                     entDB.data[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
                     # Calc the Avgs
@@ -721,7 +726,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
         elif dataSrc[0] == 'srel':
             print((printFmt+"   AbsRet     RetPA   DurYrs : startVal  -  endVal").format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print((printFmt+"     Avg     Std [ <{}% ]   MaShaMT").format("code", "name", gfRollingRetPAMinThreshold))
+            print((printFmt+"     Avg     Std [ <{}% ]   MaShaMT Yrs").format("code", "name", gfRollingRetPAMinThreshold))
             x = []
             y = []
             c = []
