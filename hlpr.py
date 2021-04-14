@@ -155,6 +155,37 @@ def string_cleanup(theString, cleanupMap):
     return theString
 
 
+def days_in(sDuration, bSkipWeekends):
+    """
+    Get the number of days in the given duration.
+    The duration could be
+        <Number> = number of days
+        <Number>W = number of weeks
+        <Number>M = number of months
+        <Number>Y = number of years
+    """
+    if sDuration[-1].isnumeric():
+        return int(sDuration)
+    dType = sDuration[-1].upper()
+    iDur = int(sDuration[:-1])
+    if dType == 'Y':
+        if bSkipWeekends:
+            return int((365*5/7)*iDur)
+        else:
+            return 365*iDur
+    elif dType == 'M':
+        if bSkipWeekends:
+            return int((365/12)*iDur*5/7)
+        else:
+            return int((365/12)*iDur)
+    elif dType == 'W':
+        if bSkipWeekends:
+            return 5*iDur
+        else:
+            return 7*iDur
+    return int(iDur)
+
+
 def dateint(y, m, d):
     """
     Convert year, month and day into a numeric YYYYMMDD format.
