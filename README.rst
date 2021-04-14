@@ -411,7 +411,11 @@ ex: rollData=roll365(data)
 
 It calculates rolling returnPerAnnum over the full dataset, wrt given rollingReturn windowSize.
 
-Some common window sizes one could use are 365 (i.e 1Yr), 1095 (i.e 3Yr), 1825 (i.e 5Yr).
+Some common window sizes one could use are
+
+   If weekends are not skipped, then 365 (i.e 1Yr), 1095 (i.e 3Yr), 1825 (i.e 5Yr).
+
+   If weekends are skipped, then 260 (i.e 1Yr), 782 (i.e 3Yr), 1303 (i.e 5Yr).
 
 It also stores the following additional meta data:
 
@@ -457,6 +461,12 @@ As part of the MetaLabel give the following info:
 
 NOTE: Full dataset means for all the entities and over the full date range for which data is loaded.
 
+NOTE: IN the above operations where <Days> is mentioned, one can either pass the number of days directly
+Or else one can pass the duration notations of ?W or ?M or ?Y (? == any number) to specify a given num
+of weeks or months or years, as the case may be. If one uses the duration notation, then the program,
+will automatically use a roughly appropriate number of days based on whether skipping of weekends is
+currently enabled or not.
+
 
 Look at raw/processed data
 =============================
@@ -465,35 +475,33 @@ Look at raw/processed data
 procedb.anal_simple
 ----------------------
 
-Sort/Rank the entities in the dataset based on the criteria (op + opType) given
+Sort/Order the entities in the dataset based on the criteria (analType and sort order) given
 
-Some of the operationTypes supported include
+Some of the analTypes supported include
 
    normal: Depending on the value in the given dataSrc on the given date or index, decide
-   how to rank the entities.
+   how to order the entities.
 
    srel_absret: The dataSrc should be one generated using srel procedb.ops operation.
    Look at the associated absoluteReturn value for each of the specified entities, and
-   rank the entities.
+   order the entities.
 
    srel_retpa: The dataSrc should be one generated using srel procedb.ops operation.
    Look at the associated returnPerAnnum value for each of the specified entities, and
-   rank the entities.
+   order the entities.
 
    roll_avg: The dataSrc should be one generated using roll<Days> operation of procedb.ops.
-   This looks at the full period average of the rolling returnPerAnnum over the full dateRange
-   loaded, for each entity, to decide how to rank the entities.
-
-      analdata_simple('roll1095', 'top', 'roll_avg')
+   This looks at the full period average of rolling returnPerAnnum over the full dateRange
+   loaded, for each entity, to decide how to order the entities.
 
    block_ranked: The dataSrc should be one generated using block<Days> procedb.ops oepration.
    This identifies the pentile to which each entity belongs, when compared to all other
    entities loaded, wrt each block period. Inturn it calculates a naive average of the
-   pentile rank across all the blocks, and uses the same to rank the specified subset of
+   pentile rank across all the blocks, and uses the same to order the specified subset of
    entities.
 
       NOTE: One needs to be extra careful, when trying to interpret this result.
-      If one sees change in ranking between roll_avg and block_ranked(of blockOp on roll data),
+      If one sees change in ordering between roll_avg and block_ranked(of blockOp on roll data),
       look at the rank array to try and see why it might be so. Maybe the entity was performing
       good in only some of the blocks (sub time periods) (or it peformed bad over many blocks
       or ...) in the overall date range or so...
@@ -502,6 +510,10 @@ Some of the operationTypes supported include
       may not be useful always. (Here we are talking about the total number of entities,
       in the loaded dataset and not the subset that may be selected for sorting using
       entCodes).
+
+Example usage:
+
+      procedb.anal_simple('roll3Y', 'roll_avg', 'top')
 
 
 procedb.infoset1
@@ -520,8 +532,8 @@ procedb.infoset1_prep.
 
 procedb.infoset1_prep()
 
-   process the raw data using a standard set of operations like srel, roll1095, roll1825
-   and reton, in order to generate useful info.
+   process the raw data using a standard set of operations like srel, roll3Y, roll5Y
+   and reton, in order to generate possibly useful info.
 
 procedb.infoset1_result()
 
@@ -689,8 +701,8 @@ stocks.load()
 
 stocks.prep()
 
-   This calculates certain things like mas50, mas200, mae24, mae 50, roll1095,
-   roll1825, and so on.
+   This calculates certain things like mas50, mas200, mae24, mae 50, roll3Y,
+   roll5Y, and so on.
 
 stocks._plot('STOCK_SYMBOL')
 
@@ -769,4 +781,7 @@ around this now.
 The default path used by program has been changed.
 
 Date handling as been partly simplified and also now based on python datetime.
+
+Add string based duration notation of ?W/?M/?Y
+
 
