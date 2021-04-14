@@ -47,6 +47,8 @@ def plot(entCodes, bLinRegress=False):
     """
     Plot a predefined set of data wrt each entCode in the given list.
     """
+    if type(entCodes) == str:
+        entCodes = [ entCodes ]
     for entCode in entCodes:
         _plot(entCode, bLinRegress)
         mPlot.show()

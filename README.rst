@@ -736,6 +736,11 @@ stocks.topbottom()
 Crazy
 -------
 
+This module is not imported by default. User has to explicitly import it by giving
+the below command.
+
+import crazy;
+
 Remember to load data such that it ends on a working day and not a holiday/weekend,
 so that there is valid data on the last date in the date range currently loaded.
 Or else control dataIndex and cmpEndDateIndex such that they dont fall on a
