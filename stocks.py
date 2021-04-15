@@ -39,9 +39,7 @@ def _plot(entCodes, bLinRegress=False):
         linear regression based lines wrt 3M, 6M, 1Y and 3Y.
     """
     mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
-    ma = mPlot._axes()
-    ia = ma.inset_axes([0,0,1,0.2])
-    ia.patch.set_alpha(0.5)
+    ia = mPlot.inset_axes([0,0,1,0.2])
     mPlot._data(['volume'], entCodes, axes=ia)
     if bLinRegress:
         mPlot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])

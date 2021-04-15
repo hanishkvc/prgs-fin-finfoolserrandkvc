@@ -26,9 +26,35 @@ def _entDB(entDB=None):
 
 
 def _axes(axes=None):
+    """
+    Return the main axes being used for plotting,
+    if a explicit axes is not specified.
+    """
     if axes == None:
         return plt.gca()
     return axes
+
+
+def inset_axes(bounds, bTransparent=True, bShareXAxis=True, bYTicksRight=True, axes=None):
+    """
+    Create a inset axes, for the given axes.
+
+    By default it
+        Shares the x-axis with parent axes
+        is transparent
+        has yticks to the right side
+    """
+    axes = _axes(axes)
+    if bShareXAxis:
+        sharex = axes
+    else:
+        sharex = None
+    iaxes = axes.inset_axes(bounds, sharex=sharex)
+    if bTransparent:
+        iaxes.patch.set_alpha(0.5)
+    if bYTicksRight:
+        iaxes.yaxis.tick_right()
+    return iaxes
 
 
 def _data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None, axes=None):
