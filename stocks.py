@@ -73,9 +73,9 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         entIndex = entDB.meta['codeD'][entCode]
         entName = entDB.meta['name'][entIndex]
         print("\n\nEntity: {:20} {}".format(entCode, entName))
+        ops.print_pivotpoints('pp', entCode, "PivotPnts")
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
-        ops.print_pivotpoints('pp', entCode, "PivotPnts")
         _plot(entCode, bPivotPoints=True, bVolumes=bVolumes, bLinRegress=bLinRegress)
         mPlot.show()
 
