@@ -70,7 +70,8 @@ def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
     axes = eplot._axes(axes)
     entIndex = entDB.meta['codeD'][entCode]
     pp = entDB.data[dataKey][entIndex]
-    for p in pp:
-        axes.plot([dateIndex-10, dateIndex], [p, p])
+    for p,s in zip(pp, ['S2', 'S1', 'P', 'R1', 'R2']):
+        axes.text(dateIndex-5, p, s)
+        axes.plot([dateIndex-10, dateIndex], [p, p], '.')
 
 
