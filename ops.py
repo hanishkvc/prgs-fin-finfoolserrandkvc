@@ -5,6 +5,7 @@
 
 import numpy
 import edb
+import plot as eplot
 
 
 def _entDB(entDB=None):
@@ -37,6 +38,7 @@ def pivotpoints(dataDst, dateIndex=-1, entDB=None):
     it to a different date by passing the corresponding dateIndex.
     The dataDst array will contain [S2,S1,P,R1,R2] wrt each entity.
     """
+    print("DBUG:Ops:PivotPoints:", dataDst)
     entDB = _entDB(entDB)
     high = entDB.data['high'][:,dateIndex]
     low = entDB.data['low'][:,dateIndex]
@@ -52,5 +54,17 @@ def pivotpoints(dataDst, dateIndex=-1, entDB=None):
     tS1 = tS1.reshape(-1,1)
     tS2 = tS2.reshape(-1,1)
     entDB.data[dataDst] = numpy.hstack((tS2,tS1,tP,tR1,tR2))
+
+
+def plot_pivotpoints(dataKey, entCode, dateIndex=-1, entDB=None, axes=None):
+    """
+    Plot the pivot points of the given entCode on the given axes.
+    """
+    entDB = _entDB(entDB)
+    axes = eplot._axes(axes)
+    entIndex = entDB.meta['codeD'][entCode]
+    pp = entDB.data[dataKey][entIndex]
+    for p in pp:
+        axes.plot([100,1000], [p, p])
 
 
