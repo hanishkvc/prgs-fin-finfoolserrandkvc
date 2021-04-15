@@ -31,15 +31,19 @@ def print_pivotpoints(dataKey, entCodes, tag="", bPrintHdr=True, entDB=None):
         print("{}: {:16} {:32} {:7.2f} {:7.2f} {:7.2f} {:7.2f} {:7.2f}".format(tag, entCode, entName, pp[0], pp[1], pp[2], pp[3], pp[4]))
 
 
-def pivotpoints(dataDst, dateIndex=-1, entDB=None):
+def pivotpoints(dataDst, date=-1, dateIndex=None, entDB=None):
     """
     Calculate the pivot points for all the entities and store at dataDst within entDB.
     By default its calculated wrt the last date in the entities db. User can change
-    it to a different date by passing the corresponding dateIndex.
+    it to a different date by passing the date or its corresponding dateIndex.
     The dataDst array will contain [S2,S1,P,R1,R2] wrt each entity.
+    NOTE: If date is specified, pivot points will be calculated using data corresponding
+    to the given date.
     """
     print("DBUG:Ops:PivotPoints:", dataDst)
     entDB = _entDB(entDB)
+    if not dateIndex:
+        dummyDateIndex, dateIndex = entDB.daterange2index(date, date)
     high = entDB.data['high'][:,dateIndex]
     low = entDB.data['low'][:,dateIndex]
     close = entDB.data['close'][:,dateIndex]
@@ -56,15 +60,17 @@ def pivotpoints(dataDst, dateIndex=-1, entDB=None):
     entDB.data[dataDst] = numpy.hstack((tS2,tS1,tP,tR1,tR2))
 
 
-def plot_pivotpoints(dataKey, entCode, dateIndex=-1, entDB=None, axes=None):
+def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
     """
     Plot the pivot points of the given entCode on the given axes.
+    The pivot points are plotted around the specified date's location.
     """
     entDB = _entDB(entDB)
+    dummyDateIndex, dateIndex = entDB.daterange2index(date, date)
     axes = eplot._axes(axes)
     entIndex = entDB.meta['codeD'][entCode]
     pp = entDB.data[dataKey][entIndex]
     for p in pp:
-        axes.plot([100,1000], [p, p])
+        axes.plot([dateIndex-10, dateIndex], [p, p])
 
 
