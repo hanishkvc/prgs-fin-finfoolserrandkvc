@@ -15,6 +15,8 @@ L1 = [ "edb.load", "edb.fetch", "edb.search", "edb.load_mfs", "edb.load_stocks",
         "procedb.infoset1_prep", "procedb.infoset1_result",
         "stocks.load", "stocks.prep", "stocks._plot", "stocks.plot", "stocks.topbottom",
         "crazy.above_ndays", "crazy.below_ndays",
+        "ops.pivotpoints", "ops.print_pivotpoints",
+        "hlpr.print_list",
         "quit"
         ]
 
