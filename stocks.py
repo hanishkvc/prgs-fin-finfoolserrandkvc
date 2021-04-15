@@ -49,7 +49,6 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     """
     mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
     if bPivotPoints:
-        ops.print_pivotpoints('pp', entCodes)
         ops.plot_pivotpoints('pp', entCodes, axes=mPlot._axes())
     if bVolumes:
         ia = mPlot.inset_axes([0,0,1,0.1], sTitle="Volumes")
@@ -76,6 +75,7 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         print("\n\nEntity: {:20} {}".format(entCode, entName))
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
+        ops.print_pivotpoints('pp', entCode, "PivotPnts")
         _plot(entCode, bPivotPoints=True, bVolumes=bVolumes, bLinRegress=bLinRegress)
         mPlot.show()
 
