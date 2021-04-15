@@ -30,7 +30,7 @@ def _plot_prep():
     procedb.ops(['mae9=mae9(data)', 'mae26=mae26(data)', 'mae50=mae50(data)'])
 
 
-def _plot(entCodes, bLinRegress=False):
+def _plot(entCodes, bVolumes=True, bLinRegress=False):
     """
     Plot data related to the given set of entCodes.
 
@@ -39,13 +39,14 @@ def _plot(entCodes, bLinRegress=False):
         linear regression based lines wrt 3M, 6M, 1Y and 3Y.
     """
     mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
-    ia = mPlot.inset_axes([0,0,1,0.2])
-    mPlot._data(['volume'], entCodes, axes=ia)
+    if bVolumes:
+        ia = mPlot.inset_axes([0,0,1,0.1], sTitle="Volumes")
+        mPlot._data(['volume'], entCodes, axes=ia)
     if bLinRegress:
         mPlot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 
 
-def plot(entCodes, bLinRegress=False):
+def plot(entCodes, bVolumes=True, bLinRegress=False):
     """
     Plot a predefined set of data wrt each entCode in the given list.
     """
@@ -63,7 +64,7 @@ def plot(entCodes, bLinRegress=False):
         print("\n\nEntity: {:20} {}".format(entCode, entName))
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
-        _plot(entCode, bLinRegress)
+        _plot(entCode, bVolumes=bVolumes, bLinRegress=bLinRegress)
         mPlot.show()
 
 

@@ -35,7 +35,7 @@ def _axes(axes=None):
     return axes
 
 
-def inset_axes(bounds, bTransparent=True, bShareXAxis=True, bYTicksRight=True, axes=None):
+def inset_axes(bounds, sTitle=None, bTransparent=True, bShareXAxis=True, bYTicksRight=True, axes=None):
     """
     Create a inset axes, for the given axes.
 
@@ -50,6 +50,8 @@ def inset_axes(bounds, bTransparent=True, bShareXAxis=True, bYTicksRight=True, a
     else:
         sharex = None
     iaxes = axes.inset_axes(bounds, sharex=sharex)
+    if sTitle:
+        iaxes.set_title(sTitle)
     if bTransparent:
         iaxes.patch.set_alpha(0.5)
     if bYTicksRight:
