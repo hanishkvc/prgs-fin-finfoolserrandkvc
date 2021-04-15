@@ -32,20 +32,25 @@ def _plot_prep():
     ops.pivotpoints('pp')
 
 
-def _plot(entCodes, bVolumes=True, bLinRegress=False):
+def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     """
     Plot data related to the given set of entCodes.
 
-    This includes the close related
-        raw, mas50 and mas200 data as well as
-        linear regression based lines wrt 3M, 6M, 1Y and 3Y.
+    This includes
+        the close related
+            raw, mas50 and mas200 data as well as
+            linear regression based lines wrt 3M, 6M, 1Y and 3Y.
+        Volumes traded.
+        PivotPoints.
 
     Even thou entCodes can be passed as a list, passing a single
     entCode may be more practically useful. Also plot_pivotpoints
     currently supports a single entCode only.
     """
     mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
-    ops.plot_pivotpoints('pp', entCodes, axes=mPlot._axes())
+    if bPivotPoints:
+        ops.print_pivotpoints('pp', entCodes)
+        ops.plot_pivotpoints('pp', entCodes, axes=mPlot._axes())
     if bVolumes:
         ia = mPlot.inset_axes([0,0,1,0.1], sTitle="Volumes")
         mPlot._data(['volume'], entCodes, axes=ia)
@@ -53,7 +58,7 @@ def _plot(entCodes, bVolumes=True, bLinRegress=False):
         mPlot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 
 
-def plot(entCodes, bVolumes=True, bLinRegress=False):
+def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     """
     Plot a predefined set of data wrt each entCode in the given list.
     """
@@ -71,7 +76,7 @@ def plot(entCodes, bVolumes=True, bLinRegress=False):
         print("\n\nEntity: {:20} {}".format(entCode, entName))
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
-        _plot(entCode, bVolumes=bVolumes, bLinRegress=bLinRegress)
+        _plot(entCode, bPivotPoints=True, bVolumes=bVolumes, bLinRegress=bLinRegress)
         mPlot.show()
 
 
