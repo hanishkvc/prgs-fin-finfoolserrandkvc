@@ -29,7 +29,9 @@ def _plot_prep():
     """
     procedb.ops(['mas50=mas50(data)', 'mas200=mas200(data)'])
     procedb.ops(['mae9=mae9(data)', 'mae26=mae26(data)', 'mae50=mae50(data)'])
+    ops._weekly_view(['open','high','low','close','volume'], ['s','M','m','e','a'], "w.{}")
     ops.pivotpoints('pp')
+    ops.pivotpoints('ppW', "w.{}")
 
 
 def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
@@ -50,6 +52,7 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     eplot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
     if bPivotPoints:
         ops.plot_pivotpoints('pp', entCodes, axes=eplot._axes())
+        ops.plot_pivotpoints('ppW', entCodes, axes=eplot._axes())
     if bVolumes:
         ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
         eplot._data(['volume'], entCodes, axes=ia)
@@ -73,7 +76,8 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         entIndex = entDB.meta['codeD'][entCode]
         entName = entDB.meta['name'][entIndex]
         print("\n\nEntity: {:20} {}".format(entCode, entName))
-        ops.print_pivotpoints('pp', entCode, "PivotPnts")
+        ops.print_pivotpoints('pp', entCode, "PivotPntsD")
+        ops.print_pivotpoints('ppW', entCode, "PivotPntsW")
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
         _plot(entCode, bPivotPoints=True, bVolumes=bVolumes, bLinRegress=bLinRegress)
