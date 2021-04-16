@@ -9,6 +9,7 @@ import edb
 import plot as eplot
 import procedb
 import ops
+import hlpr
 
 
 
@@ -44,15 +45,19 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
             linear regression based lines wrt 3M, 6M, 1Y and 3Y.
         Volumes traded.
         PivotPoints.
+            day based pivot line drawn across 2 weeks
+            week based pivot line drawn across 6 weeks
 
     Even thou entCodes can be passed as a list, passing a single
     entCode may be more practically useful. Also plot_pivotpoints
     currently supports a single entCode only.
     """
+    entDB = edb.gEntDB
+    weekDays = hlpr.days_in('1W', entDB.bSkipWeekends)
     eplot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
     if bPivotPoints:
-        ops.plot_pivotpoints('pp', entCodes, axes=eplot._axes())
-        ops.plot_pivotpoints('ppW', entCodes, plotRange=45, axes=eplot._axes())
+        ops.plot_pivotpoints('pp', entCodes, plotRange=weekDays, axes=eplot._axes())
+        ops.plot_pivotpoints('ppW', entCodes, plotRange=weekDays*3, axes=eplot._axes())
     if bVolumes:
         ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
         eplot._data(['volume'], entCodes, axes=ia)
