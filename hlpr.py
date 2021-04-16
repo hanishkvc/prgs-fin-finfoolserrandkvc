@@ -414,9 +414,14 @@ def data_metakeys(dataDst):
     return dataKey, labelKey
 
 
-def derive_keys(keyNameTmpl="{}", inKeys):
+def derive_keys(inKeys, keyNameTmpl="{}"):
+    """
+    Generate new key names for given list of keys, using the keyNameTmpl.
+    Example keyNameTmpls include
+        "{}", "w.{}", ...
+    """
     outKeys = []
-    for kI in keys:
+    for kI in inKeys:
         kO = keyNameTmpl.format(kI)
         outKeys.append(kO)
     return outKeys

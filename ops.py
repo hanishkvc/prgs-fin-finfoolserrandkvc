@@ -47,7 +47,7 @@ def pivotpoints(dataDst, srcKeyNameTmpl="{}", date=-1, dateIndex=None, entDB=Non
     entDB = _entDB(entDB)
     if not dateIndex:
         dummyDateIndex, dateIndex = entDB.daterange2index(date, date)
-    highKey, lowKey, closeKey = hlpr.derive_keys(srcKeyNameTmpl, ['high', 'low', 'close'])
+    highKey, lowKey, closeKey = hlpr.derive_keys(['high', 'low', 'close'], srcKeyNameTmpl)
     high = entDB.data[highKey][:,dateIndex]
     low = entDB.data[lowKey][:,dateIndex]
     close = entDB.data[closeKey][:,dateIndex]
@@ -102,7 +102,7 @@ def _weekly_view(dataSrcs, modes, destKeyNameTmpl="w.{}", entDB=None):
     srcShape = entDB.data[dataSrcs[0]].shape
     dstShape = list(srcShape)
     dstShape[1] = int(dstShape[1]/weekDays)
-    dataDsts = hlpr.derive_keys(dataSrcs)
+    dataDsts = hlpr.derive_keys(dataSrcs, destKeyNameTmpl)
     for dDst in dataDsts:
         entDB.data[dDst] = numpy.zeros(dstShape)
     endI = entDB.nxtDateIndex
