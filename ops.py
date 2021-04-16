@@ -6,6 +6,7 @@
 import numpy
 import edb
 import plot as eplot
+import hlpr
 
 
 def _entDB(entDB=None):
@@ -75,28 +76,33 @@ def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
         axes.plot([dateIndex-20, dateIndex], [p, p], color=c, alpha=0.5, linestyle='dashed')
 
 
-def _weekly_view(dataSrc, dataDst="w.{}", entDB=None):
+def _weekly_view(dataSrcs, modes, dataDst="w.{}", entDB=None):
     entDB = _entDB(entDB)
-    srcShape = entDB.data[dataSrc].shape
+    if type(dataSrcs) == str:
+        dataSrcs = [ dataSrcs ]
+    srcShape = entDB.data[dataSrcs[0]].shape
     dstShape = list(srcShape)
     dstShape[1] = int(dstShape[1]/7)
-    dataDst = dataDst.format(dataSrc)
-    entDB.data[dataDst] = numpy.zeros(dstShape)
+    for dSrc in dataSrcs:
+        dDst = dataDst.format(dSrc)
+        entDB.data[dDst] = numpy.zeros(dstShape)
     weekDays = hlpr.days_in('1W', entDB.bSkipWeekends)
     endI = entDB.nxtDateIndex
     startI = endI - weekDays
     iDst = -1
     while startI > 0:
-        if mode == 'M':
-            entDB.data[dataDst][:,iDst] = numpy.max(entDB.data[dataSrc][:,startI:endI], axis=1)
-        elif mode == 'm':
-            entDB.data[dataDst][:,iDst] = numpy.min(entDB.data[dataSrc][:,startI:endI], axis=1)
-        elif mode == 's':
-            entDB.data[dataDst][:,iDst] = entDB.data[dataSrc][:,startI]
-        elif mode == 'e':
-            entDB.data[dataDst][:,iDst] = entDB.data[dataSrc][:,endI-1]
-        elif mode == 'a':
-            entDB.data[dataDst][:,iDst] = numpy.average(entDB.data[dataSrc][:,startI:endI], axis=1)
+        for dSrc, mode in zip(dataSrcs, modes):
+            dDst = dataDst.format(dSrc)
+            if mode == 'M':
+                entDB.data[dDst][:,iDst] = numpy.max(entDB.data[dSrc][:,startI:endI], axis=1)
+            elif mode == 'm':
+                entDB.data[dDst][:,iDst] = numpy.min(entDB.data[dSrc][:,startI:endI], axis=1)
+            elif mode == 's':
+                entDB.data[dDst][:,iDst] = entDB.data[dSrc][:,startI]
+            elif mode == 'e':
+                entDB.data[dDst][:,iDst] = entDB.data[dSrc][:,endI-1]
+            elif mode == 'a':
+                entDB.data[dDst][:,iDst] = numpy.average(entDB.data[dSrc][:,startI:endI], axis=1)
         endI = startI
         startI = endI - weekDays
 
