@@ -75,3 +75,29 @@ def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
         axes.plot([dateIndex-20, dateIndex], [p, p], color=c, alpha=0.5, linestyle='dashed')
 
 
+def _weekly_view(dataSrc, dataDst="w.{}", entDB=None):
+    entDB = _entDB(entDB)
+    srcShape = entDB.data[dataSrc].shape
+    dstShape = list(srcShape)
+    dstShape[1] = int(dstShape[1]/7)
+    dataDst = dataDst.format(dataSrc)
+    entDB.data[dataDst] = numpy.zeros(dstShape)
+    weekDays = hlpr.days_in('1W', entDB.bSkipWeekends)
+    endI = entDB.nxtDateIndex
+    startI = endI - weekDays
+    iDst = -1
+    while startI > 0:
+        if mode == 'M':
+            entDB.data[dataDst][:,iDst] = numpy.max(entDB.data[dataSrc][:,startI:endI], axis=1)
+        elif mode == 'm':
+            entDB.data[dataDst][:,iDst] = numpy.min(entDB.data[dataSrc][:,startI:endI], axis=1)
+        elif mode == 's':
+            entDB.data[dataDst][:,iDst] = entDB.data[dataSrc][:,startI]
+        elif mode == 'e':
+            entDB.data[dataDst][:,iDst] = entDB.data[dataSrc][:,endI-1]
+        elif mode == 'a':
+            entDB.data[dataDst][:,iDst] = numpy.average(entDB.data[dataSrc][:,startI:endI], axis=1)
+        endI = startI
+        startI = endI - weekDays
+
+
