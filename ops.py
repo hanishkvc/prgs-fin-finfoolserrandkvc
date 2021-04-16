@@ -32,22 +32,25 @@ def print_pivotpoints(dataKey, entCodes, tag="", bPrintHdr=True, entDB=None):
         print("{}: {:16} {:32} {:7.2f} {:7.2f} {:7.2f} {:7.2f} {:7.2f}".format(tag, entCode, entName, pp[0], pp[1], pp[2], pp[3], pp[4]))
 
 
-def pivotpoints(dataDst, date=-1, dateIndex=None, entDB=None):
+def pivotpoints(dataDst, srcKeyNameTmpl="{}", date=-1, dateIndex=None, entDB=None):
     """
     Calculate the pivot points for all the entities and store at dataDst within entDB.
     By default its calculated wrt the last date in the entities db. User can change
     it to a different date by passing the date or its corresponding dateIndex.
     The dataDst array will contain [S2,S1,P,R1,R2] wrt each entity.
-    NOTE: If date is specified, pivot points will be calculated using data corresponding
-    to the given date.
+    NOTE: If date/dateIndex is specified, pivot points will be calculated using data
+    corresponding to the given date/dateIndex.
+    srcKeyNameTmpl: Is used to decide whether one is working with base data set or
+        one of the derived/calculated data sets like weekly/monthly view or so.
     """
     print("DBUG:Ops:PivotPoints:", dataDst)
     entDB = _entDB(entDB)
     if not dateIndex:
         dummyDateIndex, dateIndex = entDB.daterange2index(date, date)
-    high = entDB.data['high'][:,dateIndex]
-    low = entDB.data['low'][:,dateIndex]
-    close = entDB.data['close'][:,dateIndex]
+    highKey, lowKey, closeKey = hlpr.derive_keys(srcKeyNameTmpl, ['high', 'low', 'close'])
+    high = entDB.data[highKey][:,dateIndex]
+    low = entDB.data[lowKey][:,dateIndex]
+    close = entDB.data[closeKey][:,dateIndex]
     tP = (high + low + close)/3
     tR1 = (tP*2) - low
     tS1 = (tP*2) - high
@@ -76,7 +79,7 @@ def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
         axes.plot([dateIndex-20, dateIndex], [p, p], color=c, alpha=0.5, linestyle='dashed')
 
 
-def _weekly_view(dataSrcs, modes, dataDstNameTmpl="w.{}", entDB=None):
+def _weekly_view(dataSrcs, modes, destKeyNameTmpl="w.{}", entDB=None):
     """
     Generate data(s) which provide a weekly view of the passed source data(s).
     dataSrcs: A list of source data keys for which weekly view needs to be created.
@@ -86,7 +89,7 @@ def _weekly_view(dataSrcs, modes, dataDstNameTmpl="w.{}", entDB=None):
         's': Use the value belonging to the first day for a given week.
         'e': Use the value belonging to the last day for a given week.
         'a': Use the average value of all the data for a given week.
-    dataDstNameTmpl: A template which specifies how the destination dataKeys
+    destKeyNameTmpl: A template which specifies how the destination dataKeys
         should be named.
     NOTE: The weeks are assumed starting from the lastday in the data set,
         as the last day of a week, irrespective of which calender day it
@@ -99,10 +102,8 @@ def _weekly_view(dataSrcs, modes, dataDstNameTmpl="w.{}", entDB=None):
     srcShape = entDB.data[dataSrcs[0]].shape
     dstShape = list(srcShape)
     dstShape[1] = int(dstShape[1]/weekDays)
-    dataDsts = []
-    for dSrc in dataSrcs:
-        dDst = dataDstNameTmpl.format(dSrc)
-        dataDsts.append(dDst)
+    dataDsts = hlpr.derive_keys(dataSrcs)
+    for dDst in dataDsts:
         entDB.data[dDst] = numpy.zeros(dstShape)
     endI = entDB.nxtDateIndex
     startI = endI - weekDays

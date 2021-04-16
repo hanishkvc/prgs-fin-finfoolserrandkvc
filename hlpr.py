@@ -414,3 +414,11 @@ def data_metakeys(dataDst):
     return dataKey, labelKey
 
 
+def derive_keys(keyNameTmpl="{}", inKeys):
+    outKeys = []
+    for kI in keys:
+        kO = keyNameTmpl.format(kI)
+        outKeys.append(kO)
+    return outKeys
+
+
