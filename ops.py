@@ -148,19 +148,30 @@ def monthly_view(dataSrcs, modes, destKeyNameTmpl="m.{}", entDB=None):
     return _blocky_view(dataSrcs, modes, "1M", destKeyNameTmpl, entDB)
 
 
-def rsi(dataSrc, lookBackDays=14, entDB=None):
+def rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
     """
     Calculate the rsi
     """
     entDB = _entDB(entDB)
-    tData = entDB.data[dataSrc][-lookBackDays:]
-    tPrev = entDB.data[dataSrc][-(lookBackDays+1):-1]
+    tData = entDB.data[dataSrc][:,1:]
+    tPrev = entDB.data[dataSrc][:,:-1]
     tData = ((tData/tPrev)-1)*100
-    tPos = tData[tData > 0]
-    tNeg = tData[tData < 0]
-    tGain = numpy.average(tPos)
-    tLoss = abs(numpy.average(tNeg))
+    tPos = tData.copy()
+    tNeg = tData.copy()
+    tPos[tPos < 0] = 0
+    tNeg[tNeg > 0] = 0
+    tNeg = -1*tNeg
+    srcShape = entDB.data[dataSrc].shape
+    tGain = numpy.zeros(srcShape)
+    tLoss = numpy.zeros(srcShape)
+    tPoss = numpy.zeros(srcShape)
+    tNegs = numpy.zeros(srcShape)
+    for i in range(lookBackDays):
+        iStart = i
+        iEnd = iStart + (srcShape[1]-lookBackDays)
+        tGain[:, lookBackDays:] += tPos[:, iStart:iEnd]
+        tLoss[:, lookBackDays:] += tNeg[:, iStart:iEnd]
     tRSI = 100 - (100/(1+((tGain/lookBackDays)/(tLoss/lookBackDays))))
-    return tRSI
+    entDB.data[dataDst] = tRSI
 
 
