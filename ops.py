@@ -76,23 +76,39 @@ def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
         axes.plot([dateIndex-20, dateIndex], [p, p], color=c, alpha=0.5, linestyle='dashed')
 
 
-def _weekly_view(dataSrcs, modes, dataDst="w.{}", entDB=None):
+def _weekly_view(dataSrcs, modes, dataDstNameTmpl="w.{}", entDB=None):
+    """
+    Generate data(s) which provide a weekly view of the passed source data(s).
+    dataSrcs: A list of source data keys for which weekly view needs to be created.
+    modes: Specifies how to generate the weekly view. It could be one of
+        'M': Use the max value from among all the data for a given week.
+        'm': Use the min value from among all the data for a given week.
+        's': Use the value belonging to the first day for a given week.
+        'e': Use the value belonging to the last day for a given week.
+        'a': Use the average value of all the data for a given week.
+    dataDstNameTmpl: A template which specifies how the destination dataKeys
+        should be named.
+    NOTE: The weeks are assumed starting from the lastday in the data set,
+        as the last day of a week, irrespective of which calender day it
+        may be.
+    """
     entDB = _entDB(entDB)
+    weekDays = hlpr.days_in('1W', entDB.bSkipWeekends)
     if type(dataSrcs) == str:
         dataSrcs = [ dataSrcs ]
     srcShape = entDB.data[dataSrcs[0]].shape
     dstShape = list(srcShape)
-    dstShape[1] = int(dstShape[1]/7)
+    dstShape[1] = int(dstShape[1]/weekDays)
+    dataDsts = []
     for dSrc in dataSrcs:
-        dDst = dataDst.format(dSrc)
+        dDst = dataDstNameTmpl.format(dSrc)
+        dataDsts.append(dDst)
         entDB.data[dDst] = numpy.zeros(dstShape)
-    weekDays = hlpr.days_in('1W', entDB.bSkipWeekends)
     endI = entDB.nxtDateIndex
     startI = endI - weekDays
     iDst = -1
     while startI > 0:
-        for dSrc, mode in zip(dataSrcs, modes):
-            dDst = dataDst.format(dSrc)
+        for dSrc, mode, dDst in zip(dataSrcs, modes, dataDsts):
             if mode == 'M':
                 entDB.data[dDst][:,iDst] = numpy.max(entDB.data[dSrc][:,startI:endI], axis=1)
             elif mode == 'm':
@@ -105,5 +121,6 @@ def _weekly_view(dataSrcs, modes, dataDst="w.{}", entDB=None):
                 entDB.data[dDst][:,iDst] = numpy.average(entDB.data[dSrc][:,startI:endI], axis=1)
         endI = startI
         startI = endI - weekDays
+        iDst -= 1
 
 
