@@ -31,7 +31,7 @@ def _plot_prep():
     procedb.ops(['mae9=mae9(data)', 'mae26=mae26(data)', 'mae50=mae50(data)'])
     ops._weekly_view(['open','high','low','close','volume'], ['s','M','m','e','a'], "w.{}")
     ops.pivotpoints('pp')
-    ops.pivotpoints('ppW', "w.{}")
+    ops.pivotpoints('ppW', "w.{}", dateIndex=-1)
 
 
 def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
@@ -52,7 +52,7 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     eplot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
     if bPivotPoints:
         ops.plot_pivotpoints('pp', entCodes, axes=eplot._axes())
-        ops.plot_pivotpoints('ppW', entCodes, axes=eplot._axes())
+        ops.plot_pivotpoints('ppW', entCodes, plotRange=45, axes=eplot._axes())
     if bVolumes:
         ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
         eplot._data(['volume'], entCodes, axes=ia)

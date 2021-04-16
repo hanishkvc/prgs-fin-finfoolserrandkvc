@@ -64,10 +64,11 @@ def pivotpoints(dataDst, srcKeyNameTmpl="{}", date=-1, dateIndex=None, entDB=Non
     entDB.data[dataDst] = numpy.hstack((tS2,tS1,tP,tR1,tR2))
 
 
-def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
+def plot_pivotpoints(dataKey, entCode, plotRange=10, date=-1, entDB=None, axes=None):
     """
     Plot the pivot points of the given entCode on the given axes.
     The pivot points are plotted around the specified date's location.
+    plotRange: length of the pivot point lines.
     """
     entDB = _entDB(entDB)
     dummyDateIndex, dateIndex = entDB.daterange2index(date, date)
@@ -75,8 +76,8 @@ def plot_pivotpoints(dataKey, entCode, date=-1, entDB=None, axes=None):
     entIndex = entDB.meta['codeD'][entCode]
     pp = entDB.data[dataKey][entIndex]
     for p,s,c in zip(pp, ['S2', 'S1', 'P', 'R1', 'R2'], ['green','green','black','red','red']):
-        axes.text(dateIndex-10, p, s)
-        axes.plot([dateIndex-20, dateIndex], [p, p], color=c, alpha=0.5, linestyle='dashed')
+        axes.text(dateIndex-plotRange, p, s)
+        axes.plot([dateIndex-plotRange*2, dateIndex], [p, p], color=c, alpha=0.5, linestyle='dashed')
 
 
 def _weekly_view(dataSrcs, modes, destKeyNameTmpl="w.{}", entDB=None):
