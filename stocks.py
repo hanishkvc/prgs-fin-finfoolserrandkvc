@@ -6,7 +6,7 @@
 
 import time
 import edb
-import plot as mPlot
+import plot as eplot
 import procedb
 import ops
 
@@ -47,14 +47,14 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     entCode may be more practically useful. Also plot_pivotpoints
     currently supports a single entCode only.
     """
-    mPlot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
+    eplot._data(['data', 'mas200', 'mae9', 'mae26', 'mae50'], entCodes)
     if bPivotPoints:
-        ops.plot_pivotpoints('pp', entCodes, axes=mPlot._axes())
+        ops.plot_pivotpoints('pp', entCodes, axes=eplot._axes())
     if bVolumes:
-        ia = mPlot.inset_axes([0,0,1,0.1], sTitle="Volumes")
-        mPlot._data(['volume'], entCodes, axes=ia)
+        ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
+        eplot._data(['volume'], entCodes, axes=ia)
     if bLinRegress:
-        mPlot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
+        eplot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 
 
 def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
@@ -77,7 +77,7 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
         _plot(entCode, bPivotPoints=True, bVolumes=bVolumes, bLinRegress=bLinRegress)
-        mPlot.show()
+        eplot.show()
 
 
 def prep():
