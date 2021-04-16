@@ -30,9 +30,11 @@ def _plot_prep():
     """
     procedb.ops(['mas50=mas50(data)', 'mas200=mas200(data)'])
     procedb.ops(['mae9=mae9(data)', 'mae26=mae26(data)', 'mae50=mae50(data)'])
-    ops._weekly_view(['open','high','low','close','volume'], ['s','M','m','e','a'], "w.{}")
+    ops.weekly_view(['open','high','low','close','volume'], ['s','M','m','e','a'], "w.{}")
+    ops.monthly_view(['open','high','low','close','volume'], ['s','M','m','e','a'], "m.{}")
     ops.pivotpoints('pp')
     ops.pivotpoints('ppW', "w.{}", dateIndex=-1)
+    ops.pivotpoints('ppM', "m.{}", dateIndex=-1)
 
 
 def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
@@ -46,7 +48,8 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         Volumes traded.
         PivotPoints.
             day based pivot line drawn across 2 weeks
-            week based pivot line drawn across 6 weeks
+            week based pivot line drawn across 6 weeks (1.5 months)
+            month based pivot line drawn across 12 weeks (3 months)
 
     Even thou entCodes can be passed as a list, passing a single
     entCode may be more practically useful. Also plot_pivotpoints
@@ -58,6 +61,7 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     if bPivotPoints:
         ops.plot_pivotpoints('pp', entCodes, plotRange=weekDays, axes=eplot._axes())
         ops.plot_pivotpoints('ppW', entCodes, plotRange=weekDays*3, axes=eplot._axes())
+        ops.plot_pivotpoints('ppM', entCodes, plotRange=weekDays*6, axes=eplot._axes())
     if bVolumes:
         ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
         eplot._data(['volume'], entCodes, axes=ia)
@@ -82,7 +86,8 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         entName = entDB.meta['name'][entIndex]
         print("\n\nEntity: {:20} {}".format(entCode, entName))
         ops.print_pivotpoints('pp', entCode, "PivotPntsD")
-        ops.print_pivotpoints('ppW', entCode, "PivotPntsW")
+        ops.print_pivotpoints('ppW', entCode, "PivotPntsW", False)
+        ops.print_pivotpoints('ppM', entCode, "PivotPntsM", False)
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
         _plot(entCode, bPivotPoints=True, bVolumes=bVolumes, bLinRegress=bLinRegress)

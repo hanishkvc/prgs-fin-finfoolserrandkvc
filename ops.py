@@ -80,34 +80,38 @@ def plot_pivotpoints(dataKey, entCode, plotRange=10, date=-1, entDB=None, axes=N
         axes.plot([dateIndex-plotRange*2, dateIndex], [p, p], color=c, alpha=0.5, linestyle='dashed')
 
 
-def _weekly_view(dataSrcs, modes, destKeyNameTmpl="w.{}", entDB=None):
+def _blocky_view(dataSrcs, modes, blockDays, destKeyNameTmpl, entDB=None):
     """
-    Generate data(s) which provide a weekly view of the passed source data(s).
-    dataSrcs: A list of source data keys for which weekly view needs to be created.
-    modes: Specifies how to generate the weekly view. It could be one of
-        'M': Use the max value from among all the data for a given week.
-        'm': Use the min value from among all the data for a given week.
-        's': Use the value belonging to the first day for a given week.
-        'e': Use the value belonging to the last day for a given week.
-        'a': Use the average value of all the data for a given week.
+    Generate data(s) which provide a blocks based view of the passed source data(s).
+        For each block of days, within the overall dataset, a single representative
+        value is identified, as defined by the mode.
+    dataSrcs: list of source data keys for which blocks based view needs to be created.
+    modes: Specifies how to generate the blocks based view. It could be one of
+        'M': Use the max value from among all the data wrt each of the blocks.
+        'm': Use the min value from among all the data wrt each of the blocks.
+        's': Use the values belonging to the first day from each of the blocks.
+        'e': Use the values belonging to the last day from each of the blocks.
+        'a': Use the average value of all the data wrt each of the blocks.
+    blockDays: The size of each block wrt the blocks the overall data is divided into.
     destKeyNameTmpl: A template which specifies how the destination dataKeys
         should be named.
-    NOTE: The weeks are assumed starting from the lastday in the data set,
-        as the last day of a week, irrespective of which calender day it
-        may be.
+    NOTE: The blocks are assumed starting from the lastday in the data set,
+        as the last day of the last block, irrespective of which calender day
+        it may be.
     """
     entDB = _entDB(entDB)
-    weekDays = hlpr.days_in('1W', entDB.bSkipWeekends)
+    if type(blockDays) == str:
+        blockDays = hlpr.days_in(blockDays, entDB.bSkipWeekends)
     if type(dataSrcs) == str:
         dataSrcs = [ dataSrcs ]
     srcShape = entDB.data[dataSrcs[0]].shape
     dstShape = list(srcShape)
-    dstShape[1] = int(dstShape[1]/weekDays)
+    dstShape[1] = int(dstShape[1]/blockDays)
     dataDsts = hlpr.derive_keys(dataSrcs, destKeyNameTmpl)
     for dDst in dataDsts:
         entDB.data[dDst] = numpy.zeros(dstShape)
     endI = entDB.nxtDateIndex
-    startI = endI - weekDays
+    startI = endI - blockDays
     iDst = -1
     while startI > 0:
         for dSrc, mode, dDst in zip(dataSrcs, modes, dataDsts):
@@ -122,7 +126,25 @@ def _weekly_view(dataSrcs, modes, destKeyNameTmpl="w.{}", entDB=None):
             elif mode == 'a':
                 entDB.data[dDst][:,iDst] = numpy.average(entDB.data[dSrc][:,startI:endI], axis=1)
         endI = startI
-        startI = endI - weekDays
+        startI = endI - blockDays
         iDst -= 1
+
+
+def weekly_view(dataSrcs, modes, destKeyNameTmpl="w.{}", entDB=None):
+    """
+    Reduce the given data into smaller set, by grouping adjacent data
+    at a weekly level. i.e each week of data will get replaced with
+    a single representative value.
+    """
+    return _blocky_view(dataSrcs, modes, "1W", destKeyNameTmpl, entDB)
+
+
+def monthly_view(dataSrcs, modes, destKeyNameTmpl="m.{}", entDB=None):
+    """
+    Reduce the given data into smaller set, by grouping adjacent data
+    at a monthly level. i.e each month amount of data will get replaced
+    with a single representative value.
+    """
+    return _blocky_view(dataSrcs, modes, "1M", destKeyNameTmpl, entDB)
 
 

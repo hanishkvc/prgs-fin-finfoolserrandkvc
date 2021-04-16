@@ -317,8 +317,8 @@ ex: search_data("fund index -NO-bonus")
 ex: search_data(["direct bluechip -NO-dividend", "direct bluechip dividend us"])
 
 
-Processing Data
-===================
+Processing Data - procedb.ops
+===============================
 
 procedb.ops(<ListOfOperations>)
 
@@ -638,6 +638,17 @@ help(plot.linregress)
 help(plot.show)
 
 
+Processing Data - ops module
+===============================
+
+ops.pivotpoints
+
+ops.weekly_view
+
+ops.monthly_view
+
+
+
 Entity types
 ==============
 
@@ -722,7 +733,8 @@ stocks._plot('STOCK_SYMBOL')
 stocks.plot(['STOCK_SYMBOL1', 'STOCK_SYMBOL2', ...])
 
    Look at the data and corresponding moving averages and linear regression line
-   fit wrt the given stock(s).
+   fit wrt the given stock(s). It also shows the pivot point lines wrt latest
+   day, week and month based data.
 
 
 stocks.topbottom()
