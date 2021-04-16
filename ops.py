@@ -148,3 +148,19 @@ def monthly_view(dataSrcs, modes, destKeyNameTmpl="m.{}", entDB=None):
     return _blocky_view(dataSrcs, modes, "1M", destKeyNameTmpl, entDB)
 
 
+def rsi(dataSrc, lookBackDays=14, entDB=None):
+    """
+    Calculate the rsi
+    """
+    entDB = _entDB(entDB)
+    tData = entDB.data[dataSrc][-lookBackDays:]
+    tPrev = entDB.data[dataSrc][-(lookBackDays+1):-1]
+    tData = ((tData/tPrev)-1)*100
+    tPos = tData[tData > 0]
+    tNeg = tData[tData < 0]
+    tGain = numpy.average(tPos)
+    tLoss = abs(numpy.average(tNeg))
+    tRSI = 100 - (100/(1+((tGain/lookBackDays)/(tLoss/lookBackDays))))
+    return tRSI
+
+
