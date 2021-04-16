@@ -35,6 +35,7 @@ def _plot_prep():
     ops.pivotpoints('pp')
     ops.pivotpoints('ppW', "w.{}", dateIndex=-1)
     ops.pivotpoints('ppM', "m.{}", dateIndex=-1)
+    ops.rsi('rsi', 'data')
 
 
 def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
@@ -65,6 +66,9 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     if bVolumes:
         ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
         eplot._data(['volume'], entCodes, axes=ia)
+    if True:
+        ia = eplot.inset_axes([0,0.1,1,0.1], sTitle="MaRSI")
+        eplot._data(['rsi'], entCodes, axes=ia)
     if bLinRegress:
         eplot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 

@@ -150,7 +150,8 @@ def monthly_view(dataSrcs, modes, destKeyNameTmpl="m.{}", entDB=None):
 
 def rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
     """
-    Calculate the rsi
+    A initial rough calculation of RSI, wrt all the entities in the
+    entities database.
     """
     entDB = _entDB(entDB)
     tData = entDB.data[dataSrc][:,1:]
