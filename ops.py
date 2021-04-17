@@ -186,9 +186,38 @@ def ma_rsi(dataDst, dataSrc, lookBackDays=14, bEMASmooth=False, entDB=None):
     entDB.data[dataDst] = tRSI
 
 
-def plot_ma_rsi(dataKey, entCode, plotRefs=[30,50,70], entDB=None, axes=None):
+def jww_rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
     """
-    Plot ma rsi data along with reference lines.
+    Calculate RSI wrt all the entities in the entities database,
+    for the full date range of data available, with the given
+    lookBack period.
+    """
+    entDB = _entDB(entDB)
+    tData = entDB.data[dataSrc][:,1:]
+    tPrev = entDB.data[dataSrc][:,:-1]
+    tData = tData - tPrev
+    tPos = tData.copy()
+    tNeg = tData.copy()
+    tPos[tPos < 0] = 0
+    tNeg[tNeg > 0] = 0
+    tNeg = numpy.abs(tNeg)
+    srcShape = entDB.data[dataSrc].shape
+    tGainAvg = numpy.zeros(srcShape)
+    tLossAvg = numpy.zeros(srcShape)
+    tGainAvg[:,lookBackDays] = numpy.average(tPos[:,:lookBackDays], axis=1)
+    tLossAvg[:,lookBackDays] = numpy.average(tNeg[:,:lookBackDays], axis=1)
+    for i in range(lookBackDays+1,srcShape[1]):
+        tGainAvg[:,i] = (tGainAvg[:,i-1]*(lookBackDays-1) + tPos[:,i])/lookBackDays
+        tLossAvg[:,i] = (tLossAvg[:,i-1]*(lookBackDays-1) + tNeg[:,i])/lookBackDays
+    tGainAvg[:,:lookBackDays] = numpy.nan
+    tLossAvg[:,:lookBackDays] = numpy.nan
+    tRSI = 100 - (100/(1+(tGainAvg/tLossAvg)))
+    entDB.data[dataDst] = tRSI
+
+
+def plot_rsi(dataKey, entCode, plotRefs=[30,50,70], entDB=None, axes=None):
+    """
+    Plot rsi data along with reference lines.
     """
     entDB = _entDB(entDB)
     axes = eplot._axes(axes)
