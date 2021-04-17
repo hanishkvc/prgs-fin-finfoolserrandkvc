@@ -651,6 +651,10 @@ ops.ma_rsi
 
    calculate rsi based on simple moving average of gain and loss.
 
+ops.jww.rsi
+
+   potentially calculate rsi as defined by J Welles Wilder.
+
 
 Entity types
 ==============
@@ -735,10 +739,11 @@ stocks.prep()
 stocks._plot('STOCK_SYMBOL')
 stocks.plot(['STOCK_SYMBOL1', 'STOCK_SYMBOL2', ...])
 
-   Look at the data and corresponding moving averages and linear regression line
-   fit wrt the given stock(s). It also shows the pivot point lines wrt latest
-   day, week and month based data.
+   Look at the data of the given stocks including processed data like
 
+      moving averages and linear regression line fit
+      pivot point lines wrt latest day, week and month based data.
+      RSI of closing data (Either SMA based or JWW based)
 
 stocks.topbottom()
 

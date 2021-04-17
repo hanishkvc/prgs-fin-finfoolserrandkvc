@@ -27,9 +27,12 @@ def load(startDate=None, endDate=None, bSkipWeekends=True):
     edb.load_data_stocks(startDate, endDate)
 
 
-def _plot_prep():
+def _plot_prep(opts):
     """
     Calculate some of the data required for later.
+    opts: a dictionary of optional arguments to control the logic.
+        'bJwwRSI': If True, Jww RSI will be shown by plot, by default.
+            else SMA based RSI.
     """
     procedb.ops(['mas50=mas50(data)', 'mas200=mas200(data)'])
     procedb.ops(['mae9=mae9(data)', 'mae26=mae26(data)', 'mae50=mae50(data)'])
@@ -38,12 +41,16 @@ def _plot_prep():
     ops.pivotpoints('pp')
     ops.pivotpoints('ppW', "w.{}", dateIndex=-1)
     ops.pivotpoints('ppM', "m.{}", dateIndex=-1)
-    ops.ma_rsi('rsi', 'data')
-    #ops.ma_rsi('rsiES', 'data', bEMASmooth=True)
     ops.jww_rsi('rsiJWW', 'data')
+    ops.ma_rsi('rsiSMA', 'data')
+    bJwwRSI = opts.get('bJwwRSI', False)
+    if bJwwRSI:
+        edb.gEntDB.data['rsi'] = edb.gEntDB.data['rsiJWW']
+    else:
+        edb.gEntDB.data['rsi'] = edb.gEntDB.data['rsiSMA']
 
 
-def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
+def _plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=False):
     """
     Plot data related to the given set of entCodes.
 
@@ -71,15 +78,14 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
     if bVolumes:
         ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
         eplot._data(['volume'], entCodes, axes=ia)
-    if True:
-        ia = eplot.inset_axes([0,0.1,1,0.1], sTitle="MaRSI")
+    if bRSI:
+        ia = eplot.inset_axes([0,0.1,1,0.1], sTitle="RSI")
         ops.plot_rsi('rsi', entCodes, axes=ia)
-        ops.plot_rsi('rsiJWW', entCodes, axes=ia)
     if bLinRegress:
         eplot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 
 
-def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
+def plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=False):
     """
     Plot a predefined set of data wrt each entCode in the given list.
     """
@@ -100,12 +106,17 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         ops.print_pivotpoints('ppM', entCode, "PivotPntsM", False)
         for d in datas:
             print("{:10} {}".format(d[0], entDB.data[d[1]][entIndex]))
-        _plot(entCode, bPivotPoints=True, bVolumes=bVolumes, bLinRegress=bLinRegress)
+        _plot(entCode, bPivotPoints=bPivotPoints, bVolumes=bVolumes, bRSI=bRSI, bLinRegress=bLinRegress)
         eplot.show()
 
 
-def prep():
-    _plot_prep()
+def prep(bJwwRSI=True):
+    """
+    Process available entity raw datasets to generated useful processed data.
+    This is needed before calling plot or topbottom.
+    """
+    opts = { 'bJwwRSI': bJwwRSI }
+    _plot_prep(opts)
     procedb.infoset1_prep()
 
 
