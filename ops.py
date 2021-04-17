@@ -177,3 +177,15 @@ def ma_rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
     entDB.data[dataDst] = tRSI
 
 
+def plot_ma_rsi(dataKey, entCode, plotRefs=[30,50,70], entDB=None, axes=None):
+    """
+    Plot ma rsi data along with reference lines.
+    """
+    entDB = _entDB(entDB)
+    axes = eplot._axes(axes)
+    eplot._data([dataKey], entCode, entDB=entDB, axes=axes)
+    numDates=entDB.data[dataKey].shape[1]
+    for ref,c in zip(plotRefs,['green','black','red']):
+        axes.plot([0, numDates], [ref, ref], color=c, alpha=0.5, linestyle='dashed')
+
+

@@ -71,7 +71,7 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):
         eplot._data(['volume'], entCodes, axes=ia)
     if True:
         ia = eplot.inset_axes([0,0.1,1,0.1], sTitle="MaRSI")
-        eplot._data(['rsi'], entCodes, axes=ia)
+        ops.plot_ma_rsi('rsi', entCodes, axes=ia)
     if bLinRegress:
         eplot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 

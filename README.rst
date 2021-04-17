@@ -647,6 +647,9 @@ ops.weekly_view
 
 ops.monthly_view
 
+ops.ma_rsi
+
+   calculate rsi based on simple moving average of gain and loss.
 
 
 Entity types
