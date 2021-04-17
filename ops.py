@@ -267,10 +267,11 @@ def _ma(xMA, dataSrc, entIndexS, entIndexE, entDB=None):
     cCnt = entDB.data[dataSrc].shape[1]
     rCnt = entIndexE - entIndexS
     tResult = numpy.empty([rCnt, cCnt])
+    weightsLen = len(xMA['winWeights'])
     for r in range(entIndexS, entIndexE):
-        tMARes = ops._ssconvolve_data(entDB.data[dataSrc][r,:], xMA['winWeights'])
-        tResult[r-entIndexS,maDays-1:] = tMARes
-        tResult[r-entIndexS,:maDays-1] = numpy.nan
+        tMARes = _ssconvolve_data(entDB.data[dataSrc][r,:], xMA['winWeights'])
+        tResult[r-entIndexS,weightsLen-1:] = tMARes
+        tResult[r-entIndexS,:weightsLen-1] = numpy.nan
     return tResult
 
 

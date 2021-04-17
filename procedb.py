@@ -16,6 +16,7 @@ import enttypes
 import indexes
 import entities
 import edb
+import ops as theOps
 
 
 # 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
@@ -155,7 +156,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("ma"):
             maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)
-            xMA=ops._ma_init(maDays, op[2])
+            xMA=theOps._ma_init(maDays, op[2])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
@@ -249,7 +250,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("ma"):
-                    tResult[r] = ops._ma(xMA, dataSrc, r, r+1, entDB)
+                    tResult[r] = theOps._ma(xMA, dataSrc, r, r+1, entDB)
                     if True:
                         try:
                             dataSrcLabel = entDB.data[dataSrcMetaLabel][r]
