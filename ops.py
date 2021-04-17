@@ -173,7 +173,11 @@ def ma_rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
         iEnd = iStart + (srcShape[1]-lookBackDays)
         tGain[:, lookBackDays:] += tPos[:, iStart:iEnd]
         tLoss[:, lookBackDays:] += tNeg[:, iStart:iEnd]
-    tRSI = 100 - (100/(1+((tGain/lookBackDays)/(tLoss/lookBackDays))))
+    tGainAvg = tGain/lookBackDays
+    tLossAvg = tLoss/lookBackDays
+    tGainAvg[:,:lookBackDays] = numpy.nan
+    tLossAvg[:,:lookBackDays] = numpy.nan
+    tRSI = 100 - (100/(1+(tGainAvg/tLossAvg)))
     entDB.data[dataDst] = tRSI
 
 
