@@ -47,20 +47,6 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
 
-def _ssconvolve(data, weight):
-    """
-    A simple stupid convolve, which returns the valid set.
-    NOTE: This doesnt mirror the weight before using it.
-          Which is what makes sense for its use here.
-    """
-    resLen = len(data)-len(weight)+1
-    #tResult = numpy.zeros(resLen)
-    tResult = numpy.zeros(len(data))
-    for i in range(len(weight)):
-        tResult[:resLen] += data[i:resLen+i]*weight[i]
-    return tResult[:resLen]
-
-
 gbRelDataPlusFloat = False
 gfRollingRetPAMinThreshold = 4.0
 def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
@@ -169,14 +155,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("ma"):
             maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)
-            if op[2] == 's':
-                maWinWeights = numpy.ones(maDays)/maDays
-            else:
-                baseWeight = 1/maDays
-                baseWeight = 2/(maDays+1)
-                maWinWeights = numpy.arange(maDays-1,-1,-1)
-                maWinWeights = (1-baseWeight)**maWinWeights
-                maWinWeights = maWinWeights/sum(maWinWeights)
+            xMA=ops._ma_init(maDays, op[2])
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
@@ -270,10 +249,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("ma"):
-                    tMARes = numpy.convolve(entDB.data[dataSrc][r,:], maWinWeights, 'valid')
-                    tMARes = _ssconvolve(entDB.data[dataSrc][r,:], maWinWeights)
-                    tResult[r,maDays-1:] = tMARes
-                    tResult[r,:maDays-1] = numpy.nan
+                    tResult[r] = ops._ma(xMA, dataSrc, r, r+1, entDB)
                     if True:
                         try:
                             dataSrcLabel = entDB.data[dataSrcMetaLabel][r]

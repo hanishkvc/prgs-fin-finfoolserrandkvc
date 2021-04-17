@@ -231,3 +231,46 @@ def plot_rsi(dataKey, entCode, plotRefs=[30,50,70], entDB=None, axes=None):
         axes.plot([0, numDates], [ref, ref], color=c, alpha=0.5, linestyle='dashed')
 
 
+def _ssconvolve_data(data, weight):
+    """
+    A simple stupid convolve, which returns the valid set.
+    NOTE: This doesnt mirror the weight before using it.
+          Which is what makes sense for its use here.
+    """
+    resLen = len(data)-len(weight)+1
+    #tResult = numpy.zeros(resLen)
+    tResult = numpy.zeros(len(data))
+    for i in range(len(weight)):
+        tResult[:resLen] += data[i:resLen+i]*weight[i]
+    return tResult[:resLen]
+
+
+def _ma_init(maDays, mode='s'):
+    """
+    Create intermediate data required to do moving average operation.
+    """
+    mode = mode.lower()
+    if mode == 'e':
+        baseWeight = 2/(maDays+1)
+        weightLen = int(numpy.log(0.001)/-baseWeight)
+        maWinWeights = numpy.arange(weightLen-1,-1,-1)
+        maWinWeights = (1-baseWeight)**maWinWeights
+        maWinWeights = maWinWeights/sum(maWinWeights)
+    else:
+        maWinWeights = numpy.ones(maDays)/maDays
+        baseWeight = maWinWeights[0]
+    xMA = { 'maDays': maDays, 'mode': mode, 'baseWeight': baseWeight, 'winWeights': maWinWeights }
+    return xMA
+
+
+def _ma(xMA, dataSrc, entIndexS, entIndexE, entDB=None):
+    cCnt = entDB.data[dataSrc].shape[1]
+    rCnt = entIndexE - entIndexS
+    tResult = numpy.empty([rCnt, cCnt])
+    for r in range(entIndexS, entIndexE):
+        tMARes = ops._ssconvolve_data(entDB.data[dataSrc][r,:], xMA['winWeights'])
+        tResult[r-entIndexS,maDays-1:] = tMARes
+        tResult[r-entIndexS,:maDays-1] = numpy.nan
+    return tResult
+
+
