@@ -221,8 +221,12 @@ def plot_rsi(dataKey, entCode, plotRefs=[30,50,70], entDB=None, axes=None):
     """
     entDB = _entDB(entDB)
     axes = eplot._axes(axes)
+    entIndex = entDB.meta['codeD'][entCode]
     eplot._data([dataKey], entCode, entDB=entDB, axes=axes)
     numDates=entDB.data[dataKey].shape[1]
+    fRSI=entDB.data[dataKey][entIndex][-1]
+    sRSI=str(round(fRSI,2))
+    axes.text(numDates,fRSI,sRSI)
     for ref,c in zip(plotRefs,['green','black','red']):
         axes.plot([0, numDates], [ref, ref], color=c, alpha=0.5, linestyle='dashed')
 
