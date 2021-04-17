@@ -74,6 +74,15 @@ def setup(basePath):
     loadfilters.list()
 
 
+def skip_weekends(bSkipWeekends=True):
+    """
+    Set the global skip weekends flag to True or False.
+    """
+    global gbSkipWeekends
+    gbSkipWeekends = bSkipWeekends
+    return gbSkipWeekends
+
+
 def proc_days(startDate, endDate, handle_date_func, opts=None, bNotBeyondToday=True, bDebug=False):
     """
     Call the passed function for each date with the given start and end range.

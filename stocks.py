@@ -13,11 +13,14 @@ import hlpr
 
 
 
-def load(startDate=None, endDate=None):
+def load(startDate=None, endDate=None, bSkipWeekends=True):
     """
     Load data from stocks related data sources.
     If no date range is given, then it loads data for the last 7 years.
+    NOTE: By default weekends are skipped, user can change this
+    by setting bSkipWeekends argument appropriately.
     """
+    edb.skip_weekends(bSkipWeekends)
     if startDate == None:
         endDate = time.gmtime().tm_year
         startDate = endDate - 7
