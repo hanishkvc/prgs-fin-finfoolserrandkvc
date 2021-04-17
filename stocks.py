@@ -35,7 +35,7 @@ def _plot_prep():
     ops.pivotpoints('pp')
     ops.pivotpoints('ppW', "w.{}", dateIndex=-1)
     ops.pivotpoints('ppM', "m.{}", dateIndex=-1)
-    ops.rsi('rsi', 'data')
+    ops.ma_rsi('rsi', 'data')
 
 
 def _plot(entCodes, bPivotPoints=True, bVolumes=True, bLinRegress=False):

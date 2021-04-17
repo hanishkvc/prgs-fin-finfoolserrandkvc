@@ -148,25 +148,26 @@ def monthly_view(dataSrcs, modes, destKeyNameTmpl="m.{}", entDB=None):
     return _blocky_view(dataSrcs, modes, "1M", destKeyNameTmpl, entDB)
 
 
-def rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
+def ma_rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
     """
-    A initial rough calculation of RSI, wrt all the entities in the
-    entities database.
+    Calculate RSI wrt all the entities in the entities database,
+    for the full date range of data available, with the given
+    lookBack period.
+    NOTE: This uses a simple moving average wrt Gain and Loss.
     """
     entDB = _entDB(entDB)
     tData = entDB.data[dataSrc][:,1:]
     tPrev = entDB.data[dataSrc][:,:-1]
-    tData = ((tData/tPrev)-1)*100
+    #tData = ((tData/tPrev)-1)*100
+    tData = tData - tPrev
     tPos = tData.copy()
     tNeg = tData.copy()
     tPos[tPos < 0] = 0
     tNeg[tNeg > 0] = 0
-    tNeg = -1*tNeg
+    tNeg = numpy.abs(tNeg)
     srcShape = entDB.data[dataSrc].shape
     tGain = numpy.zeros(srcShape)
     tLoss = numpy.zeros(srcShape)
-    tPoss = numpy.zeros(srcShape)
-    tNegs = numpy.zeros(srcShape)
     for i in range(lookBackDays):
         iStart = i
         iEnd = iStart + (srcShape[1]-lookBackDays)
