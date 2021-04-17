@@ -176,8 +176,10 @@ def ma_rsi(dataDst, dataSrc, lookBackDays=14, bEMASmooth=False, entDB=None):
     tGainAvg = tGain/lookBackDays
     tLossAvg = tLoss/lookBackDays
     if bEMASmooth:
-        tGainAvg[:,1:] = (tGainAvg[:,:-1]*(lookBackDays-1) + tGainAvg[:,1:])/lookBackDays
-        tLossAvg[:,1:] = (tLossAvg[:,:-1]*(lookBackDays-1) + tLossAvg[:,1:])/lookBackDays
+        smoothDays=5
+        for i in range(lookBackDays+1,srcShape[1]):
+            tGainAvg[:,i] = (tGainAvg[:,i-1]*(smoothDays-3) + 3*tGainAvg[:,i])/smoothDays
+            tLossAvg[:,i] = (tLossAvg[:,i-1]*(smoothDays-3) + 3*tLossAvg[:,i])/smoothDays
     tGainAvg[:,:lookBackDays] = numpy.nan
     tLossAvg[:,:lookBackDays] = numpy.nan
     tRSI = 100 - (100/(1+(tGainAvg/tLossAvg)))
