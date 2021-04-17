@@ -207,8 +207,8 @@ def jww_rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
     tGainAvg[:,lookBackDays] = numpy.average(tPos[:,:lookBackDays], axis=1)
     tLossAvg[:,lookBackDays] = numpy.average(tNeg[:,:lookBackDays], axis=1)
     for i in range(lookBackDays+1,srcShape[1]):
-        tGainAvg[:,i] = (tGainAvg[:,i-1]*(lookBackDays-1) + tPos[:,i])/lookBackDays
-        tLossAvg[:,i] = (tLossAvg[:,i-1]*(lookBackDays-1) + tNeg[:,i])/lookBackDays
+        tGainAvg[:,i] = (tGainAvg[:,i-1]*(lookBackDays-1) + tPos[:,i-1])/lookBackDays
+        tLossAvg[:,i] = (tLossAvg[:,i-1]*(lookBackDays-1) + tNeg[:,i-1])/lookBackDays
     tGainAvg[:,:lookBackDays] = numpy.nan
     tLossAvg[:,:lookBackDays] = numpy.nan
     tRSI = 100 - (100/(1+(tGainAvg/tLossAvg)))
