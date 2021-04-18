@@ -51,6 +51,16 @@ def _plot_prep(opts):
         edb.gEntDB.data['rsi'] = edb.gEntDB.data['rsiSMA']
 
 
+def _plot_volume(dataKeys, entCode, insetId=0):
+    ia = eplot.inset_axes([0,0.0*insetId,1,0.1], sTitle="Volumes")
+    eplot._data(dataKeys, entCode, axes=ia)
+
+
+def _plot_rsi(dataKey, entCode, insetId=0):
+    ia = eplot.inset_axes([0,0.1*insetId,1,0.1], sTitle="RSI")
+    ops.plot_rsi(dataKey, entCode, axes=ia)
+
+
 def _plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=False):
     """
     Plot data related to the given set of entCodes.
@@ -77,11 +87,9 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=Fal
         ops.plot_pivotpoints('ppW', entCodes, plotRange=weekDays*3, axes=eplot._axes())
         ops.plot_pivotpoints('ppM', entCodes, plotRange=weekDays*6, axes=eplot._axes())
     if bVolumes:
-        ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
-        eplot._data(['volume', 'mas10Vol'], entCodes, axes=ia)
+        _plot_volume(['volume', 'mas10Vol'], entCodes, 1)
     if bRSI:
-        ia = eplot.inset_axes([0,0.1,1,0.1], sTitle="RSI")
-        ops.plot_rsi('rsi', entCodes, axes=ia)
+        _plot_rsi('rsi', entCodes, 0)
     if bLinRegress:
         eplot.linregress('data', entCodes, days=['3M','6M','1Y','3Y'])
 
