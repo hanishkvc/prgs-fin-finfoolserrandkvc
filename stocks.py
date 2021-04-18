@@ -36,6 +36,7 @@ def _plot_prep(opts):
     """
     procedb.ops(['mas50=mas50(data)', 'mas200=mas200(data)'])
     procedb.ops(['mae9=mae9(data)', 'mae26=mae26(data)', 'mae50=mae50(data)'])
+    procedb.ops(['mas10Vol=mas10(volume)'])
     ops.weekly_view(['open','high','low','close','volume'], ['s','M','m','e','a'], "w.{}")
     ops.monthly_view(['open','high','low','close','volume'], ['s','M','m','e','a'], "m.{}")
     ops.pivotpoints('pp')
@@ -77,7 +78,7 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=Fal
         ops.plot_pivotpoints('ppM', entCodes, plotRange=weekDays*6, axes=eplot._axes())
     if bVolumes:
         ia = eplot.inset_axes([0,0,1,0.1], sTitle="Volumes")
-        eplot._data(['volume'], entCodes, axes=ia)
+        eplot._data(['volume', 'mas10Vol'], entCodes, axes=ia)
     if bRSI:
         ia = eplot.inset_axes([0,0.1,1,0.1], sTitle="RSI")
         ops.plot_rsi('rsi', entCodes, axes=ia)
