@@ -51,9 +51,14 @@ def _plot_prep(opts):
         edb.gEntDB.data['rsi'] = edb.gEntDB.data['rsiSMA']
 
 
-def _plot_volume(dataKeys, entCode, insetId=0):
-    ia = eplot.inset_axes([0,0.0*insetId,1,0.1], sTitle="Volumes")
-    eplot._data(dataKeys, entCode, axes=ia)
+gbPlotVolumeBar=True
+def _plot_volume(dataKeyVol, dataKeyVolMA, entCode, insetId=0):
+    ia = eplot.inset_axes([0,0.1*insetId,1,0.1], sTitle="Volumes")
+    if gbPlotVolumeBar:
+        eplot._bar(dataKeyVol, entCode, axes=ia)
+        eplot._data(dataKeyVolMA, entCode, axes=ia)
+    else:
+        eplot._data([dataKeyVol, dataKeyVolMA], entCode, axes=ia)
 
 
 def _plot_rsi(dataKey, entCode, insetId=0):
@@ -69,7 +74,7 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=Fal
         the close related
             raw, mas50 and mas200 data as well as
             linear regression based lines wrt 3M, 6M, 1Y and 3Y.
-        Volumes traded.
+        Volumes traded and its 10day moving average.
         PivotPoints.
             day based pivot line drawn across 2 weeks
             week based pivot line drawn across 6 weeks (1.5 months)
@@ -87,7 +92,7 @@ def _plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=Fal
         ops.plot_pivotpoints('ppW', entCodes, plotRange=weekDays*3, axes=eplot._axes())
         ops.plot_pivotpoints('ppM', entCodes, plotRange=weekDays*6, axes=eplot._axes())
     if bVolumes:
-        _plot_volume(['volume', 'mas10Vol'], entCodes, 1)
+        _plot_volume('volume', 'mas10Vol', entCodes, 1)
     if bRSI:
         _plot_rsi('rsi', entCodes, 0)
     if bLinRegress:

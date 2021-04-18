@@ -59,6 +59,18 @@ def inset_axes(bounds, sTitle=None, bTransparent=True, bShareXAxis=True, bYTicks
     return iaxes
 
 
+def _bar(dataKey, entCode, startDate=-1, endDate=-1, entDB=None, axes=None):
+    """
+    Bar plot the dataKey's data for the specified entCode, over the given date range.
+    """
+    entDB = _entDB(entDB)
+    axes = _axes(axes)
+    startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
+    x = numpy.arange(startDateIndex, endDateIndex+1)
+    index = entDB.meta['codeD'][entCode]
+    axes.bar(x, entDB.data[dataKey][index,startDateIndex:endDateIndex+1])
+
+
 def _data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None, axes=None):
     """
     Plot specified datas for the specified entities from entDB, over the specified
