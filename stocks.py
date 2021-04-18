@@ -55,7 +55,7 @@ gbPlotVolumeBar=True
 def _plot_volume(dataKeyVol, dataKeyVolMA, entCode, insetId=0):
     ia = eplot.inset_axes([0,0.1*insetId,1,0.1], sTitle="Volumes")
     if gbPlotVolumeBar:
-        eplot._bar(dataKeyVol, entCode, axes=ia)
+        eplot._step(dataKeyVol, entCode, axes=ia)
         eplot._data(dataKeyVolMA, entCode, axes=ia)
     else:
         eplot._data([dataKeyVol, dataKeyVolMA], entCode, axes=ia)

@@ -62,6 +62,7 @@ def inset_axes(bounds, sTitle=None, bTransparent=True, bShareXAxis=True, bYTicks
 def _bar(dataKey, entCode, startDate=-1, endDate=-1, entDB=None, axes=None):
     """
     Bar plot the dataKey's data for the specified entCode, over the given date range.
+    NOTE: Step plot will be very fast (similar to line plot) compared to bar plot.
     """
     entDB = _entDB(entDB)
     axes = _axes(axes)
@@ -69,6 +70,18 @@ def _bar(dataKey, entCode, startDate=-1, endDate=-1, entDB=None, axes=None):
     x = numpy.arange(startDateIndex, endDateIndex+1)
     index = entDB.meta['codeD'][entCode]
     axes.bar(x, entDB.data[dataKey][index,startDateIndex:endDateIndex+1])
+
+
+def _step(dataKey, entCode, startDate=-1, endDate=-1, where='mid', entDB=None, axes=None):
+    """
+    Step plot the dataKey's data for the specified entCode, over the given date range.
+    """
+    entDB = _entDB(entDB)
+    axes = _axes(axes)
+    startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
+    x = numpy.arange(startDateIndex, endDateIndex+1)
+    index = entDB.meta['codeD'][entCode]
+    axes.step(x, entDB.data[dataKey][index,startDateIndex:endDateIndex+1], where=where)
 
 
 def _data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None, axes=None):
