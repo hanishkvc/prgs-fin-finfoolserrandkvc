@@ -156,7 +156,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("ma"):
             maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)
-            xMA=theOps._ma_init(maDays, op[2])
+            theOps.movavg(dataDst, dataSrc, maDays, op[2], entDB)
         elif op.startswith("roll"):
             # RollWindowSize number of days at beginning will not have
             # Rolling ret data, bcas there arent enough days to calculate
@@ -250,24 +250,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
                     entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
                 elif op.startswith("ma"):
-                    tResult[r] = theOps._ma(xMA, dataSrc, r, r+1, entDB)
-                    if True:
-                        try:
-                            dataSrcLabel = entDB.data[dataSrcMetaLabel][r]
-                        except:
-                            if bDebug:
-                                print("WARN:ProcDataEx:{}:No dataSrcMetaLabel".format(op))
-                            dataSrcLabel = ""
-                        tArray = tResult[r,:]
-                        tFinite = tArray[numpy.isfinite(tArray)]
-                        tNonZero = numpy.nonzero(tFinite)[0]
-                        if len(tNonZero) >= 2:
-                            tStart,tEnd = tFinite[tNonZero[0]],tFinite[tNonZero[-1]]
-                            label = "{:8.4f} - {:8.4f}".format(tStart, tEnd)
-                        else:
-                            label = ""
-                        label = "{} : {}".format(dataSrcLabel, label)
-                        entDB.data[dataDstMetaLabel].append(label)
+                    tResult = []
                 elif op.startswith("roll"):
                     durationForPA = rollDays/daysInAYear
                     if '_' in op:

@@ -231,6 +231,32 @@ def plot_rsi(dataKey, entCode, plotRefs=[30,50,70], entDB=None, axes=None):
         axes.plot([0, numDates], [ref, ref], color=c, alpha=0.5, linestyle='dashed')
 
 
+def _valid_nonzero_firstlast(dataArray):
+    """
+    Return the valid first and last non zero value wrt each row (i.e wrt each entity).
+    """
+    tFinite = dataArray[numpy.isfinite(dataArray)]
+    tNonZero = numpy.nonzero(tFinite)[0]
+    if len(tNonZero) >= 2:
+        return tFinite[tNonZero[0]],tFinite[tNonZero[-1]]
+    else:
+        return numpy.nan, numpy.nan
+
+
+def valid_nonzero_firstlast_md(dataKey, entDB):
+    """
+    Return a array of valid first and last value wrt each row (i.e wrt each entity).
+    """
+    tData = entDB.data[dataKey]
+    lFLData = []
+    lFLLabel = []
+    for r in range(tData.shape[0]):
+        tFirst, tLast = _valid_nonzero_firstlast(tData[r])
+        lFLData.append([tFirst, tLast])
+        lFLLabel.append([tFirst, tLast])
+    return numpy.array(lFLData), numpy.array(lFLLabel)
+
+
 def _ssconvolve_data(data, weight):
     """
     A simple stupid convolve, which returns the valid set.
@@ -263,7 +289,10 @@ def _movavg_init(maDays, mode='s'):
     return xMA
 
 
-def _movavg(xMA, dataDst, dataSrc):
+def _movavg(xMA, dataDst, dataSrc, entDB):
+    """
+    Calculate the moving average.
+    """
     eCnt, dCnt = entDB.data[dataSrc].shape
     entDB.data[dataDst] = numpy.zeros([eCnt, dCnt])
     weightsLen = len(xMA['winWeights'])
@@ -273,12 +302,22 @@ def _movavg(xMA, dataDst, dataSrc):
     entDB.data[dataDst][:,:weightsLen-1] = numpy.nan
 
 
+def movavg_md2str(entMD):
+    """
+    Convert moving averages meta data into string.
+    """
+    label = "{:8.4f} - {:8.4f}".format(entMD[0], entMD[1])
+    return label
+
+
 def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):
     """
     Calculate the Moving average (simple or exponential) for the given dataSrc.
     """
+    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
     xMA = _movavg_init(maDays, mode)
-    _movavg(xMA, dataDst, dataSrc)
+    _movavg(xMA, dataDst, dataSrc, entDB)
+    entDB.data[dataDstMD], entDB.data[dataDstML] = valid_nonzero_firstlast_md(dataDst, entDB)
 
 

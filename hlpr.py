@@ -400,7 +400,7 @@ def print_list(lData, width1st=16, widthRem=32):
             print(data)
 
 
-def data_metakeys(dataDst):
+def data_metakeys(dataKey):
     """
     Returns the possible Meta Keys related to given data key.
 
@@ -409,8 +409,8 @@ def data_metakeys(dataDst):
     MetaLabel: This key points to processed label/summary info wrt each entity.
         This is useful for labeling plots etc.
     """
-    dataKey="{}MetaData".format(dataDst)
-    labelKey="{}MetaLabel".format(dataDst)
+    dataKey="{}.MetaData".format(dataKey)
+    labelKey="{}.MetaLabel".format(dataKey)
     return dataKey, labelKey
 
 
