@@ -630,11 +630,11 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
     """
     entDB = _entDB(entDB)
     dataSrcs = [
-            ['srel', 'srelMetaLabel'],
-            ['absRet', 'roabsMetaLabel'],
-            ['retOn', 'rosafMetaLabel'],
-            ['roll3Y', 'roll3YMetaLabel'],
-            ['roll5Y', 'roll5YMetaLabel'],
+            ['srel', 'srel.MetaLabel'],
+            ['absRet', 'roabs.MetaLabel'],
+            ['retOn', 'rosaf.MetaLabel'],
+            ['roll3Y', 'roll3Y.MetaLabel'],
+            ['roll5Y', 'roll5Y.MetaLabel'],
             ]
     for entCode in entCodes:
         entIndex = entDB.meta['codeD'][entCode]

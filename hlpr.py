@@ -409,9 +409,9 @@ def data_metakeys(dataKey):
     MetaLabel: This key points to processed label/summary info wrt each entity.
         This is useful for labeling plots etc.
     """
-    dataKey="{}.MetaData".format(dataKey)
-    labelKey="{}.MetaLabel".format(dataKey)
-    return dataKey, labelKey
+    mdataKey="{}.MetaData".format(dataKey)
+    mlabelKey="{}.MetaLabel".format(dataKey)
+    return mdataKey, mlabelKey
 
 
 def derive_keys(inKeys, keyNameTmpl="{}"):

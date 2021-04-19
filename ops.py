@@ -333,7 +333,7 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
     entDB.data[dataDstMD] = numpy.ones([entDB.nxtEntIndex,historicGaps.shape[0]])*numpy.nan
     validHistoric = historicGaps[historicGaps < (retonDateIndex+1)]
     histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
-    retonData = entDB.data[dataSrc][:, retonDateIndex].transpose()
+    retonData = entDB.data[dataSrc][:, retonDateIndex].reshape(entDB.nxtEntIndex,1)
     tROAbs = ((retonData/entDB.data[dataSrc])-1)*100
     tRORPA = (((retonData/entDB.data[dataSrc])**(daysInAYear/histDays))-1)*100
     if retonType == 'absret':

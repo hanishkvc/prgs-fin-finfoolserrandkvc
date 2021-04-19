@@ -104,9 +104,9 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=Fals
     Plot a predefined set of data wrt each entCode in the given list.
     """
     datas = [
-        ['srel', 'srelMetaLabel'],
-        ['roll3Y', 'roll3YMetaLabel'],
-        ['retOn', 'rosafMetaLabel']
+        ['srel', 'srel.MetaLabel'],
+        ['roll3Y', 'roll3Y.MetaLabel'],
+        ['retOn', 'rosaf.MetaLabel']
         ]
     entDB = edb.gEntDB
     if type(entCodes) == str:
