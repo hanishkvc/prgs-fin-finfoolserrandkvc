@@ -43,11 +43,11 @@ def pivotpoints(dataDst, srcKeyNameTmpl="{}", date=-1, dateIndex=None, entDB=Non
     srcKeyNameTmpl: Is used to decide whether one is working with base data set or
         one of the derived/calculated data sets like weekly/monthly view or so.
     """
-    print("DBUG:Ops:PivotPoints:", dataDst)
     entDB = _entDB(entDB)
     if not dateIndex:
         dummyDateIndex, dateIndex = entDB.daterange2index(date, date)
     highKey, lowKey, closeKey = hlpr.derive_keys(['high', 'low', 'close'], srcKeyNameTmpl)
+    print("DBUG:Ops:PivotPoints:", dataDst, highKey, lowKey, closeKey)
     high = entDB.data[highKey][:,dateIndex]
     low = entDB.data[lowKey][:,dateIndex]
     close = entDB.data[closeKey][:,dateIndex]
@@ -155,6 +155,7 @@ def ma_rsi(dataDst, dataSrc, lookBackDays=14, bEMASmooth=False, entDB=None):
     lookBack period.
     NOTE: This uses a simple moving average wrt Gain and Loss.
     """
+    print("DBUG:Ops:MaRSI:", dataDst, dataSrc, lookBackDays)
     entDB = _entDB(entDB)
     tData = entDB.data[dataSrc][:,1:]
     tPrev = entDB.data[dataSrc][:,:-1]
@@ -192,6 +193,7 @@ def jww_rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
     for the full date range of data available, with the given
     lookBack period.
     """
+    print("DBUG:Ops:JwwRSI:", dataDst, dataSrc, lookBackDays)
     entDB = _entDB(entDB)
     tData = entDB.data[dataSrc][:,1:]
     tPrev = entDB.data[dataSrc][:,:-1]
@@ -253,7 +255,7 @@ def valid_nonzero_firstlast_md(dataKey, entDB):
     for r in range(tData.shape[0]):
         tFirst, tLast = _valid_nonzero_firstlast(tData[r])
         lFLData.append([tFirst, tLast])
-        lFLLabel.append([tFirst, tLast])
+        lFLLabel.append(valid_nonzero_firstlast_md2str([tFirst, tLast]))
     return numpy.array(lFLData), numpy.array(lFLLabel)
 
 
@@ -308,6 +310,9 @@ def movavg_md2str(entMD):
     """
     label = "{:8.4f} - {:8.4f}".format(entMD[0], entMD[1])
     return label
+
+
+valid_nonzero_firstlast_md2str=movavg_md2str
 
 
 def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):

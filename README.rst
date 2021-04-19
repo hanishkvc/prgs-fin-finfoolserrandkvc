@@ -5,6 +5,7 @@ Author: HanishKVC
 Version: v20210414IST0126
 License: GPL
 Status: Not fully updated wrt new version of PROGRAM
+PRGSTATUS: In the middle of a transistion
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
