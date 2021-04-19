@@ -185,7 +185,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             else:
                 retonDate = int(retonT[5:])
                 retonDateIndex = entDB.datesD[retonDate]
-            theOps.reton(dataDst, dataSrc, retonDateIndex, gHistoricGaps)
+            theOps.reton(dataDst, dataSrc, retonDateIndex, retonType, gHistoricGaps, entDB)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
         for r in range(entDB.nxtEntIndex):

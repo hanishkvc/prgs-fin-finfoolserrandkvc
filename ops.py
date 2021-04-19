@@ -321,9 +321,15 @@ def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):
     entDB.data[dataDstMD], entDB.data[dataDstML] = valid_nonzero_firstlast_md(dataDst, entDB)
 
 
-def reton(dataDst, dataSrc, retonDateIndex, historicGaps, entDB=None):
+def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None):
+    """
+    Calculate the absolute returns and or returnsPerAnnum as on endDate wrt/relative_to
+    all the other dates.
+    """
     dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
+    startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     entDB.data[dataDstMD] = numpy.ones([entDB.nxtEntIndex,historicGaps.shape[0]])*numpy.nan
     validHistoric = historicGaps[historicGaps < (retonDateIndex+1)]
     histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
@@ -331,16 +337,19 @@ def reton(dataDst, dataSrc, retonDateIndex, historicGaps, entDB=None):
     tROAbs = ((retonData/entDB.data[dataSrc])-1)*100
     tRORPA = (((retonData/entDB.data[dataSrc])**(daysInAYear/histDays))-1)*100
     if retonType == 'absret':
-        tResult[r,:] = tROAbs
+        tResult = tROAbs
     elif retonType == 'retpa':
-        tResult[r,:] = tRORPA
+        tResult = tRORPA
     else:
         if len(tROAbs) > daysInAYear:
-            tResult[r,-daysInAYear:] = tROAbs[-daysInAYear:]
-            tResult[r,:-daysInAYear] = tRORPA[:-daysInAYear]
+            #tResult[:, -daysInAYear:] = tROAbs[:, -daysInAYear:]
+            tResult = tROAbs
+            tResult[:, :-daysInAYear] = tRORPA[:, :-daysInAYear]
         else:
-            tResult[r,:] = tROAbs
-    entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
-    entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
+            tResult = tROAbs
+    entDB.data[dataDstMD][:, :validHistoric.shape[0]] = tResult[:, -(validHistoric+1)]
+    entDB.data[dataDstML] = []
+    for md in entDB.data[dataDstMD]:
+        entDB.data[dataDstML].append(hlpr.array_str(md, width=7))
 
 
