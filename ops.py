@@ -245,7 +245,7 @@ def _ssconvolve_data(data, weight):
     return tResult[:resLen]
 
 
-def _ma_init(maDays, mode='s'):
+def _movavg_init(maDays, mode='s'):
     """
     Create intermediate data required to do moving average operation.
     """
@@ -263,15 +263,22 @@ def _ma_init(maDays, mode='s'):
     return xMA
 
 
-def _ma(xMA, dataSrc, entIndexS, entIndexE, entDB=None):
-    cCnt = entDB.data[dataSrc].shape[1]
-    rCnt = entIndexE - entIndexS
-    tResult = numpy.empty([rCnt, cCnt])
+def _movavg(xMA, dataDst, dataSrc):
+    eCnt, dCnt = entDB.data[dataSrc].shape
+    entDB.data[dataDst] = numpy.zeros([eCnt, dCnt])
     weightsLen = len(xMA['winWeights'])
-    for r in range(entIndexS, entIndexE):
-        tMARes = _ssconvolve_data(entDB.data[dataSrc][r,:], xMA['winWeights'])
-        tResult[r-entIndexS,weightsLen-1:] = tMARes
-        tResult[r-entIndexS,:weightsLen-1] = numpy.nan
-    return tResult
+    validLen = dCnt-weightsLen+1
+    for i in range(weightsLen):
+        entDB.data[dataDst][:,weightsLen-1:] += entDB.data[dataSrc][:,i:validLen+i]*xMA['winWeights'][i]
+    entDB.data[dataDst][:,:weightsLen-1] = numpy.nan
+
+
+def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):
+    """
+    Calculate the Moving average (simple or exponential) for the given dataSrc.
+    """
+    entDB = _entDB(entDB)
+    xMA = _movavg_init(maDays, mode)
+    _movavg(xMA, dataDst, dataSrc)
 
 
