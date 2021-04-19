@@ -185,9 +185,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             else:
                 retonDate = int(retonT[5:])
                 retonDateIndex = entDB.datesD[retonDate]
-            entDB.data[dataDstMetaData] = numpy.ones([entDB.nxtEntIndex,gHistoricGaps.shape[0]])*numpy.nan
-            validHistoric = gHistoricGaps[gHistoricGaps < (retonDateIndex+1)]
-            histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
+            theOps.reton(dataDst, dataSrc, retonDateIndex, gHistoricGaps)
         update_metas(op, dataSrc, dataDst)
         #### Handle each individual record as specified by the op
         for r in range(entDB.nxtEntIndex):
@@ -234,21 +232,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     entDB.data[dataDstMetaLabel].append(label)
                     entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
                 elif op.startswith("reton"):
-                    retonData = entDB.data[dataSrc][r, retonDateIndex]
-                    tROAbs = ((retonData/entDB.data[dataSrc][r,:])-1)*100
-                    tRORPA = (((retonData/entDB.data[dataSrc][r,:])**(daysInAYear/histDays))-1)*100
-                    if retonType == 'absret':
-                        tResult[r,:] = tROAbs
-                    elif retonType == 'retpa':
-                        tResult[r,:] = tRORPA
-                    else:
-                        if len(tROAbs) > daysInAYear:
-                            tResult[r,-daysInAYear:] = tROAbs[-daysInAYear:]
-                            tResult[r,:-daysInAYear] = tRORPA[:-daysInAYear]
-                        else:
-                            tResult[r,:] = tROAbs
-                    entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
-                    entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
+                    tResult = []
                 elif op.startswith("ma"):
                     tResult = []
                 elif op.startswith("roll"):

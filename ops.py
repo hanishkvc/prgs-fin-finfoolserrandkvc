@@ -321,3 +321,26 @@ def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):
     entDB.data[dataDstMD], entDB.data[dataDstML] = valid_nonzero_firstlast_md(dataDst, entDB)
 
 
+def reton(dataDst, dataSrc, retonDateIndex, historicGaps, entDB=None):
+    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    entDB = _entDB(entDB)
+    entDB.data[dataDstMD] = numpy.ones([entDB.nxtEntIndex,historicGaps.shape[0]])*numpy.nan
+    validHistoric = historicGaps[historicGaps < (retonDateIndex+1)]
+    histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
+    retonData = entDB.data[dataSrc][:, retonDateIndex].transpose()
+    tROAbs = ((retonData/entDB.data[dataSrc])-1)*100
+    tRORPA = (((retonData/entDB.data[dataSrc])**(daysInAYear/histDays))-1)*100
+    if retonType == 'absret':
+        tResult[r,:] = tROAbs
+    elif retonType == 'retpa':
+        tResult[r,:] = tRORPA
+    else:
+        if len(tROAbs) > daysInAYear:
+            tResult[r,-daysInAYear:] = tROAbs[-daysInAYear:]
+            tResult[r,:-daysInAYear] = tRORPA[:-daysInAYear]
+        else:
+            tResult[r,:] = tROAbs
+    entDB.data[dataDstMetaData][r,:validHistoric.shape[0]] = tResult[r,-(validHistoric+1)]
+    entDB.data[dataDstMetaLabel].append(hlpr.array_str(entDB.data[dataDstMetaData][r], width=7))
+
+
