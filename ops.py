@@ -321,6 +321,13 @@ def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):
     entDB.data[dataDstMD], entDB.data[dataDstML] = valid_nonzero_firstlast_md(dataDst, entDB)
 
 
+def reton_md2str(entMD):
+    """
+    Convert retOn meta data into string.
+    """
+    return hlpr.array_str(entMD, width=7)
+
+
 def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None):
     """
     Calculate the absolute returns and or returnsPerAnnum as on endDate wrt/relative_to
@@ -350,6 +357,6 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
     entDB.data[dataDstMD][:, :validHistoric.shape[0]] = tResult[:, -(validHistoric+1)]
     entDB.data[dataDstML] = []
     for md in entDB.data[dataDstMD]:
-        entDB.data[dataDstML].append(hlpr.array_str(md, width=7))
+        entDB.data[dataDstML].append(reton_md2str(md))
 
 
