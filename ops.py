@@ -365,3 +365,21 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
         entDB.data[dataDstML].append(reton_md2str(md))
 
 
+def relto(dataDst, dataSrc, baseDate, entDB=None):
+    """
+    Calculate the absolute return for all dates wrt/relative_to a given base date.
+    """
+    baseDateIndex = entDB.datesD[baseDate]
+    baseData = entDB.data[dataSrc][r, baseDateIndex]
+    dEnd = entDB.data[dataSrc][r, endDateIndex]
+    tResult[r,:] = (((entDB.data[dataSrc][r,:])/baseData)-1)*100
+    dAbsRet = tResult[r, -1]
+    durationInYears = hlpr.days2year(endDateIndex-baseDateIndex+1, entDB.bSkipWeekends)
+    dRetPA = ((((dAbsRet/100)+1)**(1/durationInYears))-1)*100
+    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
+    entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
+    entDB.data[dataDstMetaLabel].append(label)
+    entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+
+
+

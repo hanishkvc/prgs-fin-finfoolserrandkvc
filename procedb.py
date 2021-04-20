@@ -153,7 +153,12 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
         if op == 'srel':
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
         elif op.startswith("rel"):
-            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
+            baseDate = op[3:]
+            if baseDate != '':
+                baseDate = int(baseDate)
+            else:
+                baseDate = entDB.datesL[0]
+            theOps.relto(dataDst, dataSrc, baseDate, entDB)
         elif op.startswith("ma"):
             maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)
             theOps.movavg(dataDst, dataSrc, maDays, op[2], entDB)
@@ -216,21 +221,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                         entDB.data[dataDstMetaLabel].append("")
                         entDB.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
                 elif op.startswith("rel"):
-                    baseDate = op[3:]
-                    if baseDate != '':
-                        baseDate = int(baseDate)
-                        baseDateIndex = entDB.datesD[baseDate]
-                    else:
-                        baseDateIndex = startDateIndex
-                    baseData = entDB.data[dataSrc][r, baseDateIndex]
-                    dEnd = entDB.data[dataSrc][r, endDateIndex]
-                    tResult[r,:] = (((entDB.data[dataSrc][r,:])/baseData)-1)*100
-                    dAbsRet = tResult[r, -1]
-                    durationInYears = hlpr.days2year(endDateIndex-baseDateIndex+1, entDB.bSkipWeekends)
-                    dRetPA = ((((dAbsRet/100)+1)**(1/durationInYears))-1)*100
-                    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
-                    entDB.data[dataDstMetaLabel].append(label)
-                    entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
+                    tResult = []
                 elif op.startswith("reton"):
                     tResult = []
                 elif op.startswith("ma"):
