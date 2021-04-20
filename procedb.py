@@ -170,15 +170,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 5])
         elif op.startswith("block"):
             blockDays = hlpr.days_in(op[5:], entDB.bSkipWeekends)
-            blockTotalDays = endDateIndex - startDateIndex + 1
-            blockCnt = int(blockTotalDays/blockDays)
-            dataDstAvgs = "{}Avgs".format(dataDst)
-            dataDstStds = "{}Stds".format(dataDst)
-            dataDstQntls = "{}Qntls".format(dataDst)
-            entDB.data[dataDstAvgs] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
-            entDB.data[dataDstStds] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
-            entDB.data[dataDstQntls] = numpy.zeros([entDB.nxtEntIndex,blockCnt,5])
-            tResult = []
+            theOps.blockstats(dataDst, dataSrc, blockDays, entDB)
         elif op.startswith("reton"):
             if '_' in op:
                 retonT, retonType = op.split('_')
@@ -259,27 +251,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     label = "{:7.2f} {:7.2f} {} {:7.2f} {:4.1f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT, trYears)
                     entDB.data[dataDstMetaLabel].append(label)
                 elif op.startswith("block"):
-                    # Calc the Avgs
-                    iEnd = endDateIndex+1
-                    lAvgs = []
-                    lStds = []
-                    for i in range(blockCnt):
-                        iStart = iEnd-blockDays
-                        tBlockData = entDB.data[dataSrc][r,iStart:iEnd]
-                        tBlockData = tBlockData[numpy.isfinite(tBlockData)]
-                        lAvgs.insert(0, numpy.mean(tBlockData))
-                        lStds.insert(0, numpy.std(tBlockData))
-                        iEnd = iStart
-                        if len(tBlockData) == 0:
-                            tBlockData = [0]
-                        entDB.data[dataDstQntls][r, blockCnt-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
-                    avgAvgs = numpy.nanmean(lAvgs)
-                    avgStds = numpy.nanmean(lStds)
-                    entDB.data[dataDstAvgs][r,:] = lAvgs
-                    entDB.data[dataDstStds][r,:] = lStds
-                    #entDB.data[dataDstMetaData][r] = [avgAvgs, avgStds]
-                    label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
-                    entDB.data[dataDstMetaLabel].append(label)
+                    tResult = []
             except:
                 traceback.print_exc()
                 print("DBUG:ProcDataEx:Exception skipping entity at ",r)
