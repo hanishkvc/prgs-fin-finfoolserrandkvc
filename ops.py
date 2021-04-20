@@ -400,9 +400,7 @@ def relto(dataDst, dataSrc, baseDate, entDB=None):
 
 
 def blockstats_md2str(entMD):
-    avgAvgs = numpy.mean(entMD[0])
-    avgStds = numpy.mean(entMD[1])
-    label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(entMD[0],4,1), avgAvgs, avgStds)
+    label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(entMD[0],4,1), entMD[1], entMD[3])
     return label
 
 
@@ -427,7 +425,7 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
     entDB.data[dataDstAvgs] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
     entDB.data[dataDstStds] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
     entDB.data[dataDstQntls] = numpy.zeros([entDB.nxtEntIndex,blockCnt,5])
-    entDB.data[dataDstMD] = numpy.empty([entDB.nxtEntIndex,2], dtype=object)
+    entDB.data[dataDstMD] = numpy.empty([entDB.nxtEntIndex,4], dtype=object)
     # Calc the stats
     iEnd = endDateIndex+1
     lAvgs = []
@@ -443,7 +441,9 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         iEnd = iStart
     for i in range(entDB.nxtEntIndex):
         entDB.data[dataDstMD][i,0] = entDB.data[dataDstAvgs][i]
-        entDB.data[dataDstMD][i,1] = entDB.data[dataDstStds][i]
+        entDB.data[dataDstMD][i,1] = numpy.mean(entDB.data[dataDstAvgs][i])
+        entDB.data[dataDstMD][i,2] = entDB.data[dataDstStds][i]
+        entDB.data[dataDstMD][i,3] = numpy.mean(entDB.data[dataDstStds][i])
         entDB.data[dataDstML].append(blockstats_md2str(entDB.data[dataDstMD][i]))
 
 
