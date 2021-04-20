@@ -648,11 +648,11 @@ ops.weekly_view
 
 ops.monthly_view
 
-ops.ma_rsi
+ops.rsi_sma
 
    calculate rsi based on simple moving average of gain and loss.
 
-ops.jww.rsi
+ops.rsi_jww
 
    potentially calculate rsi as defined by J Welles Wilder.
 

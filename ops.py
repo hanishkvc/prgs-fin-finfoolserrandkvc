@@ -148,7 +148,7 @@ def monthly_view(dataSrcs, modes, destKeyNameTmpl="m.{}", entDB=None):
     return _blocky_view(dataSrcs, modes, "1M", destKeyNameTmpl, entDB)
 
 
-def ma_rsi(dataDst, dataSrc, lookBackDays=14, bEMASmooth=False, entDB=None):
+def rsi_sma(dataDst, dataSrc, lookBackDays=14, bEMASmooth=False, entDB=None):
     """
     Calculate RSI wrt all the entities in the entities database,
     for the full date range of data available, with the given
@@ -187,7 +187,7 @@ def ma_rsi(dataDst, dataSrc, lookBackDays=14, bEMASmooth=False, entDB=None):
     entDB.data[dataDst] = tRSI
 
 
-def jww_rsi(dataDst, dataSrc, lookBackDays=14, entDB=None):
+def rsi_jww(dataDst, dataSrc, lookBackDays=14, entDB=None):
     """
     Calculate RSI wrt all the entities in the entities database,
     for the full date range of data available, with the given

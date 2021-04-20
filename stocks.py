@@ -31,7 +31,7 @@ def _plot_prep(opts):
     """
     Calculate some of the data required for later.
     opts: a dictionary of optional arguments to control the logic.
-        'bJwwRSI': If True, Jww RSI will be shown by plot, by default.
+        'bRSIJWW': If True, Jww RSI will be shown by plot, by default.
             else SMA based RSI.
     """
     procedb.ops(['mas50=mas50(data)', 'mas200=mas200(data)'])
@@ -42,10 +42,10 @@ def _plot_prep(opts):
     ops.pivotpoints('pp')
     ops.pivotpoints('ppW', "w.{}", dateIndex=-1)
     ops.pivotpoints('ppM', "m.{}", dateIndex=-1)
-    ops.jww_rsi('rsiJWW', 'data')
-    ops.ma_rsi('rsiSMA', 'data')
-    bJwwRSI = opts.get('bJwwRSI', False)
-    if bJwwRSI:
+    ops.rsi_jww('rsiJWW', 'data')
+    ops.rsi_sma('rsiSMA', 'data')
+    bRSIJWW = opts.get('bRSIJWW', False)
+    if bRSIJWW:
         edb.gEntDB.data['rsi'] = edb.gEntDB.data['rsiJWW']
     else:
         edb.gEntDB.data['rsi'] = edb.gEntDB.data['rsiSMA']
@@ -124,12 +124,12 @@ def plot(entCodes, bPivotPoints=True, bVolumes=True, bRSI=True, bLinRegress=Fals
         eplot.show()
 
 
-def prep(bJwwRSI=True):
+def prep(bRSIJWW=True):
     """
     Process available entity raw datasets to generated useful processed data.
     This is needed before calling plot or topbottom.
     """
-    opts = { 'bJwwRSI': bJwwRSI }
+    opts = { 'bRSIJWW': bRSIJWW }
     _plot_prep(opts)
     procedb.infoset1_prep()
 
