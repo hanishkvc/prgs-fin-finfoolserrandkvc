@@ -157,7 +157,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             if baseDate != '':
                 baseDate = int(baseDate)
             else:
-                baseDate = entDB.datesL[0]
+                baseDate = entDB.dates[0]
             theOps.relto(dataDst, dataSrc, baseDate, entDB)
         elif op.startswith("ma"):
             maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)

@@ -365,21 +365,37 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
         entDB.data[dataDstML].append(reton_md2str(md))
 
 
+def relto_md2str(entMD):
+    """
+    Convert the relto MetaData to string
+    """
+    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
+    return label
+
+
 def relto(dataDst, dataSrc, baseDate, entDB=None):
     """
     Calculate the absolute return for all dates wrt/relative_to a given base date.
     """
+    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    entDB = _entDB(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
+    startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     baseDateIndex = entDB.datesD[baseDate]
-    baseData = entDB.data[dataSrc][r, baseDateIndex]
-    dEnd = entDB.data[dataSrc][r, endDateIndex]
-    tResult[r,:] = (((entDB.data[dataSrc][r,:])/baseData)-1)*100
-    dAbsRet = tResult[r, -1]
+    dBase = entDB.data[dataSrc][:, baseDateIndex].reshape(entDB.nxtEntIndex,1)
+    dEnd = entDB.data[dataSrc][:, endDateIndex]
+    tResult = ((entDB.data[dataSrc]/dBase)-1)*100
+    dLatestAbsRet = tResult[:, -1]
     durationInYears = hlpr.days2year(endDateIndex-baseDateIndex+1, entDB.bSkipWeekends)
-    dRetPA = ((((dAbsRet/100)+1)**(1/durationInYears))-1)*100
-    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(dAbsRet, dRetPA, durationInYears, baseData, dEnd)
-    entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
-    entDB.data[dataDstMetaLabel].append(label)
-    entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
-
+    dLatestRetPA = ((((dLatestAbsRet/100)+1)**(1/durationInYears))-1)*100
+    entDB.data[dataDstMD] = numpy.zeros([entDB.nxtEntIndex,5])
+    entDB.data[dataDstMD][:,0] = dLatestAbsRet
+    entDB.data[dataDstMD][:,1] = dLatestRetPA
+    entDB.data[dataDstMD][:,2] = durationInYears
+    entDB.data[dataDstMD][:,3] = dBase.transpose()
+    entDB.data[dataDstMD][:,4] = dEnd
+    entDB.data[dataDstML] = []
+    for md in entDB.data[dataDstMD]:
+        entDB.data[dataDstML].append(relto_md2str(md))
 
 
