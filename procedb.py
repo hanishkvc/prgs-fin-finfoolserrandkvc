@@ -115,6 +115,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                     Average
                     Standard Deviation
                     Quantiles
+                MetaData = BlockAvgs, BlockStds
                 MetaLabel = BlockAvgs, AvgBlockAvgs, AvgBlockStds
 
     NOTE: NaN is used, because plot will ignore those data points and keep the corresponding

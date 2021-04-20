@@ -399,7 +399,26 @@ def relto(dataDst, dataSrc, baseDate, entDB=None):
         entDB.data[dataDstML].append(relto_md2str(md))
 
 
-def blockstats(dataDst, dataSrc, blockDays, entDB=None);
+def blockstats_md2str(entMD):
+    avgAvgs = numpy.mean(entMD[0])
+    avgStds = numpy.mean(entMD[1])
+    label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(entMD[0],4,1), avgAvgs, avgStds)
+    return label
+
+
+def blockstats(dataDst, dataSrc, blockDays, entDB=None):
+    """
+    Calculate stats like Avg,STD,Qnts wrt each block of data.
+    The data in the specified dataSrc is divided into blocks of blockDays duration
+    and the statistics calculated for each resultant block.
+    NOTE: Any Inf or NaN value will be converted to 0, before stats are calculated.
+    """
+    # Get generic things required
+    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    entDB = _entDB(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
+    startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
+    # Prepare the job specific params
     blockTotalDays = endDateIndex - startDateIndex + 1
     blockCnt = int(blockTotalDays/blockDays)
     dataDstAvgs = "{}Avgs".format(dataDst)
@@ -408,27 +427,23 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None);
     entDB.data[dataDstAvgs] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
     entDB.data[dataDstStds] = numpy.zeros([entDB.nxtEntIndex,blockCnt])
     entDB.data[dataDstQntls] = numpy.zeros([entDB.nxtEntIndex,blockCnt,5])
-    tResult = []
-    # Calc the Avgs
+    entDB.data[dataDstMD] = numpy.empty([entDB.nxtEntIndex,2], dtype=object)
+    # Calc the stats
     iEnd = endDateIndex+1
     lAvgs = []
     lStds = []
     for i in range(blockCnt):
+        iDst = blockCnt-i-1
         iStart = iEnd-blockDays
-        tBlockData = entDB.data[dataSrc][r,iStart:iEnd]
-        tBlockData = tBlockData[numpy.isfinite(tBlockData)]
-        lAvgs.insert(0, numpy.mean(tBlockData))
-        lStds.insert(0, numpy.std(tBlockData))
+        tBlockData = entDB.data[dataSrc][:,iStart:iEnd].copy()
+        tBlockData[~numpy.isfinite(tBlockData)] = 0
+        entDB.data[dataDstAvgs][:,iDst] = numpy.mean(tBlockData,axis=1)
+        entDB.data[dataDstStds][:,iDst] = numpy.std(tBlockData,axis=1)
+        entDB.data[dataDstQntls][:,iDst] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1],axis=1).transpose()
         iEnd = iStart
-        if len(tBlockData) == 0:
-            tBlockData = [0]
-        entDB.data[dataDstQntls][r, blockCnt-1-i] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1])
-    avgAvgs = numpy.nanmean(lAvgs)
-    avgStds = numpy.nanmean(lStds)
-    entDB.data[dataDstAvgs][r,:] = lAvgs
-    entDB.data[dataDstStds][r,:] = lStds
-    #entDB.data[dataDstMetaData][r] = [avgAvgs, avgStds]
-    label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(lAvgs,4,1), avgAvgs, avgStds)
-    entDB.data[dataDstMetaLabel].append(label)
+    for i in range(entDB.nxtEntIndex):
+        entDB.data[dataDstMD][i,0] = entDB.data[dataDstAvgs][i]
+        entDB.data[dataDstMD][i,1] = entDB.data[dataDstStds][i]
+        entDB.data[dataDstML].append(blockstats_md2str(entDB.data[dataDstMD][i]))
 
 
