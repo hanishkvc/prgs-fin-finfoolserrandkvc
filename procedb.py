@@ -567,12 +567,13 @@ def infoset1_prep(entDB=None):
     potentially useful info, on the loaded data,
     """
     entDB = _entDB(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     warnings.filterwarnings('ignore')
     ops(['srel=srel(data)', 'mas50Srel=mas50(srel)'], entDB=entDB)
     ops(['roabs=reton_absret(data)', 'rosaf=reton(data)'], entDB=entDB)
     ops(['roll3Y=roll3Y(data)', 'mas50Roll3Y=mas50(roll3Y)'], entDB=entDB)
     ops(['roll5Y=roll5Y(data)', 'mas50Roll5Y=mas50(roll5Y)'], entDB=entDB)
-    blockDays = int(entDB.nxtDateIndex/5)
+    blockDays = int((entDB.nxtDateIndex-daysInAYear*3)/5)
     ops(['blockNRoll3Y=block{}(roll3Y)'.format(blockDays)], entDB=entDB)
     warnings.filterwarnings('default')
 
