@@ -367,6 +367,7 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
             tResult[:, :-daysInAYear] = tRORPA[:, :-daysInAYear]
         else:
             tResult = tROAbs
+    entDB.data[dataDst] = tResult
     entDB.data[dataDstMD][:, :validHistoric.shape[0]] = tResult[:, -(validHistoric+1)]
     entDB.data[dataDstML] = []
     for md in entDB.data[dataDstMD]:
@@ -394,6 +395,7 @@ def relto(dataDst, dataSrc, baseDate, entDB=None):
     dBase = entDB.data[dataSrc][:, baseDateIndex].reshape(entDB.nxtEntIndex,1)
     dEnd = entDB.data[dataSrc][:, endDateIndex]
     tResult = ((entDB.data[dataSrc]/dBase)-1)*100
+    entDB.data[dataDst] = tResult
     dLatestAbsRet = tResult[:, -1]
     durationInYears = hlpr.days2year(endDateIndex-baseDateIndex+1, entDB.bSkipWeekends)
     dLatestRetPA = ((((dLatestAbsRet/100)+1)**(1/durationInYears))-1)*100
