@@ -192,30 +192,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
         for r in range(entDB.nxtEntIndex):
             try:
                 if op == "srel":
-                    #breakpoint()
-                    iStart = -1
-                    dStart = 0
-                    nonZeros = numpy.nonzero(entDB.data[dataSrc][r, startDateIndex:endDateIndex+1])[0]
-                    if (len(nonZeros) > 0):
-                        iStart = nonZeros[0] + startDateIndex
-                        dStart = entDB.data[dataSrc][r, iStart]
-                    dEnd = entDB.data[dataSrc][r, endDateIndex]
-                    if dStart != 0:
-                        if gbRelDataPlusFloat:
-                            tResult[r,:] = (entDB.data[dataSrc][r,:]/dStart)
-                        else:
-                            tResult[r,:] = ((entDB.data[dataSrc][r,:]/dStart)-1)*100
-                        tResult[r,:iStart] = numpy.nan
-                        dAbsRet = tResult[r, -1]
-                        durationInYears = hlpr.days2year((endDateIndex-startDateIndex+1)-iStart, entDB.bSkipWeekends)
-                        dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
-                        label = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
-                        entDB.data[dataDstMetaLabel].append(label)
-                        entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
-                    else:
-                        durationInYears = hlpr.days2year(endDateIndex-startDateIndex+1, entDB.bSkipWeekends)
-                        entDB.data[dataDstMetaLabel].append("")
-                        entDB.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
+                    tResult = []
                 elif op.startswith("rel"):
                     tResult = []
                 elif op.startswith("reton"):
