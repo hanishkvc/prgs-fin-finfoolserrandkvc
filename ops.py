@@ -501,9 +501,9 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     trStd.set_fill_value(numpy.nan)
     entDB.data[dataDstMD][:,1] = trStd.filled()
     # The BelowMinRetPA
-    trValidBelowMinRetPA = numpy.count_nonzero(trValid < gfMinRetPA, axis=1)
+    trValidBelowMinRetPA = numpy.count_nonzero(trValid < gfMinRetPA, axis=1)*1.0
     trValidBelowMinRetPA.set_fill_value(numpy.nan)
-    trValidLens = numpy.count_nonzero(trValid, axis=1)
+    trValidLens = numpy.count_nonzero(trValid, axis=1)*1.0
     trValidLens.set_fill_value(numpy.nan)
     trBelowMinRetPA = (trValidBelowMinRetPA.filled()/trValidLens.filled())*100
     entDB.data[dataDstMD][:,2] = trBelowMinRetPA
