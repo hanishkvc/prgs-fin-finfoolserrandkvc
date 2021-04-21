@@ -457,6 +457,14 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         entDB.data[dataDstML].append(blockstats_md2str(entDB.data[dataDstMD][i]))
 
 
+def rollret_md2str(entMD):
+    """
+    Convert the entity MetaData wrt rollret op to a string.
+    """
+    theStr = "{:7.2f} {:7.2f} [{:5.2f}%<] {:7.2f} {:4.1f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
+    return theStr
+
+
 def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     """
     Calculate the rolling return corresponding to the given rollDays,
@@ -479,38 +487,34 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     if not gbRetDataAsFloat:
         tResult = (tResult - 1)*100
     tResult[:,:rollDays] = numpy.nan
-    # Create the meta data
+    # Create the meta datas
     entDB.data[dataDstMD] = numpy.zeros([entDB.nxtEntIndex, 5])
     trValid = numpy.ma.masked_invalid(tResult)
     # The Avgs
     trAvg = numpy.mean(trValid, axis=1)
-    trAvg.set_fill_value(0) # Or maybe fill with NaN
+    trAvg.set_fill_value(numpy.nan)
     entDB.data[dataDstMD][:,0] = trAvg.filled()
     # The Stds
     trStd = numpy.std(trValid, axis=1)
-    trStd.set_fill_value(0) # Or maybe fill with NaN
+    trStd.set_fill_value(numpy.nan)
     entDB.data[dataDstMD][:,1] = trStd.filled()
+    # The BelowMinThreshold
+    trValidBelowMinThreshold = numpy.count_nonzero(trValid < gfRollingRetPAMinThreshold)
+    trValidBelowMinThreshold.set_fill_value(numpy.nan)
+    trValidLens = numpy.count_nonzero(trValid, axis=1)
+    trValidLens.set_fill_value(numpy.nan)
+    trBelowMinThreshold = (trValidBelowMinThreshold.filled()/trValidLens.filled())*100
+    entDB.data[dataDstMD][:,2] = trBelowMinThreshold
     # The MaSharpeMinT
     trMaSharpeMinT = (trAvg-gfRollingRetPAMinThreshold)/trStd
-    trMaSharpeMinT.set_fill_value(0) # Or maybe fill with NaN
+    trMaSharpeMinT.set_fill_value(numpy.nan)
     entDB.data[dataDstMD][:,3] = trMaSarpeMinT.filled()
-
-
-    trLenValidResult = len(trValidResult)
-    if trLenValidResult > 0:
-        trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
-        trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
-        trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
-    else:
-        trBelowMinThreshold = numpy.nan
-        trBelowMinThresholdLabel = "[--NA--<]"
-        trAvg = numpy.nan
-        trStd = numpy.nan
-        trMaSharpeMinT = numpy.nan
-    trYears = entDB.datesD[entDB.meta['lastSeen'][r]] - entDB.datesD[entDB.meta['firstSeen'][r]]
-    trYears = hlpr.days2year(trYears, entDB.bSkipWeekends)
-    entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT, trYears]
-    label = "{:7.2f} {:7.2f} {} {:7.2f} {:4.1f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT, trYears)
-    entDB.data[dataDstMetaLabel].append(label)
+    # Meta label and Years
+    entDB.data[dataDstML] = []
+    for i,md in enumerate(entDB.data[dataDstMD]):
+        trYears = entDB.datesD[entDB.meta['lastSeen'][i]] - entDB.datesD[entDB.meta['firstSeen'][i]]
+        trYears = hlpr.days2year(trYears, entDB.bSkipWeekends)
+        entDB.data[dataDstMD][i,4] = trYears
+        entDB.data[dataDstML].append(rollret_md2str(md))
 
 
