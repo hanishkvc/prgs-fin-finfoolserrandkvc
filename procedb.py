@@ -48,7 +48,65 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
 
-gbRelDataPlusFloat = False
+def _ops(curOp, startDate, endDate, entDB):
+    """
+    THe helper which processes the individual op for ops function.
+    This inturn depends on the ops module to do the actual op.
+    """
+    gHistoricGaps = _gHistoricGaps(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
+    startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
+    curOpFull = curOp
+    if '=' in curOp:
+        dataDst, curOp = curOp.split('=')
+    else:
+        dataDst = ''
+    op, dataSrc = curOp.split('(', 1)
+    dataSrc = dataSrc[:-1]
+    if dataDst == '':
+        dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
+    print("DBUG:ops:op[{}]:dst[{}]".format(curOpFull, dataDst))
+    #### Op specific things to do before getting into individual records
+    if op == 'srel':
+        theOps.srel(dataDst, dataSrc, entDB)
+    elif op.startswith("rel"):
+        baseDate = op[3:]
+        if baseDate != '':
+            baseDate = int(baseDate)
+        else:
+            baseDate = entDB.dates[0]
+        theOps.relto(dataDst, dataSrc, baseDate, entDB)
+    elif op.startswith("ma"):
+        maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)
+        theOps.movavg(dataDst, dataSrc, maDays, op[2], entDB)
+    elif op.startswith("roll"):
+        # RollWindowSize number of days at beginning will not have
+        # Rolling ret data, bcas there arent enough days to calculate
+        # rolling ret while satisfying the RollingRetWIndowSize requested.
+        rollDays = hlpr.days_in(op[4:].split('_')[0], entDB.bSkipWeekends)
+        if '_' in op:
+            opType = op.split('_')[1]
+        else:
+            opType = 'retpa'
+        theOps.rollret(dataDst, dataSrc, rollDays, opType, entDB)
+    elif op.startswith("block"):
+        blockDays = hlpr.days_in(op[5:], entDB.bSkipWeekends)
+        theOps.blockstats(dataDst, dataSrc, blockDays, entDB)
+    elif op.startswith("reton"):
+        if '_' in op:
+            retonT, retonType = op.split('_')
+        else:
+            retonT = op
+            retonType = 'safe'
+        if retonT == "reton":
+            retonDateIndex = endDateIndex
+        else:
+            retonDate = int(retonT[5:])
+            retonDateIndex = entDB.datesD[retonDate]
+        theOps.reton(dataDst, dataSrc, retonDateIndex, retonType, gHistoricGaps, entDB)
+    update_metas(op, dataSrc, dataDst)
+
+
 def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     """
     Allow data from any valid data key in entDB.data to be operated on and the results to be saved
@@ -128,86 +186,14 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     dont account for them being different from the default.
     """
     entDB = _entDB(entDB)
-    gHistoricGaps = _gHistoricGaps(entDB)
-    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
-    startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     if type(opsList) == str:
         opsList = [ opsList ]
     for curOp in opsList:
-        curOpFull = curOp
-        if '=' in curOp:
-            dataDst, curOp = curOp.split('=')
-        else:
-            dataDst = ''
-        op, dataSrc = curOp.split('(', 1)
-        dataSrc = dataSrc[:-1]
-        if dataDst == '':
-            dataDst = "{}({}[{}:{}])".format(op, dataSrc, startDate, endDate)
-        print("DBUG:ops:op[{}]:dst[{}]".format(curOpFull, dataDst))
-        #dataLen = endDateIndex - startDateIndex + 1
-        tResult = entDB.data[dataSrc].copy()
-        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
-        dataDstMetaData, dataDstMetaLabel = hlpr.data_metakeys(dataDst)
-        entDB.data[dataDstMetaLabel] = []
-        #### Op specific things to do before getting into individual records
-        if op == 'srel':
-            theOps.srel(dataDst, dataSrc, entDB)
-        elif op.startswith("rel"):
-            baseDate = op[3:]
-            if baseDate != '':
-                baseDate = int(baseDate)
-            else:
-                baseDate = entDB.dates[0]
-            theOps.relto(dataDst, dataSrc, baseDate, entDB)
-        elif op.startswith("ma"):
-            maDays = hlpr.days_in(op[3:], entDB.bSkipWeekends)
-            theOps.movavg(dataDst, dataSrc, maDays, op[2], entDB)
-        elif op.startswith("roll"):
-            # RollWindowSize number of days at beginning will not have
-            # Rolling ret data, bcas there arent enough days to calculate
-            # rolling ret while satisfying the RollingRetWIndowSize requested.
-            rollDays = hlpr.days_in(op[4:].split('_')[0], entDB.bSkipWeekends)
-            if '_' in op:
-                opType = op.split('_')[1]
-            else:
-                opType = 'retpa'
-            theOps.rollret(dataDst, dataSrc, rollDays, opType, entDB)
-        elif op.startswith("block"):
-            blockDays = hlpr.days_in(op[5:], entDB.bSkipWeekends)
-            theOps.blockstats(dataDst, dataSrc, blockDays, entDB)
-        elif op.startswith("reton"):
-            if '_' in op:
-                retonT, retonType = op.split('_')
-            else:
-                retonT = op
-                retonType = 'safe'
-            if retonT == "reton":
-                retonDateIndex = endDateIndex
-            else:
-                retonDate = int(retonT[5:])
-                retonDateIndex = entDB.datesD[retonDate]
-            theOps.reton(dataDst, dataSrc, retonDateIndex, retonType, gHistoricGaps, entDB)
-        update_metas(op, dataSrc, dataDst)
-        #### Handle each individual record as specified by the op
-        for r in range(entDB.nxtEntIndex):
-            try:
-                if op == "srel":
-                    tResult = []
-                elif op.startswith("rel"):
-                    tResult = []
-                elif op.startswith("reton"):
-                    tResult = []
-                elif op.startswith("ma"):
-                    tResult = []
-                elif op.startswith("roll"):
-                    tResult = []
-                elif op.startswith("block"):
-                    tResult = []
-            except:
-                traceback.print_exc()
-                print("DBUG:ProcDataEx:Exception skipping entity at ",r)
-        if len(tResult) > 0:
-            entDB.data[dataDst] = tResult
+        try:
+            _ops(curOp, startDate, endDate, entDB)
+        except:
+            traceback.print_exc()
+            print("DBUG:ProcEDB:Ops:Exception processing {}, skipping to next".format(curOp))
 
 
 def _mabeta(dataSrc, refCode, entCodes, entDB=None):
