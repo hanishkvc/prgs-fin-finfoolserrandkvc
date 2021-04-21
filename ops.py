@@ -521,30 +521,47 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
         entDB.data[dataDstML].append(rollret_md2str(md))
 
 
+def srel_md2str(entMD):
+    theStr = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
+    return theStr
+
+
 def srel(dataDst, dataSrc, entDB):
-                    #breakpoint()
-                    iStart = -1
-                    dStart = 0
-                    nonZeros = numpy.nonzero(entDB.data[dataSrc][r, startDateIndex:endDateIndex+1])[0]
-                    if (len(nonZeros) > 0):
-                        iStart = nonZeros[0] + startDateIndex
-                        dStart = entDB.data[dataSrc][r, iStart]
-                    dEnd = entDB.data[dataSrc][r, endDateIndex]
-                    if dStart != 0:
-                        if gbRelDataPlusFloat:
-                            tResult[r,:] = (entDB.data[dataSrc][r,:]/dStart)
-                        else:
-                            tResult[r,:] = ((entDB.data[dataSrc][r,:]/dStart)-1)*100
-                        tResult[r,:iStart] = numpy.nan
-                        dAbsRet = tResult[r, -1]
-                        durationInYears = hlpr.days2year((endDateIndex-startDateIndex+1)-iStart, entDB.bSkipWeekends)
-                        dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
-                        label = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(dAbsRet, dRetPA, durationInYears, dStart, dEnd)
-                        entDB.data[dataDstMetaLabel].append(label)
-                        entDB.data[dataDstMetaData][r,:] = numpy.array([dAbsRet, dRetPA, durationInYears])
-                    else:
-                        durationInYears = hlpr.days2year(endDateIndex-startDateIndex+1, entDB.bSkipWeekends)
-                        entDB.data[dataDstMetaLabel].append("")
-                        entDB.data[dataDstMetaData][r,:] = numpy.array([0.0, 0.0, durationInYears])
+    """
+    Calculate the absolute return for all dates wrt/relative_to start date.
+    NOTE: If a entity was active from day 1 or rather 0th day wrt database,
+        then the return is calculated wrt that.
+        However if the entity started later than start date, then calculate
+        relative to the start date of that given entity.
+    """
+    # Get generic things required
+    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    entDB = _entDB(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
+    startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
+    # Rolling ret related logic starts
+    iStart = entDB.meta['firstSeenDI']
+    dStart = entDB.data[dataSrc][range(entDB.nxtEntIndex), iStart]
+    dStartT = dStart.reshape(entDB.nxtEntIndex,1)
+    dEnd = entDB.data[dataSrc][:, endDateIndex]
+    tResult = entDB.data[dataSrc]/dStartT
+    if not gbRetDataAsFloat:
+        tResult = (tResult - 1)*100
+    entDB.data[dataDst] = tResult
+    # Work on the meta data
+    entDB.data[dataDstMD] = numpy.zeros([entDB.nxtEntIndex,5])
+    dAbsRet = tResult[:, -1]
+    totalDays = endDateIndex-startDateIndex+1
+    durationInYears = (totalDays - iStart)/daysInAYear
+    dRetPA = (((dEnd/dStart)**(1/durationInYears))-1)*100
+    entDB.data[dataDstMD][:,0] = dAbsRet
+    entDB.data[dataDstMD][:,1] = dRetPA
+    entDB.data[dataDstMD][:,2] = durationInYears
+    entDB.data[dataDstMD][:,3] = dStart
+    entDB.data[dataDstMD][:,4] = dEnd
+    for i in range(entDB.nxtEntIndex):
+        entDB.data[dataDst][i, :iStart[i]] = numpy.nan
+        md = entDB.data[dataDstMD][i]
+        entDB.data[dataDstML].append(srel_md2str(md))
 
 

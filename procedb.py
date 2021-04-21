@@ -151,7 +151,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
         entDB.data[dataDstMetaLabel] = []
         #### Op specific things to do before getting into individual records
         if op == 'srel':
-            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex,3])
+            theOps.srel(dataDst, dataSrc, entDB)
         elif op.startswith("rel"):
             baseDate = op[3:]
             if baseDate != '':
