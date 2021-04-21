@@ -168,7 +168,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = hlpr.days_in(op[4:].split('_')[0], entDB.bSkipWeekends)
-            entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 5])
+            theOps.rollret(dataDst, dataSrc, rollDays, entDB)
         elif op.startswith("block"):
             blockDays = hlpr.days_in(op[5:], entDB.bSkipWeekends)
             theOps.blockstats(dataDst, dataSrc, blockDays, entDB)
@@ -220,37 +220,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 elif op.startswith("ma"):
                     tResult = []
                 elif op.startswith("roll"):
-                    durationForPA = rollDays/daysInAYear
-                    if '_' in op:
-                        opType = op.split('_')[1]
-                        if opType == 'abs':
-                            durationForPA = 1
-                    if gbRelDataPlusFloat:
-                        tResult[r,rollDays:] = (entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA)
-                    else:
-                        tResult[r,rollDays:] = (((entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
-                    tResult[r,:rollDays] = numpy.nan
-                    # Additional meta data
-                    trValidResult = tResult[r][numpy.isfinite(tResult[r])]
-                    trLenValidResult = len(trValidResult)
-                    if trLenValidResult > 0:
-                        trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
-                        trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
-                        trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
-                        trAvg = numpy.mean(trValidResult)
-                        trStd = numpy.std(trValidResult)
-                        trMaSharpeMinT = (trAvg-gfRollingRetPAMinThreshold)/trStd
-                    else:
-                        trBelowMinThreshold = numpy.nan
-                        trBelowMinThresholdLabel = "[--NA--<]"
-                        trAvg = numpy.nan
-                        trStd = numpy.nan
-                        trMaSharpeMinT = numpy.nan
-                    trYears = entDB.datesD[entDB.meta['lastSeen'][r]] - entDB.datesD[entDB.meta['firstSeen'][r]]
-                    trYears = hlpr.days2year(trYears, entDB.bSkipWeekends)
-                    entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT, trYears]
-                    label = "{:7.2f} {:7.2f} {} {:7.2f} {:4.1f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT, trYears)
-                    entDB.data[dataDstMetaLabel].append(label)
+                    tResult = []
                 elif op.startswith("block"):
                     tResult = []
             except:

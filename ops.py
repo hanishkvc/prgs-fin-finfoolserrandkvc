@@ -447,3 +447,38 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         entDB.data[dataDstML].append(blockstats_md2str(entDB.data[dataDstMD][i]))
 
 
+def rollret(dataDst, dataSrc, rollDays, entDB=None):
+    entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 5])
+    durationForPA = rollDays/daysInAYear
+    if '_' in op:
+        opType = op.split('_')[1]
+        if opType == 'abs':
+            durationForPA = 1
+    if gbRelDataPlusFloat:
+        tResult[r,rollDays:] = (entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA)
+    else:
+        tResult[r,rollDays:] = (((entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
+    tResult[r,:rollDays] = numpy.nan
+    # Additional meta data
+    trValidResult = tResult[r][numpy.isfinite(tResult[r])]
+    trLenValidResult = len(trValidResult)
+    if trLenValidResult > 0:
+        trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
+        trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
+        trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
+        trAvg = numpy.mean(trValidResult)
+        trStd = numpy.std(trValidResult)
+        trMaSharpeMinT = (trAvg-gfRollingRetPAMinThreshold)/trStd
+    else:
+        trBelowMinThreshold = numpy.nan
+        trBelowMinThresholdLabel = "[--NA--<]"
+        trAvg = numpy.nan
+        trStd = numpy.nan
+        trMaSharpeMinT = numpy.nan
+    trYears = entDB.datesD[entDB.meta['lastSeen'][r]] - entDB.datesD[entDB.meta['firstSeen'][r]]
+    trYears = hlpr.days2year(trYears, entDB.bSkipWeekends)
+    entDB.data[dataDstMetaData][r] = [trAvg, trStd, trBelowMinThreshold, trMaSharpeMinT, trYears]
+    label = "{:7.2f} {:7.2f} {} {:7.2f} {:4.1f}".format(trAvg, trStd, trBelowMinThresholdLabel, trMaSharpeMinT, trYears)
+    entDB.data[dataDstMetaLabel].append(label)
+
+
