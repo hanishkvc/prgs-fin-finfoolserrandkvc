@@ -106,7 +106,7 @@ def _data(dataKeys, entCodes, startDate=-1, endDate=-1, entDB=None, axes=None):
         entCodes = [ entCodes]
     for dataKey in dataKeys:
         print("DBUG:plot_data:{}".format(dataKey))
-        dataKeyMetaData, dataKeyMetaLabel = hlpr.data_metakeys(dataKey)
+        dataKeyMetaType, dataKeyMetaData, dataKeyMetaLabel = hlpr.data_metakeys(dataKey)
         for entCode in entCodes:
             index = entDB.meta['codeD'][entCode]
             name = entDB.meta['name'][index][:giLabelNameChopLen]

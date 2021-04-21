@@ -384,7 +384,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif analType.startswith("srel"):
-        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
+        dataSrcMetaType, dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         if analType == 'srel_absret':
             printHdr.extend(['AbsRet'])
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
@@ -395,7 +395,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             input("ERRR:AnalSimple:{}:dataSrc[{}]: unknown srel anal subType, returning...".format(theAnal, dataSrc))
             return None
     elif analType.startswith("roll"):
-        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
+        dataSrcMetaType, dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         if analType == 'roll_avg':
             printHdr.extend(['Avg', 'Std', '<minT', 'MaSha', 'Yrs'])
             theSaneArray = entDB.data[dataSrcMetaData][:,0].copy()
@@ -405,7 +405,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
                 {'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.1f}",'str':'{:{width}}'}])
             printWidths.extend([7, 7, 7, 4])
     elif analType == "block_avg":
-        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
+        dataSrcMetaType, dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         printHdr.extend(['AvgRank', 'blockAvgs', 'blockStds'])
         metaDataAvgs = "{}Avgs".format(dataSrc)
         metaDataStds = "{}Avgs".format(dataSrc)
@@ -447,7 +447,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         dataYearsAvailable = entDB.nxtDateIndex/daysInAYear
         if (dataYearsAvailable < minDataYears):
             print("WARN:AnalSimple:{}: dataYearsAvailable[{}] < minDataYears[{}]".format(theAnal, dataYearsAvailable, minDataYears))
-        srelMetaData, srelMetaLabel = hlpr.data_metakeys('srel')
+        srelMetaType, srelMetaData, srelMetaLabel = hlpr.data_metakeys('srel')
         theSRelMetaData = entDB.data.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
             ops('srel=srel(data)')
