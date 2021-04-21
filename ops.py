@@ -540,7 +540,7 @@ def srel(dataDst, dataSrc, entDB):
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     # Rolling ret related logic starts
-    iStart = entDB.meta['firstSeenDI'].astype(int)
+    iStart = entDB.meta['firstSeenDI']
     dStart = entDB.data[dataSrc][range(entDB.nxtEntIndex), iStart]
     dStartT = dStart.reshape(entDB.nxtEntIndex,1)
     dEnd = entDB.data[dataSrc][:, endDateIndex]

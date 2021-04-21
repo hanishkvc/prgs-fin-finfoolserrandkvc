@@ -59,8 +59,8 @@ class EntitiesDB:
         self.meta['codeL'] = numpy.empty(entCnt, dtype=object)
         self.meta['codeD'] = {}
         self.meta['typeId'] = numpy.empty(entCnt, dtype=object)
-        self.meta['firstSeenDI'] = numpy.ones(entCnt)*-1
-        self.meta['lastSeenDI'] = numpy.ones(entCnt)*-1
+        self.meta['firstSeenDI'] = numpy.ones(entCnt, dtype=int)*-1
+        self.meta['lastSeenDI'] = numpy.ones(entCnt, dtype=int)*-1
 
 
     def __init__(self, dataKeys, aliases, entCnt, dateCnt, bSkipWeekends=True):
