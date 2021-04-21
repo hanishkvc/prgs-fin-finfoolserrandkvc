@@ -345,12 +345,13 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
     Calculate the absolute returns and or returnsPerAnnum as on endDate wrt/relative_to
     all the other dates.
     """
+    # Get generic things required
     dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
     entDB.data[dataDstMT] = 'reton'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
-    entDB.data[dataDstMD] = numpy.ones([entDB.nxtEntIndex,historicGaps.shape[0]])*numpy.nan
+    # Work on reton
     validHistoric = historicGaps[historicGaps < (retonDateIndex+1)]
     histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
     retonData = entDB.data[dataSrc][:, retonDateIndex].reshape(entDB.nxtEntIndex,1)
@@ -368,6 +369,8 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
         else:
             tResult = tROAbs
     entDB.data[dataDst] = tResult
+    # Handle meta data
+    entDB.data[dataDstMD] = numpy.ones([entDB.nxtEntIndex,historicGaps.shape[0]])*numpy.nan
     entDB.data[dataDstMD][:, :validHistoric.shape[0]] = tResult[:, -(validHistoric+1)]
     entDB.data[dataDstML] = []
     for md in entDB.data[dataDstMD]:
@@ -386,16 +389,19 @@ def relto(dataDst, dataSrc, baseDate, entDB=None):
     """
     Calculate the absolute return for all dates wrt/relative_to a given base date.
     """
+    # Get generic things required
     dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
     entDB.data[dataDstMT] = 'relto'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
+    # Start on relto specific logic
     baseDateIndex = entDB.datesD[baseDate]
     dBase = entDB.data[dataSrc][:, baseDateIndex].reshape(entDB.nxtEntIndex,1)
     dEnd = entDB.data[dataSrc][:, endDateIndex]
     tResult = ((entDB.data[dataSrc]/dBase)-1)*100
     entDB.data[dataDst] = tResult
+    # Start on MetaData/Label
     dLatestAbsRet = tResult[:, -1]
     durationInYears = hlpr.days2year(endDateIndex-baseDateIndex+1, entDB.bSkipWeekends)
     dLatestRetPA = ((((dLatestAbsRet/100)+1)**(1/durationInYears))-1)*100
@@ -457,6 +463,7 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         entDB.data[dataDstStds][:,iDst] = numpy.std(tBlockData,axis=1)
         entDB.data[dataDstQntls][:,iDst] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1],axis=1).transpose()
         iEnd = iStart
+    # Do the needful wrt MetaData/Label
     entDB.data[dataDstML] = []
     for i in range(entDB.nxtEntIndex):
         entDB.data[dataDstMD][i,0] = entDB.data[dataDstAvgs][i]
@@ -557,7 +564,7 @@ def srel(dataDst, dataSrc, entDB):
     if not gbRetDataAsFloat:
         tResult = (tResult - 1)*100
     entDB.data[dataDst] = tResult
-    # Work on the meta data
+    # Work on the meta data, also set NaN for No data zone
     entDB.data[dataDstMD] = numpy.zeros([entDB.nxtEntIndex,5])
     dAbsRet = tResult[:, -1]
     totalDays = endDateIndex-startDateIndex+1
