@@ -512,12 +512,12 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     trMaSharpeMinT = (trAvg-gfMinRetPA)/trStd
     trMaSharpeMinT.set_fill_value(numpy.nan)
     entDB.data[dataDstMD][:,3] = trMaSharpeMinT.filled()
+    # The Years alive
+    trYears = ((entDB.meta['lastSeenDI'] - entDB.meta['firstSeenDI'])+1)/daysInAYear
+    entDB.data[dataDstMD][:,4] = trYears
     # Meta label and Years
     entDB.data[dataDstML] = []
-    for i,md in enumerate(entDB.data[dataDstMD]):
-        trYears = entDB.datesD[entDB.meta['lastSeen'][i]] - entDB.datesD[entDB.meta['firstSeen'][i]]
-        trYears = hlpr.days2year(trYears, entDB.bSkipWeekends)
-        entDB.data[dataDstMD][i,4] = trYears
+    for md in entDB.data[dataDstMD]:
         entDB.data[dataDstML].append(rollret_md2str(md))
 
 
