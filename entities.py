@@ -59,8 +59,8 @@ class EntitiesDB:
         self.meta['codeL'] = numpy.empty(entCnt, dtype=object)
         self.meta['codeD'] = {}
         self.meta['typeId'] = numpy.empty(entCnt, dtype=object)
-        self.meta['firstSeen'] = numpy.zeros(entCnt)
-        self.meta['lastSeen'] = numpy.zeros(entCnt)
+        self.meta['firstSeenDI'] = numpy.ones(entCnt)*-1
+        self.meta['lastSeenDI'] = numpy.ones(entCnt)*-1
 
 
     def __init__(self, dataKeys, aliases, entCnt, dateCnt, bSkipWeekends=True):
@@ -126,6 +126,8 @@ class EntitiesDB:
         """
         It is assumed that the date is added in chronological sequence.
         dateInt: should be in YYYYMMDD format.
+        NOTE: After a date is added, all data belonging to that date should be added,
+        before going to the next date by adding that date.
         """
         self.dates[self.nxtDateIndex] = dateInt
         self.datesD[dateInt] = self.nxtDateIndex
@@ -225,10 +227,9 @@ class EntitiesDB:
         if self.nxtDateIndex == 0:
             input("DBUG:Entities:AddData: Trying to add entity data, before date is specified")
             return
-        if self.meta['firstSeen'][entIndex] == 0:
-            #self.meta['firstSeen'][entIndex] = self.dates[self.nxtDateIndex-1]
-            self.meta['firstSeen'][entIndex] = self.lastAddedDate
-        self.meta['lastSeen'][entIndex] = self.lastAddedDate
+        if self.meta['firstSeenDI'][entIndex] == -1:
+            self.meta['firstSeenDI'][entIndex] = self.nxtDateIndex-1
+        self.meta['lastSeenDI'][entIndex] = self.nxtDateIndex-1
         for dataKey in entData:
             self.data[dataKey][entIndex,self.nxtDateIndex-1] = entData[dataKey]
 
@@ -240,7 +241,7 @@ class EntitiesDB:
         for dataKey in dataKeys:
             self.data[dataKey] = self.data[dataKey][:self.nxtEntIndex,:self.nxtDateIndex]
         self._set_aliases()
-        for key in [ 'firstSeen', 'lastSeen', 'name', 'codeL', 'typeId' ]:
+        for key in [ 'firstSeenDI', 'lastSeenDI', 'name', 'codeL', 'typeId' ]:
             self.meta[key] = self.meta[key][:self.nxtEntIndex]
         self.dates = self.dates[:self.nxtDateIndex]
 
