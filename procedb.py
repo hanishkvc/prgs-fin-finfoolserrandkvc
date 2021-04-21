@@ -468,6 +468,15 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             printFmts.extend([{'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.2f}",'str':'{:{width}}'},
                 {'num':"{:{width}.2f}",'str':'{:{width}}'}, {'num':"{:{width}.1f}",'str':'{:{width}}'}])
             printWidths.extend([7, 7, 7, 4])
+    elif analType == "block_avg":
+        dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
+        printHdr.extend(['AvgRank', 'blockAvgs', 'blockStds'])
+        metaDataAvgs = "{}Avgs".format(dataSrc)
+        metaDataStds = "{}Avgs".format(dataSrc)
+        theSaneArray = entDB.data[dataSrcMetaData][:,1].astype(float).copy()
+        theSaneArray[numpy.isinf(theSaneArray)] = iSkip
+        theSaneArray[numpy.isnan(theSaneArray)] = iSkip
+        iValidBlockAtBegin = 0
     elif analType == "block_ranked":
         printHdr.extend(['AvgRank', 'blockRanks', 'blockAvgs'])
         metaDataAvgs = "{}Avgs".format(dataSrc)
@@ -552,6 +561,10 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         curEntry[2] = numpy.round(curEntry[2],2)
         if analType == "roll_avg":
             curEntry[3:] = numpy.round(curEntry[3:],2)
+        elif analType == "block_avg":
+            extra = "{}:{}".format(hlpr.array_str(entDB.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2),
+                                    hlpr.array_str(entDB.data[metaDataStds][index, iValidBlockAtBegin:],6,2))
+            curEntry.append(extra)
         elif analType == "block_ranked":
             theSelected[-1] = theSelected[-1] + [ theRankArray[index] ]
             extra = "{}:{}".format(hlpr.array_str(theRankArray[index],4,"A0L1"), hlpr.array_str(entDB.data[metaDataAvgs][index, iValidBlockAtBegin:],6,2))
