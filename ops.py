@@ -451,6 +451,7 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         entDB.data[dataDstStds][:,iDst] = numpy.std(tBlockData,axis=1)
         entDB.data[dataDstQntls][:,iDst] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1],axis=1).transpose()
         iEnd = iStart
+    entDB.data[dataDstML] = []
     for i in range(entDB.nxtEntIndex):
         entDB.data[dataDstMD][i,0] = entDB.data[dataDstAvgs][i]
         entDB.data[dataDstMD][i,1] = numpy.mean(entDB.data[dataDstAvgs][i])
@@ -559,6 +560,7 @@ def srel(dataDst, dataSrc, entDB):
     entDB.data[dataDstMD][:,2] = durationInYears
     entDB.data[dataDstMD][:,3] = dStart
     entDB.data[dataDstMD][:,4] = dEnd
+    entDB.data[dataDstML] = []
     for i in range(entDB.nxtEntIndex):
         entDB.data[dataDst][i, :iStart[i]] = numpy.nan
         md = entDB.data[dataDstMD][i]
