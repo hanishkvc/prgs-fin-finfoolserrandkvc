@@ -325,8 +325,9 @@ def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):
     """
     Calculate the Moving average (simple or exponential) for the given dataSrc.
     """
-    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
+    entDB.data[dataDstMT] = 'movavg'
     xMA = _movavg_init(maDays, mode)
     _movavg(xMA, dataDst, dataSrc, entDB)
     entDB.data[dataDstMD], entDB.data[dataDstML] = valid_nonzero_firstlast_md(dataDst, entDB)
@@ -344,8 +345,9 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
     Calculate the absolute returns and or returnsPerAnnum as on endDate wrt/relative_to
     all the other dates.
     """
-    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
+    entDB.data[dataDstMT] = 'reton'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     entDB.data[dataDstMD] = numpy.ones([entDB.nxtEntIndex,historicGaps.shape[0]])*numpy.nan
@@ -383,8 +385,9 @@ def relto(dataDst, dataSrc, baseDate, entDB=None):
     """
     Calculate the absolute return for all dates wrt/relative_to a given base date.
     """
-    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
+    entDB.data[dataDstMT] = 'relto'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     baseDateIndex = entDB.datesD[baseDate]
@@ -424,8 +427,9 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         Could be used to skip Non Data blocks/duration at begining of RollRet op.
     """
     # Get generic things required
-    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
+    entDB.data[dataDstMT] = 'blockstats'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     # Prepare the job specific params
@@ -477,8 +481,9 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
         'abs' | 'retpa'
     """
     # Get generic things required
-    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
+    entDB.data[dataDstMT] = 'rollret'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     # Rolling ret related logic starts
@@ -536,8 +541,9 @@ def srel(dataDst, dataSrc, entDB):
         relative to the start date of that given entity.
     """
     # Get generic things required
-    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
     entDB = _entDB(entDB)
+    entDB.data[dataDstMT] = 'srel'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     # Rolling ret related logic starts

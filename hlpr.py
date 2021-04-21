@@ -404,14 +404,16 @@ def data_metakeys(dataKey):
     """
     Returns the possible Meta Keys related to given data key.
 
+    MetaType: This key identifies the type of Op which generated the MetaData
     MetaData: This key points to raw meta data wrt each entity, which can be
         processed further for comparing with other entities etc.
     MetaLabel: This key points to processed label/summary info wrt each entity.
         This is useful for labeling plots etc.
     """
+    mtypeKey="{}.MetaType".format(dataKey)
     mdataKey="{}.MetaData".format(dataKey)
     mlabelKey="{}.MetaLabel".format(dataKey)
-    return mdataKey, mlabelKey
+    return mtypeKey, mdataKey, mlabelKey
 
 
 def derive_keys(inKeys, keyNameTmpl="{}"):
