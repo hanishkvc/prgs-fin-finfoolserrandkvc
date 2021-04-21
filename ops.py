@@ -573,3 +573,26 @@ def srel(dataDst, dataSrc, entDB):
         entDB.data[dataDstML].append(srel_md2str(md))
 
 
+MDStrX = {
+    'srel': srel_md2str,
+    'relto': relto_md2str,
+    'reton': reton_md2str,
+    'rollret': rollret_md2str,
+    'blockstats': blockstats_md2str,
+    }
+def md_str(dataSrc, entIndex, entDB):
+    """
+    Allow MetaData associated with specified entity (entIndex) to
+    be retreived in string form, i.e provided there is a associated
+    meta data, for the specified data source. Else return empty string.
+    """
+    dataSrcMT, dataSrcMD, dataSrcML = hlpr.data_metakeys(dataSrc)
+    try:
+        md = entDB.data[dataSrcMD][entIndex]
+        mt = entDB.data[dataSrcMT]
+        if mt in MDStrX:
+            return MDStrX[mt](md)
+    except:
+        return ""
+
+
