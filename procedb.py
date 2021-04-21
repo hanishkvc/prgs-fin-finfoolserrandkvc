@@ -321,7 +321,7 @@ def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal', entD
 gAnalSimpleBasePrintFormats = [ "{:<{width}}", "{:{width}}", {'num':"{:{width}.2f}",'str':"{:{width}}"} ]
 gAnalSimpleBasePrintWidths =  [ 16, 40, 8 ]
 def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=None, numEntities=10, entCodes=None,
-                        minEntityLifeDataInYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64, entDB=None):
+                        minDataYears=1.5, bCurrentEntitiesOnly=True, bDebug=False, iClipNameWidth=64, entDB=None):
     """
     Look at specified data in dataSrc, and find top/bottom N entities.
     The rows of the dataSrc represent the entities and
@@ -383,10 +383,9 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         the specified list of entities. If None, then all entities
         in the loaded dataset will be considered, for ranking.
 
-    minEntityLifeDataInYears: This ranking logic will ignore entities
-        who have been in existance for less than the specified duration
-        of years, AND OR if we have data for only less than the specified
-        duration of years for the entity.
+    minDataYears: This sorting logic will ignore entities for which the
+        available data duration in the entities database is less than
+        that specified here.
 
         NOTE: The default is 1.5 years, If you have loaded less than that
         amount of data, then remember to set this to a smaller value,
@@ -401,7 +400,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             of data available for a given entity in the loaded dataset,
             While a dataSrc key which corresponds to a view of partial
             data from the loaded dataset, which is less than specified
-            minEntityLifeDataInYears, can still be done.
+            minDataYears, can still be done.
 
     bCurrentEntitiesOnly: Will drop entities which have not been seen
         in the last 1 week, wrt the dateRange currently loaded.
@@ -427,6 +426,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     else:
         iSkip = numpy.inf
     theSaneArray = None
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     if analType == 'normal':
         printHdr.extend(['Value'])
         if (type(theDate) == type(None)) and (type(theIndex) == type(None)):
@@ -507,19 +507,19 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         print("WARN:DBUG:AnalSimple:{}:{}: No SaneArray????".format(theAnal, dataSrc))
         breakpoint()
     theSaneArray = _forceval_entities(theSaneArray, entCodes, iSkip, 'invert', entDB=entDB)
-    if minEntityLifeDataInYears > 0:
-        dataYearsAvailable = entDB.nxtDateIndex/365
-        if (dataYearsAvailable < minEntityLifeDataInYears):
-            print("WARN:AnalSimple:{}: dataYearsAvailable[{}] < minENtityLifeDataInYears[{}]".format(theAnal, dataYearsAvailable, minEntityLifeDataInYears))
+    if minDataYears > 0:
+        dataYearsAvailable = entDB.nxtDateIndex/daysInAYear
+        if (dataYearsAvailable < minDataYears):
+            print("WARN:AnalSimple:{}: dataYearsAvailable[{}] < minDataYears[{}]".format(theAnal, dataYearsAvailable, minDataYears))
         srelMetaData, srelMetaLabel = hlpr.data_metakeys('srel')
         theSRelMetaData = entDB.data.get(srelMetaData, None)
         if type(theSRelMetaData) == type(None):
             ops('srel=srel(data)')
         if bDebug:
             tNames = numpy.array(entDB.meta['name'])
-            tDroppedNames = tNames[entDB.data[srelMetaData][:,2] < minEntityLifeDataInYears]
+            tDroppedNames = tNames[entDB.data[srelMetaData][:,2] < minDataYears]
             print("INFO:AnalSimple:{}:{}:Dropping if baby Entity".format(theAnal, dataSrc), tDroppedNames)
-        theSaneArray[entDB.data[srelMetaData][:,2] < minEntityLifeDataInYears] = iSkip
+        theSaneArray[entDB.data[srelMetaData][:,2] < minDataYears] = iSkip
     if bCurrentEntitiesOnly:
         oldEntities = numpy.nonzero(entDB.meta['lastSeen'] < (entDB.dates[entDB.nxtDateIndex-1]-7))[0]
         if bDebug:
@@ -620,21 +620,22 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
         for dataSrc in dataSrcs:
             print("\t{:16}: {}".format(dataSrc[0], entDB.data[dataSrc[1]][entIndex]))
 
-    dateDuration = entDB.nxtDateIndex/365
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
+    dateDuration = entDB.nxtDateIndex/daysInAYear
     if dateDuration > 1.5:
         dateDuration = 1.5
-    print("INFO:dateDuration:", dateDuration)
-    analR3Y = anal_simple('roll3Y', 'roll_avg', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    print("INFO:InfoSet1:AnalSimpleDateDurationSetTo:", dateDuration)
+    analR3Y = anal_simple('roll3Y', 'roll_avg', 'top', entCodes=entCodes, numEntities=len(entCodes), minDataYears=dateDuration, entDB=entDB)
     analR3YEntCodes = [ x[0] for x in analR3Y ]
     s1 = set(entCodes)
     s2 = set(analR3YEntCodes)
     otherEntCodes = s1-s2
-    analSRelRPA = anal_simple('srel', 'srel_retpa', 'top', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    analSRelRPA = anal_simple('srel', 'srel_retpa', 'top', entCodes=otherEntCodes, numEntities=len(otherEntCodes), minDataYears=dateDuration, entDB=entDB)
     analSRelRPAEntCodes = [ x[0] for x in analSRelRPA ]
     s3 = set(analSRelRPAEntCodes)
     entCodes = analR3YEntCodes + analSRelRPAEntCodes + list(s1-(s2.union(s3)))
 
-    anal_simple('blockNRoll3Y', 'block_ranked', 'top', entCodes=entCodes, numEntities=len(entCodes), minEntityLifeDataInYears=dateDuration, entDB=entDB)
+    anal_simple('blockNRoll3Y', 'block_ranked', 'top', entCodes=entCodes, numEntities=len(entCodes), minDataYears=dateDuration, entDB=entDB)
 
     totalEntities = len(entCodes)
     if numEntities > totalEntities:
