@@ -168,7 +168,11 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
             # Rolling ret data, bcas there arent enough days to calculate
             # rolling ret while satisfying the RollingRetWIndowSize requested.
             rollDays = hlpr.days_in(op[4:].split('_')[0], entDB.bSkipWeekends)
-            theOps.rollret(dataDst, dataSrc, rollDays, entDB)
+            if '_' in op:
+                opType = op.split('_')[1]
+            else:
+                opType = 'retpa'
+            theOps.rollret(dataDst, dataSrc, rollDays, opType, entDB)
         elif op.startswith("block"):
             blockDays = hlpr.days_in(op[5:], entDB.bSkipWeekends)
             theOps.blockstats(dataDst, dataSrc, blockDays, entDB)

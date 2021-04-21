@@ -9,6 +9,10 @@ import plot as eplot
 import hlpr
 
 
+# By default returns data is stored as percentage and not float
+gbRetDataAsFloat = False
+
+
 def _entDB(entDB=None):
     if not entDB:
         return edb.gEntDB
@@ -447,19 +451,30 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         entDB.data[dataDstML].append(blockstats_md2str(entDB.data[dataDstMD][i]))
 
 
-def rollret(dataDst, dataSrc, rollDays, entDB=None):
-    entDB.data[dataDstMetaData] = numpy.zeros([entDB.nxtEntIndex, 5])
+def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
+    """
+    Calculate the rolling return corresponding to the given rollDays,
+    for each day in the database.
+    rollDays: Calculate the returns got after the specified time duration.
+    rollType: Whether to keep the returns as AbsoluteReturn or ReturnPerAnnum.
+        'abs' | 'retpa'
+    """
+    # Get generic things required
+    dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
+    entDB = _entDB(entDB)
+    daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
+    startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
+    # Rolling ret related logic starts
     durationForPA = rollDays/daysInAYear
-    if '_' in op:
-        opType = op.split('_')[1]
-        if opType == 'abs':
-            durationForPA = 1
-    if gbRelDataPlusFloat:
-        tResult[r,rollDays:] = (entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA)
-    else:
-        tResult[r,rollDays:] = (((entDB.data[dataSrc][r,rollDays:]/entDB.data[dataSrc][r,:-rollDays])**(1/durationForPA))-1)*100
-    tResult[r,:rollDays] = numpy.nan
+    if rollType == 'abs':
+        durationForPA = 1
+    tResult = numpy.zeros(entDB.data[dataSrc].shape)
+    tResult[:,rollDays:] = (entDB.data[dataSrc][:,rollDays:]/entDB.data[dataSrc][:,:-rollDays])**(1/durationForPA)
+    if not gbRetDataAsFloat:
+        tResult = (tResult - 1)*100
+    tResult[:,:rollDays] = numpy.nan
     # Additional meta data
+    entDB.data[dataDstMD] = numpy.zeros([entDB.nxtEntIndex, 5])
     trValidResult = tResult[r][numpy.isfinite(tResult[r])]
     trLenValidResult = len(trValidResult)
     if trLenValidResult > 0:
