@@ -471,12 +471,12 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             print("INFO:AnalSimple:{}:{}:Dropping if baby Entity".format(theAnal, dataSrc), tDroppedNames)
         theSaneArray[entDB.data[srelMetaData][:,2] < minDataYears] = iSkip
     if bCurrentEntitiesOnly:
-        oldEntities = numpy.nonzero(entDB.meta['lastSeen'] < (entDB.dates[entDB.nxtDateIndex-1]-7))[0]
+        oldEntities = numpy.nonzero(entDB.meta['lastSeenDI'] < (entDB.nxtDateIndex-1-7))[0]
         if bDebug:
             #aNames = numpy.array(entDB.meta['name'])
             #print(aNames[oldEntities])
             for index in oldEntities:
-                print("DBUG:AnalSimple:{}:IgnoringOldEntity:{}, {}".format(theAnal, entDB.meta['name'][index], entDB.meta['lastSeen'][index]))
+                print("DBUG:AnalSimple:{}:IgnoringOldEntity:{}, {}".format(theAnal, entDB.meta['name'][index], entDB.dates[entDB.meta['lastSeenDI'][index]]))
         theSaneArray[oldEntities] = iSkip
     #theRows=numpy.argsort(theSaneArray)[-numEntities:]
     theRows=numpy.argsort(theSaneArray)
