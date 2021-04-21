@@ -49,7 +49,6 @@ def update_metas(op, dataSrc, dataDst, entDB=None):
 
 
 gbRelDataPlusFloat = False
-gfRollingRetPAMinThreshold = 4.0
 def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
     """
     Allow data from any valid data key in entDB.data to be operated on and the results to be saved
@@ -622,7 +621,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
         elif dataSrc[0] == 'srel':
             print((printFmt+"   AbsRet     RetPA   DurYrs : startVal  -  endVal").format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print((printFmt+"     Avg     Std [ <{}% ]  MaShaMT Yrs").format("code", "name", gfRollingRetPAMinThreshold))
+            print((printFmt+"     Avg     Std [ <{}% ]  MaShaMT Yrs").format("code", "name", theOps.gfMinRetPA))
             x = []
             y = []
             c = []

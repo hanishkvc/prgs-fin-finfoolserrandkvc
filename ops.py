@@ -11,6 +11,8 @@ import hlpr
 
 # By default returns data is stored as percentage and not float
 gbRetDataAsFloat = False
+# The Default MinRetPA assumed/checked wrt
+gfMinRetPA = 4.0
 
 
 def _entDB(entDB=None):
@@ -498,15 +500,15 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     trStd = numpy.std(trValid, axis=1)
     trStd.set_fill_value(numpy.nan)
     entDB.data[dataDstMD][:,1] = trStd.filled()
-    # The BelowMinThreshold
-    trValidBelowMinThreshold = numpy.count_nonzero(trValid < gfRollingRetPAMinThreshold)
-    trValidBelowMinThreshold.set_fill_value(numpy.nan)
+    # The BelowMinRetPA
+    trValidBelowMinRetPA = numpy.count_nonzero(trValid < gfMinRetPA, axis=1)
+    trValidBelowMinRetPA.set_fill_value(numpy.nan)
     trValidLens = numpy.count_nonzero(trValid, axis=1)
     trValidLens.set_fill_value(numpy.nan)
-    trBelowMinThreshold = (trValidBelowMinThreshold.filled()/trValidLens.filled())*100
-    entDB.data[dataDstMD][:,2] = trBelowMinThreshold
+    trBelowMinRetPA = (trValidBelowMinRetPA.filled()/trValidLens.filled())*100
+    entDB.data[dataDstMD][:,2] = trBelowMinRetPA
     # The MaSharpeMinT
-    trMaSharpeMinT = (trAvg-gfRollingRetPAMinThreshold)/trStd
+    trMaSharpeMinT = (trAvg-gfMinRetPA)/trStd
     trMaSharpeMinT.set_fill_value(numpy.nan)
     entDB.data[dataDstMD][:,3] = trMaSarpeMinT.filled()
     # Meta label and Years
