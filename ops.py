@@ -589,7 +589,7 @@ MDStrX = {
     'rollret': rollret_md2str,
     'blockstats': blockstats_md2str,
     }
-def md_str(dataSrc, entIndex, entDB):
+def _md_str(dataSrc, entIndex, entDB):
     """
     Allow MetaData associated with specified entity (entIndex) to
     be retreived in string form, i.e provided there is a associated
@@ -603,5 +603,15 @@ def md_str(dataSrc, entIndex, entDB):
             return MDStrX[mt](md)
     except:
         return ""
+
+
+def md_str(dataSrc, entCodes, entDB=None):
+    entDB = _entDB(entDB)
+    lStrs = []
+    for entCode in entCodes:
+        entIndex = entDB.meta['codeD'][entCode]
+        mdStr = _md_str(dataSrc, entIndex, entDB)
+        lStrs.append([entCode, mdStr])
+    return lStrs
 
 
