@@ -414,6 +414,12 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
     The data in the specified dataSrc is divided into blocks of blockDays duration
     and the statistics calculated for each resultant block.
     NOTE: Any Inf or NaN value will be converted to 0, before stats are calculated.
+    TODO1: Replace invalid with calculated avg, before calculating STD, so that it
+        is not affected by those entries much. Or rather better still simply ignore
+        invalid values, when calculating Std.
+    TODO2: Add a skipBlocksAtBegin argument, to skip any blocks at the begining of
+        the chain of blocks, if so specified by the user.
+        Could be used to skip Non Data blocks/duration at begining of RollRet op.
     """
     # Get generic things required
     dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
@@ -473,17 +479,28 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     if not gbRetDataAsFloat:
         tResult = (tResult - 1)*100
     tResult[:,:rollDays] = numpy.nan
-    # Additional meta data
+    # Create the meta data
     entDB.data[dataDstMD] = numpy.zeros([entDB.nxtEntIndex, 5])
-    trValidResult = tResult[r][numpy.isfinite(tResult[r])]
+    trValid = numpy.ma.masked_invalid(tResult)
+    # The Avgs
+    trAvg = numpy.mean(trValid, axis=1)
+    trAvg.set_fill_value(0) # Or maybe fill with NaN
+    entDB.data[dataDstMD][:,0] = trAvg.filled()
+    # The Stds
+    trStd = numpy.std(trValid, axis=1)
+    trStd.set_fill_value(0) # Or maybe fill with NaN
+    entDB.data[dataDstMD][:,1] = trStd.filled()
+    # The MaSharpeMinT
+    trMaSharpeMinT = (trAvg-gfRollingRetPAMinThreshold)/trStd
+    trMaSharpeMinT.set_fill_value(0) # Or maybe fill with NaN
+    entDB.data[dataDstMD][:,3] = trMaSarpeMinT.filled()
+
+
     trLenValidResult = len(trValidResult)
     if trLenValidResult > 0:
         trValidBelowMinThreshold = (trValidResult < gfRollingRetPAMinThreshold)
         trBelowMinThreshold = (numpy.count_nonzero(trValidBelowMinThreshold)/trLenValidResult)*100
         trBelowMinThresholdLabel = "[{:5.2f}%<]".format(trBelowMinThreshold)
-        trAvg = numpy.mean(trValidResult)
-        trStd = numpy.std(trValidResult)
-        trMaSharpeMinT = (trAvg-gfRollingRetPAMinThreshold)/trStd
     else:
         trBelowMinThreshold = numpy.nan
         trBelowMinThresholdLabel = "[--NA--<]"
