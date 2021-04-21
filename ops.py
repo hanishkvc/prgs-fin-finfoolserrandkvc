@@ -489,6 +489,7 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     if not gbRetDataAsFloat:
         tResult = (tResult - 1)*100
     tResult[:,:rollDays] = numpy.nan
+    entDB.data[dataDst] = tResult
     # Create the meta datas
     entDB.data[dataDstMD] = numpy.zeros([entDB.nxtEntIndex, 5])
     trValid = numpy.ma.masked_invalid(tResult)
@@ -510,7 +511,7 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     # The MaSharpeMinT
     trMaSharpeMinT = (trAvg-gfMinRetPA)/trStd
     trMaSharpeMinT.set_fill_value(numpy.nan)
-    entDB.data[dataDstMD][:,3] = trMaSarpeMinT.filled()
+    entDB.data[dataDstMD][:,3] = trMaSharpeMinT.filled()
     # Meta label and Years
     entDB.data[dataDstML] = []
     for i,md in enumerate(entDB.data[dataDstMD]):
