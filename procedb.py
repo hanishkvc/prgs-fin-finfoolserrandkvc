@@ -143,11 +143,11 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
 
                 MetaLabel = dataSrcMetaLabel, validMAResultBeginVal, validMAResultEndVal
 
-        "roll<DAYSInINT>[_abs]": Calculate a rolling return rate across the full date range, with a
-                windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
+        "roll<DAYSInINT>[_absret]": Calculate a rolling return rate across the full date range, with
+                a windowsize of DAYSInINT. Again the region at the begining of the dateRange, which
                 cant satisfy the windowsize to calculate the rolling return rate, will be set to
                 NaN.
-                If _abs is specified, it calculates absolute return.
+                If _absret is specified, it calculates absolute return.
                     If Not (i.e by default) it calculates the ReturnPerAnnum.
                 DAYSInINT: The gap in days over which the return is calculated.
                 MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT, YearsActive
@@ -216,8 +216,8 @@ def mabeta(dataSrc, refCode, entCodes, entDB=None):
     Value lower than 0 - Both entities move in dissimilar/oppositive manner.
     '''
     entDB = _entDB(entDB)
-    ops('roll1Abs=roll1_abs({})'.format(dataSrc))
-    return _mabeta('roll1Abs', refCode, entCodes)
+    ops('i.roll1Abs=roll1_absret({})'.format(dataSrc))
+    return _mabeta('i.roll1Abs', refCode, entCodes)
 
 
 def _forceval_entities(data, entCodes, forcedValue, entSelectType='normal', entDB=None):
