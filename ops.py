@@ -509,7 +509,7 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         entDB.data[dataDstMD][i,0] = entDB.data[dataDstAvgs][i]
         entDB.data[dataDstMD][i,1] = numpy.mean(entDB.data[dataDstAvgs][i])
         entDB.data[dataDstMD][i,2] = entDB.data[dataDstStds][i]
-        entDB.data[dataDstMD][i,3] = numpy.mean(entDB.data[dataDstStds][i])
+        entDB.data[dataDstMD][i,3] = numpy.nanmean(entDB.data[dataDstStds][i])
         entDB.data[dataDstML].append(blockstats_md2str(entDB.data[dataDstMD][i]))
 
 
