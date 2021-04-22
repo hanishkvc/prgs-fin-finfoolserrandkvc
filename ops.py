@@ -371,7 +371,8 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
     entDB.data[dataDst] = tResult
     # Handle meta data
     entDB.data[dataDstMD] = numpy.ones([entDB.nxtEntIndex,historicGaps.shape[0]])*numpy.nan
-    entDB.data[dataDstMD][:, :validHistoric.shape[0]] = tResult[:, -(validHistoric+1)]
+    retOnDateDelta = endDateIndex-retOnDateIndex
+    entDB.data[dataDstMD][:, :validHistoric.shape[0]] = tResult[:, -(validHistoric+1+retOnDateDelta)]
     entDB.data[dataDstML] = []
     for md in entDB.data[dataDstMD]:
         entDB.data[dataDstML].append(reton_md2str(md))

@@ -143,6 +143,9 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 If type is not specified, it is assumed to be safe type.
                 MetaData  = Ret for 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
                 MetaLabel = Ret for 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+                Note: One could specify a specific date for which historic returns as on that date
+                    needs to be calculated by using notation reton<Date>[_Type]. This has not been
+                    fully tested yet.
 
         "ma<s|e><DAYSInINT>": Calculate a moving average across the full date range, with a windowsize
                 of DAYSInINT. As there wont be sufficient historic data to calculate ma wrt the begin
