@@ -19,11 +19,6 @@ import edb
 import ops as theOps
 
 
-# 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
-gHistoricGapsWithWeekends = numpy.array([1, 7, 30, 91, 182, 365, 1095, 1825, 3650])
-gHistoricGapsNoWeekends =   numpy.array([1, 5, 21, 65, 130, 260, 782, 1303, 2607])
-gHistoricGapsHdr = numpy.array(["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
-
 
 def _entDB(entDB=None):
     """
@@ -35,15 +30,6 @@ def _entDB(entDB=None):
     return entDB
 
 
-def _gHistoricGaps(entDB=None):
-    entDB = _entDB(entDB)
-    if entDB.bSkipWeekends:
-        gHistoricGaps = gHistoricGapsNoWeekends
-    else:
-        gHistoricGaps = gHistoricGapsWithWeekends
-    return gHistoricGaps
-
-
 def update_metas(op, dataSrc, dataDst, entDB=None):
     pass
 
@@ -53,7 +39,6 @@ def _ops(curOp, startDate, endDate, entDB):
     THe helper which processes the individual op for ops function.
     This inturn depends on the ops module to do the actual op.
     """
-    gHistoricGaps = _gHistoricGaps(entDB)
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(startDate, endDate)
     curOpFull = curOp
@@ -103,7 +88,7 @@ def _ops(curOp, startDate, endDate, entDB):
         else:
             retonDate = int(retonT[5:])
             retonDateIndex = entDB.datesD[retonDate]
-        theOps.reton(dataDst, dataSrc, retonDateIndex, retonType, gHistoricGaps, entDB)
+        theOps.reton(dataDst, dataSrc, retonDateIndex, retonType, None, entDB)
     update_metas(op, dataSrc, dataDst)
 
 
@@ -583,7 +568,7 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
     for dataSrc in dataSrcs:
         print("DataSrc:{}: >>showing {} of {} entities<<".format(dataSrc, numEntities, totalEntities))
         if dataSrc[0] in [ 'absRet', 'retOn' ]:
-            print((printFmt+" {}").format("code", "name",hlpr.array_str(gHistoricGapsHdr, width=7)))
+            print((printFmt+" {}").format("code", "name",hlpr.array_str(theOps.gHistoricGapsHdr, width=7)))
         elif dataSrc[0] == 'srel':
             print((printFmt+"   AbsRet     RetPA   DurYrs : startVal  -  endVal").format("code", "name"))
         elif dataSrc[0].startswith('roll'):
@@ -627,11 +612,11 @@ def infoset1_result2_entcodes(entCodes=None, bPrompt=True, numEntities=20, entDB
     lTop = set()
     lBot = set()
     for i in [0, 1, 2, 3]:
-        print("INFO:InfoSet1Result2: Top {} entities wrt last {}".format(numEntities, gHistoricGapsHdr[i]))
+        print("INFO:InfoSet1Result2: Top {} entities wrt last {}".format(numEntities, theOps.gHistoricGapsHdr[i]))
         t = anal_simple('roabsMetaData', 'normal', 'top', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
         for tEnt in [x[0] for x in t]:
             lTop.add(tEnt)
-        print("INFO:InfoSet1Result2: Bottom {} entities wrt last {}".format(numEntities, gHistoricGapsHdr[i]))
+        print("INFO:InfoSet1Result2: Bottom {} entities wrt last {}".format(numEntities, theOps.gHistoricGapsHdr[i]))
         b = anal_simple('roabsMetaData', 'normal', 'bottom', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
         for tEnt in [x[0] for x in b]:
             lBot.add(tEnt)

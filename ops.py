@@ -21,6 +21,21 @@ def _entDB(entDB=None):
     return entDB
 
 
+# 1D, 1W, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y
+gHistoricGapsWithWeekends = numpy.array([1, 7, 30, 91, 182, 365, 1095, 1825, 3650])
+gHistoricGapsNoWeekends =   numpy.array([1, 5, 21, 65, 130, 260, 782, 1303, 2607])
+gHistoricGapsHdr = numpy.array(["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "10Y"])
+
+
+def _gHistoricGaps(entDB=None):
+    entDB = _entDB(entDB)
+    if entDB.bSkipWeekends:
+        gHistoricGaps = gHistoricGapsNoWeekends
+    else:
+        gHistoricGaps = gHistoricGapsWithWeekends
+    return gHistoricGaps
+
+
 def print_pivotpoints(dataKey, entCodes, tag="", bPrintHdr=True, entDB=None):
     """
     Print the pivot points corresponding to all the entCodes passed.
@@ -333,6 +348,11 @@ def movavg(dataDst, dataSrc, maDays, mode='s', entDB=None):
     entDB.data[dataDstMD], entDB.data[dataDstML] = valid_nonzero_firstlast_md(dataDst, entDB)
 
 
+def reton_mdhdr():
+    #return "Historic returns as on given date"
+    return hlpr.array_str(gHistoricGapsHdr, width=7)
+
+
 def reton_md2str(entMD):
     """
     Convert retOn meta data into string.
@@ -340,7 +360,7 @@ def reton_md2str(entMD):
     return hlpr.array_str(entMD, width=7)
 
 
-def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None):
+def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps=None, entDB=None):
     """
     Calculate the absolute returns and or returnsPerAnnum as on endDate wrt/relative_to
     all the other dates.
@@ -352,6 +372,8 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     # Work on reton
+    if historicGaps == None:
+        historicGaps = _gHistoricGaps(entDB)
     validHistoric = historicGaps[historicGaps < (retonDateIndex+1)]
     histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
     retonData = entDB.data[dataSrc][:, retonDateIndex].reshape(entDB.nxtEntIndex,1)
