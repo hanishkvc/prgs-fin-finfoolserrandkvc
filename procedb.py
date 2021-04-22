@@ -316,7 +316,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         if required.
 
         NOTE: It expects the info about duration for which data is
-        available for each entity, to be available under 'srelMetaData'
+        available for each entity, to be available under 'srel.MetaData'
         key. If this is not the case, it will trigger a generic 'srel'
         operation through ops to generate the same.
 
@@ -613,11 +613,11 @@ def infoset1_result2_entcodes(entCodes=None, bPrompt=True, numEntities=20, entDB
     lBot = set()
     for i in [0, 1, 2, 3]:
         print("INFO:InfoSet1Result2: Top {} entities wrt last {}".format(numEntities, theOps.gHistoricGapsHdr[i]))
-        t = anal_simple('roabsMetaData', 'normal', 'top', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
+        t = anal_simple('roabs.MetaData', 'normal', 'top', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
         for tEnt in [x[0] for x in t]:
             lTop.add(tEnt)
         print("INFO:InfoSet1Result2: Bottom {} entities wrt last {}".format(numEntities, theOps.gHistoricGapsHdr[i]))
-        b = anal_simple('roabsMetaData', 'normal', 'bottom', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
+        b = anal_simple('roabs.MetaData', 'normal', 'bottom', theIndex=i, entCodes=entCodes, numEntities=numEntities, entDB=entDB)
         for tEnt in [x[0] for x in b]:
             lBot.add(tEnt)
         if bPrompt:
