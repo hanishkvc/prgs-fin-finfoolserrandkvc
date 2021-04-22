@@ -325,11 +325,16 @@ def _movavg(xMA, dataDst, dataSrc, entDB):
     entDB.data[dataDst][:,:weightsLen-1] = numpy.nan
 
 
+def movavg_mdhdr():
+    label = "{:9} - {:9}".format("Start", "End")
+    return label
+
+
 def movavg_md2str(entMD):
     """
     Convert moving averages meta data into string.
     """
-    label = "{:8.4f} - {:8.4f}".format(entMD[0], entMD[1])
+    label = "{:9.4f} - {:9.4f}".format(entMD[0], entMD[1])
     return label
 
 
@@ -401,7 +406,7 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps=None, entDB=
 
 
 def relto_mdhdr():
-    label = "{:6}% {:6}%pa {:4}Yrs : {:8} - {:8}".format("AbsRet", "Ret", "Aliv", "Base", "End")
+    label = "{:7}% {:7}%pa {:4}Yrs : {:9} - {:9}".format("AbsRet", "Ret", "Aliv", "Base", "End")
     return label
 
 
@@ -409,7 +414,7 @@ def relto_md2str(entMD):
     """
     Convert the relto MetaData to string
     """
-    label = "{:6.2f}% {:6.2f}%pa {:4.1f}Yrs : {:8.4f} - {:8.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
+    label = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
     return label
 
 
@@ -446,12 +451,11 @@ def relto(dataDst, dataSrc, baseDate, entDB=None):
 
 def blockstats_mdhdr():
     label = "<{} {:7} {:7}>".format("BlockAvgs", "AvgAvgs", "AvgStds")
-    label = "<{} {:5} {:5}>".format("BlockAvgs", "Avg", "Std")
     return label
 
 
 def blockstats_md2str(entMD):
-    label = "<{} {:5.2f} {:5.2f}>".format(hlpr.array_str(entMD[0],4,1), entMD[1], entMD[3])
+    label = "<{} {:7.2f} {:7.2f}>".format(hlpr.array_str(entMD[0],4,1), entMD[1], entMD[3])
     return label
 
 
