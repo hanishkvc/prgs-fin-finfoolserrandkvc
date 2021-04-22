@@ -365,7 +365,7 @@ def reton_md2str(entMD):
     return hlpr.array_str(entMD, width=7)
 
 
-def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps=None, entDB=None):
+def reton(dataDst, dataSrc, retOnDateIndex, retOnType, historicGaps=None, entDB=None):
     """
     Calculate the absolute returns and or returnsPerAnnum as on endDate wrt/relative_to
     all the other dates.
@@ -376,17 +376,17 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps=None, entDB=
     entDB.data[dataDstMT] = 'reton'
     daysInAYear = hlpr.days_in('1Y', entDB.bSkipWeekends)
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
-    # Work on reton
+    # Work on retOn
     if historicGaps == None:
         historicGaps = _gHistoricGaps(entDB)
-    validHistoric = historicGaps[historicGaps < (retonDateIndex+1)]
-    histDays = abs(numpy.arange(endDateIndex+1)-retonDateIndex)
-    retonData = entDB.data[dataSrc][:, retonDateIndex].reshape(entDB.nxtEntIndex,1)
-    tROAbs = ((retonData/entDB.data[dataSrc])-1)*100
-    tRORPA = (((retonData/entDB.data[dataSrc])**(daysInAYear/histDays))-1)*100
-    if retonType == 'absret':
+    validHistoric = historicGaps[historicGaps < (retOnDateIndex+1)]
+    histDays = abs(numpy.arange(endDateIndex+1)-retOnDateIndex)
+    retOnData = entDB.data[dataSrc][:, retOnDateIndex].reshape(entDB.nxtEntIndex,1)
+    tROAbs = ((retOnData/entDB.data[dataSrc])-1)*100
+    tRORPA = (((retOnData/entDB.data[dataSrc])**(daysInAYear/histDays))-1)*100
+    if retOnType == 'absret':
         tResult = tROAbs
-    elif retonType == 'retpa':
+    elif retOnType == 'retpa':
         tResult = tRORPA
     else:
         if len(tROAbs) > daysInAYear:
