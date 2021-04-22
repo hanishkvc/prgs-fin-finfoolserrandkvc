@@ -326,7 +326,7 @@ def _movavg(xMA, dataDst, dataSrc, entDB):
 
 
 def movavg_mdhdr():
-    label = "{:>9} - {:>9}".format("StartVal", "EndVal")
+    label = "{:>10} - {:>10}".format("StartVal", "EndVal")
     return label
 
 
@@ -334,7 +334,7 @@ def movavg_md2str(entMD):
     """
     Convert moving averages meta data into string.
     """
-    label = "{:9.4f} - {:9.4f}".format(entMD[0], entMD[1])
+    label = "{:10.4f} - {:10.4f}".format(entMD[0], entMD[1])
     return label
 
 
@@ -406,7 +406,7 @@ def reton(dataDst, dataSrc, retOnDateIndex, retOnType, historicGaps=None, entDB=
 
 
 def relto_mdhdr():
-    label = "{:>7}  {:>7}    {:4}Yrs : {:>9} - {:>9}".format("AbsRet%", "RetPA%", "Aliv", "BaseVal", "EndVal")
+    label = "{:>7}% {:>7}%pa {:4}Yrs : {:>10} - {:>10}".format("AbsRet", "Ret", "Aliv", "BaseVal", "EndVal")
     return label
 
 
@@ -414,7 +414,7 @@ def relto_md2str(entMD):
     """
     Convert the relto MetaData to string
     """
-    label = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
+    label = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:10.4f} - {:10.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
     return label
 
 
@@ -512,7 +512,7 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
 
 
 def rollret_mdhdr():
-    theStr = "{:>7} {:>7} [{:5.2f}%<] {:7} {:>4}".format("Avg", "Std", gfMinRetPA, "MaShaMT", "Yrs")
+    theStr = "{:>7} {:>7} [{:6.2f}%<] {:7} {:>4}".format("Avg", "Std", gfMinRetPA, "MaShaMT", "Yrs")
     return theStr
 
 
@@ -520,7 +520,7 @@ def rollret_md2str(entMD):
     """
     Convert the entity MetaData wrt rollret op to a string.
     """
-    theStr = "{:7.2f} {:7.2f} [{:5.2f}%<] {:7.2f} {:4.1f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
+    theStr = "{:7.2f} {:7.2f} [{:6.2f}%<] {:7.2f} {:4.1f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
     return theStr
 
 
@@ -580,12 +580,12 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
 
 
 def srel_mdhdr():
-    theHdr = "{:>7}  {:>7}    {:4}Yrs : {:>9} - {:>9}".format("AbsRet%", "RetPA%", "Aliv", "StartVal", "EndVal")
+    theHdr = "{:>7}% {:>7}%pa {:4}Yrs : {:>10} - {:>10}".format("AbsRet", "Ret", "Aliv", "StartVal", "EndVal")
     return theHdr
 
 
 def srel_md2str(entMD):
-    theStr = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:9.4f} - {:9.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
+    theStr = "{:7.2f}% {:7.2f}%pa {:4.1f}Yrs : {:10.4f} - {:10.4f}".format(entMD[0], entMD[1], entMD[2], entMD[3], entMD[4])
     return theStr
 
 
