@@ -406,7 +406,7 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps=None, entDB=
 
 
 def relto_mdhdr():
-    label = "{:7}% {:7}%pa {:4}Yrs : {:9} - {:9}".format("AbsRet", "Ret", "Aliv", "Base", "End")
+    label = "{:7}  {:7}    {:4}Yrs : {:9} - {:9}".format("AbsRet%", "RetPA%", "Aliv", "Base", "End")
     return label
 
 
@@ -580,7 +580,7 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
 
 
 def srel_mdhdr():
-    theHdr = "{:7}% {:7}%pa {:4}Yrs : {:9} - {:9}".format("AbsRet", "Ret", "Aliv", "Start", "End")
+    theHdr = "{:7}  {:7}    {:4}Yrs : {:9} - {:9}".format("AbsRet%", "RetPA%", "Aliv", "Start", "End")
     return theHdr
 
 
