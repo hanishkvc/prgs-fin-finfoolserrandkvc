@@ -377,6 +377,11 @@ def reton(dataDst, dataSrc, retonDateIndex, retonType, historicGaps, entDB=None)
         entDB.data[dataDstML].append(reton_md2str(md))
 
 
+def relto_mdhdr():
+    label = "{:6}% {:6}%pa {:4}Yrs : {:8} - {:8}".format("AbsRet", "Ret", "Aliv", "Base", "End")
+    return label
+
+
 def relto_md2str(entMD):
     """
     Convert the relto MetaData to string
@@ -414,6 +419,12 @@ def relto(dataDst, dataSrc, baseDate, entDB=None):
     entDB.data[dataDstML] = []
     for md in entDB.data[dataDstMD]:
         entDB.data[dataDstML].append(relto_md2str(md))
+
+
+def blockstats_mdhdr():
+    label = "<{} {:7} {:7}>".format("BlockAvgs", "AvgAvgs", "AvgStds")
+    label = "<{} {:5} {:5}>".format("BlockAvgs", "Avg", "Std")
+    return label
 
 
 def blockstats_md2str(entMD):
@@ -471,6 +482,11 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         entDB.data[dataDstMD][i,2] = entDB.data[dataDstStds][i]
         entDB.data[dataDstMD][i,3] = numpy.mean(entDB.data[dataDstStds][i])
         entDB.data[dataDstML].append(blockstats_md2str(entDB.data[dataDstMD][i]))
+
+
+def rollret_mdhdr():
+    theStr = "{:7} {:7} [{:5.2f}%<] {:7} {:4}".format("Avg", "Std", gfMinRetPA, "MaShaMT", "Yrs")
+    return theStr
 
 
 def rollret_md2str(entMD):
@@ -534,6 +550,11 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     entDB.data[dataDstML] = []
     for md in entDB.data[dataDstMD]:
         entDB.data[dataDstML].append(rollret_md2str(md))
+
+
+def srel_mdhdr():
+    theHdr = "{:7}% {:7}%pa {:4}Yrs : {:9} - {:9}".format("AbsRet", "Ret", "Aliv", "Start", "End")
+    return theHdr
 
 
 def srel_md2str(entMD):
