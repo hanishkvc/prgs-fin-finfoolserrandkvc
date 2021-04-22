@@ -570,9 +570,9 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
         if dataSrc[0] in [ 'absRet', 'retOn' ]:
             print((printFmt+" {}").format("code", "name", theOps.reton_mdhdr()))
         elif dataSrc[0] == 'srel':
-            print((printFmt+theOps.srel_mdhdr()).format("code", "name"))
+            print((printFmt+" {}").format("code", "name", theOps.srel_mdhdr()))
         elif dataSrc[0].startswith('roll'):
-            print((printFmt+theOps.rollret_mdhdr()).format("code", "name"))
+            print((printFmt+" {}").format("code", "name", theOps.rollret_mdhdr()))
             x = []
             y = []
             c = []
