@@ -464,10 +464,9 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
     Calculate stats like Avg,STD,Qnts wrt each block of data.
     The data in the specified dataSrc is divided into blocks of blockDays duration
     and the statistics calculated for each resultant block.
-    NOTE: Any Inf or NaN value will be converted to 0, before stats are calculated.
-    TODO1: Replace invalid with calculated avg, before calculating STD, so that it
-        is not affected by those entries much. Or rather better still simply ignore
-        invalid values, when calculating Std.
+    NOTE: Any Inf or NaN value will be converted to 0, before Avgs are calculated.
+    NOTE: Any Inf or NaN value are masked before Stds are calculated, so that they
+        dont impact the result.
     TODO2: Add a skipBlocksAtBegin argument, to skip any blocks at the begining of
         the chain of blocks, if so specified by the user.
         Could be used to skip Non Data blocks/duration at begining of RollRet op.
@@ -498,8 +497,11 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
         tBlockData = entDB.data[dataSrc][:,iStart:iEnd].copy()
         tBlockData[~numpy.isfinite(tBlockData)] = 0
         entDB.data[dataDstAvgs][:,iDst] = numpy.mean(tBlockData,axis=1)
-        entDB.data[dataDstStds][:,iDst] = numpy.std(tBlockData,axis=1)
         entDB.data[dataDstQntls][:,iDst] = numpy.quantile(tBlockData,[0,0.25,0.5,0.75,1],axis=1).transpose()
+        tBlockData = numpy.ma.masked_invalid(entDB.data[dataSrc][:,iStart:iEnd])
+        tStds = numpy.std(tBlockData,axis=1)
+        tStds.set_fill_value(numpy.nan)
+        entDB.data[dataDstStds][:,iDst] = tStds.filled()
         iEnd = iStart
     # Do the needful wrt MetaData/Label
     entDB.data[dataDstML] = []
