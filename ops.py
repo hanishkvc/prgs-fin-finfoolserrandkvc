@@ -326,7 +326,7 @@ def _movavg(xMA, dataDst, dataSrc, entDB):
 
 
 def movavg_mdhdr():
-    label = "{:9} - {:9}".format("StartVal", "EndVal")
+    label = "{:>9} - {:>9}".format("StartVal", "EndVal")
     return label
 
 
@@ -406,7 +406,7 @@ def reton(dataDst, dataSrc, retOnDateIndex, retOnType, historicGaps=None, entDB=
 
 
 def relto_mdhdr():
-    label = "{:7}  {:7}    {:4}Yrs : {:9} - {:9}".format("AbsRet%", "RetPA%", "Aliv", "BaseVal", "EndVal")
+    label = "{:>7}  {:>7}    {:4}Yrs : {:>9} - {:>9}".format("AbsRet%", "RetPA%", "Aliv", "BaseVal", "EndVal")
     return label
 
 
@@ -512,7 +512,7 @@ def blockstats(dataDst, dataSrc, blockDays, entDB=None):
 
 
 def rollret_mdhdr():
-    theStr = "{:7} {:7} [{:5.2f}%<] {:7} {:4}".format("Avg", "Std", gfMinRetPA, "MaShaMT", "Yrs")
+    theStr = "{:>7} {:>7} [{:5.2f}%<] {:7} {:>4}".format("Avg", "Std", gfMinRetPA, "MaShaMT", "Yrs")
     return theStr
 
 
@@ -580,7 +580,7 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
 
 
 def srel_mdhdr():
-    theHdr = "{:7}  {:7}    {:4}Yrs : {:9} - {:9}".format("AbsRet%", "RetPA%", "Aliv", "StartVal", "EndVal")
+    theHdr = "{:>7}  {:>7}    {:4}Yrs : {:>9} - {:>9}".format("AbsRet%", "RetPA%", "Aliv", "StartVal", "EndVal")
     return theHdr
 
 
