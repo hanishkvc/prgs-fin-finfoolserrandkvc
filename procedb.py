@@ -259,7 +259,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
     order: could be either 'top' or 'bottom'
 
     analType: could be one of 'normal', 'srel_absret', 'srel_retpa',
-        'roll_avg', 'block_ranked'
+        'roll_avg', 'block_ranked', 'block_avg'
 
         normal: Look at data corresponding to identified date or index,
         in the given dataSrc, to decide on entities to select.
@@ -274,16 +274,20 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
 
         roll_avg: look at Average ReturnsPerAnnum, calculated using
         rolling return (dataSrc specified should be generated using
-        roll operation), to decide on entities ranking.
+        roll operation), to decide on entities ordering/selection.
 
         block_ranked: look at the Avgs calculated by block op,
-        for each sub date periods(blocks), rank them and average
+        for each sub date periods(i.e blocks), rank them and average
         over all the sub date periods to calculate the rank for
         full date Range. Use this final rank to decide on entities
-        ranking. (dataSrc should have been generated using block
+        ordering. (dataSrc should have been generated using block
         operation).
 
-        block_avg:
+        block_avg: Look at Avg of Averages calculated by block op,
+        to order the entities. User can also do a equivalent anal
+        by running
+
+            anal_simple('blockOpDst.MetaData', 'normal', theIndex=1)
 
     theDate and theIndex: [Used by normal analType]
         If both are None, then the logic will try to find a date
@@ -398,7 +402,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         dataSrcMetaType, dataSrcMetaData, dataSrcMetaLabel = hlpr.data_metakeys(dataSrc)
         printHdr.extend(['AvgRank', 'blockAvgs', 'blockStds'])
         metaDataAvgs = "{}Avgs".format(dataSrc)
-        metaDataStds = "{}Avgs".format(dataSrc)
+        metaDataStds = "{}Stds".format(dataSrc)
         theSaneArray = entDB.data[dataSrcMetaData][:,1].astype(float).copy()
         theSaneArray[numpy.isinf(theSaneArray)] = iSkip
         theSaneArray[numpy.isnan(theSaneArray)] = iSkip
