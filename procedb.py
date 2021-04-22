@@ -568,11 +568,11 @@ def infoset1_result1_entcodes(entCodes, bPrompt=False, numEntities=-1, entDB=Non
     for dataSrc in dataSrcs:
         print("DataSrc:{}: >>showing {} of {} entities<<".format(dataSrc, numEntities, totalEntities))
         if dataSrc[0] in [ 'absRet', 'retOn' ]:
-            print((printFmt+" {}").format("code", "name",hlpr.array_str(theOps.gHistoricGapsHdr, width=7)))
+            print((printFmt+" {}").format("code", "name", theOps.reton_mdhdr()))
         elif dataSrc[0] == 'srel':
-            print((printFmt+"   AbsRet     RetPA   DurYrs : startVal  -  endVal").format("code", "name"))
+            print((printFmt+theOps.srel_mdhdr()).format("code", "name"))
         elif dataSrc[0].startswith('roll'):
-            print((printFmt+"     Avg     Std [ <{}% ]  MaShaMT Yrs").format("code", "name", theOps.gfMinRetPA))
+            print((printFmt+theOps.rollret_mdhdr()).format("code", "name"))
             x = []
             y = []
             c = []
