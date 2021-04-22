@@ -283,6 +283,8 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
         ranking. (dataSrc should have been generated using block
         operation).
 
+        block_avg:
+
     theDate and theIndex: [Used by normal analType]
         If both are None, then the logic will try to find a date
         which contains atleast some valid data, starting from the
@@ -368,7 +370,7 @@ def anal_simple(dataSrc, analType='normal', order="top", theDate=None, theIndex=
             if (type(theIndex) == type(None)) and (type(theDate) != type(None)):
                 startDateIndex, theIndex = entDB.daterange2index(theDate, theDate)
             #print("DBUG:AnalSimple:{}:theIndex:{}".format(theAnal, theIndex))
-            theSaneArray = entDB.data[dataSrc][:,theIndex].copy()
+            theSaneArray = entDB.data[dataSrc][:,theIndex].copy().astype(float)
             theSaneArray[numpy.isinf(theSaneArray)] = iSkip
             theSaneArray[numpy.isnan(theSaneArray)] = iSkip
     elif analType.startswith("srel"):
