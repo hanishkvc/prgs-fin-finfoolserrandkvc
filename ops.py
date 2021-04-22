@@ -530,7 +530,7 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     for each day in the database.
     rollDays: Calculate the returns got after the specified time duration.
     rollType: Whether to keep the returns as AbsoluteReturn or ReturnPerAnnum.
-        'abs' | 'retpa'
+        'absret' | 'retpa'
     """
     # Get generic things required
     dataDstMT, dataDstMD, dataDstML = hlpr.data_metakeys(dataDst)
@@ -540,7 +540,7 @@ def rollret(dataDst, dataSrc, rollDays, rollType, entDB=None):
     startDateIndex, endDateIndex = entDB.daterange2index(-1, -1)
     # Rolling ret related logic starts
     durationForPA = rollDays/daysInAYear
-    if rollType == 'abs':
+    if rollType == 'absret':
         durationForPA = 1
     tResult = numpy.zeros(entDB.data[dataSrc].shape)
     tResult[:,rollDays:] = (entDB.data[dataSrc][:,rollDays:]/entDB.data[dataSrc][:,:-rollDays])**(1/durationForPA)

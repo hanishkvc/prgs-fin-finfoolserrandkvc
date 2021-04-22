@@ -148,7 +148,7 @@ def ops(opsList, startDate=-1, endDate=-1, bDebug=False, entDB=None):
                 cant satisfy the windowsize to calculate the rolling return rate, will be set to
                 NaN.
                 If _absret is specified, it calculates absolute return.
-                    If Not (i.e by default) it calculates the ReturnPerAnnum.
+                    If Not (i.e by default) it calculates the ReturnPerAnnum (_retpa).
                 DAYSInINT: The gap in days over which the return is calculated.
                 MetaData  = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT, YearsActive
                 MetaLabel = RollRetAvg, RollRetStd, RollRetBelowMinThreshold, MaSharpeMinT, YearsActive
