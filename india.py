@@ -227,6 +227,8 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "ISSUE", "" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
+        [ "RS.", "" ],
+        [ "RE.", "" ],
         [ "RS", "" ],
         [ "RE", "" ],
         [ "FROM", "" ],
@@ -258,8 +260,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'B'
                     bAdd = True
                 elif purpose.startswith('SPLIT'):
-                    if "FV" not in purposes:
-                        input("DBUG:IndiaStks:parse_purposes:{}:{}:Split without FV?:{}:{}".format(code, exDate, purposes, purpose))
+                    #if "FV" not in purposes:
+                    #    input("DBUG:IndiaStks:parse_purposes:{}:{}:Split without FV?:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
                     cur,new = float(parts[1]),float(parts[3])
                     adj = new/cur
