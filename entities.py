@@ -176,6 +176,8 @@ class EntitiesDB:
         """
         Add a category (of info|data) to the more dictionary.
         """
+        if cat in self.more:
+            return
         if catType == list:
             self.more[cat] = []
         else:

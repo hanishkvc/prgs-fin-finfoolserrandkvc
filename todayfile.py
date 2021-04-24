@@ -20,7 +20,7 @@ def init(date, dataKeys):
         'entTypes': {},
         'dataKeys': dataKeys,
         'codeD': {},
-        'data': []
+        'data': [],
         'more': {}
         }
     return today
@@ -59,6 +59,8 @@ def add_morecat(today, cat, catType=list):
     wrt entities or given date or so.
     The category could either be a list or dictionary of items.
     """
+    if cat in today['more']:
+        return
     if catType == list:
         today['more'][cat] = []
     else:
