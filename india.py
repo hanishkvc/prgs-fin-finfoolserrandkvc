@@ -157,15 +157,16 @@ class IndiaSTKDS(datasrc.DataSrc):
 
     def _get_parts(self, fName):
         date = time.strptime(fName[-12:-4], "%Y%m%d")
-        csvFile = time.strftime("Pd%d%m%y.csv", date)
+        csvPDFile = time.strftime("Pd%d%m%y.csv", date)
+        csvBCFile = time.strftime("Bc%d%m%y.csv", date)
         #print("DBUG:{}:GetParts:{},{}".format(self.tag, csvFile, date))
-        return csvFile, date
+        return csvPDFile, csvBCFile, date
 
 
     def _valid_remotefile(self, fName):
         z = zipfile.ZipFile(fName)
-        csvFile, dateT = self._get_parts(fName)
-        f = z.open(csvFile)
+        csvPDFile, csvBCFile, dateT = self._get_parts(fName)
+        f = z.open(csvPDFile)
         l = f.readline()
         l = l.decode()
         f.close()
@@ -174,13 +175,11 @@ class IndiaSTKDS(datasrc.DataSrc):
         return True
 
 
-    def _parse_file(self, sFile, today):
+    def _parse_pdfile(self, csvPDFile, today):
         """
-        Parse the specified data csv file and load it into passed today dictionary.
+        Parse the Pd file containing stocks related data.
         """
-        z = zipfile.ZipFile(sFile)
-        csvFile, dateT = self._get_parts(sFile)
-        tFile = z.open(csvFile)
+        tFile = z.open(csvPDFile)
         tFile.readline()
         for l in tFile:
             l = l.decode(errors='ignore')
@@ -216,9 +215,69 @@ class IndiaSTKDS(datasrc.DataSrc):
                 #print(code, name, nav, date)
                 todayfile.add_ent(today, code, name, values, curType, date)
             except:
-                print("ERRR:IndiaSTKDS:parse_csv:{}".format(l))
+                print("ERRR:IndiaSTKDS:parse_pd_csv:{}".format(l))
                 traceback.print_exc()
         tFile.close()
+
+
+    def _parse_bcfile(self, csvBCFile, today):
+        """
+        Parse the Bc file containing corporate actions related to stocks.
+        """
+        today.add_morecat('CorpAct')
+        tFile = z.open(csvBCFile)
+        tFile.readline()
+        for l in tFile:
+            l = l.decode(errors='ignore')
+            l = l.strip()
+            lt = l.split(',')
+            la = []
+            for c in lt:
+                la.append(c.strip())
+            if la[0] == '':
+                continue
+            try:
+                series = la[0]
+                code = la[1]
+                name = la[2]
+                exDate = la[6]
+                purpose = la[9]
+                if series.lower() != 'eq':
+                    continue
+                bAdd = False
+                if purpose.startswith('BONUS'):
+                    tpurpose,datas = purpose.split(' ',1)
+                    datas = datas.strip()
+                    new,cur = datas.split(':')
+                    new,cur = int(new), int(cur)
+                    total = new+cur
+                    adj = cur/total
+                    bAdd = True
+                elif purpose.startswith('FVSPLT'):
+                    tparts = purpose.split(' ')
+                    parts = []
+                    for part in tparts:
+                        if part != '':
+                            parts.append(part)
+                    cur,new = parts[3],parts[6]
+                    adj = new/cur
+                    bAdd = True
+                if bAdd:
+                    today.add_morecat_data('CorpAct',[code, exDate, purpose, adj])
+            except:
+                print("ERRR:IndiaSTKDS:parse_bc_csv:{}".format(l))
+                traceback.print_exc()
+        tFile.close()
+
+
+    def _parse_file(self, sFile, today):
+        """
+        Parse the specified data csv file and load it into passed today dictionary.
+        """
+        z = zipfile.ZipFile(sFile)
+        csvPDFile, csvBCFile, dateT = self._get_parts(sFile)
+        self._parse_pdfile(csvPDFile, today)
+        self._parse_bcfile(csvBCFile, today)
         z.close()
 
 
