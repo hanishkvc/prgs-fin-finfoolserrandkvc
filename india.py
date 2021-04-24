@@ -226,6 +226,8 @@ class IndiaSTKDS(datasrc.DataSrc):
     purposeCM = [
         [ "BON ", "BONUS " ],
         [ "ISSUE", "" ],
+        [ "DIV-", "DIV" ],
+        [ "PER SHARE", "" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
         [ "RS.", "" ],
@@ -237,6 +239,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ " ", "" ],
         [ "BONUS", "BONUS " ],
         [ "SPLIT", "SPLIT " ],
+        [ "DIV", "DIV " ],
         [ "TO", " TO " ],
         ]
     def _parse_purposes(self, purposes, code=None, exDate=None):
@@ -268,6 +271,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = new/cur
                     actType = 'S'
                     bAdd = True
+                elif purpose.startswith('DIV'):
+                    input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
                 if bAdd:
                     lReturn.append([actType, adj, purpose])
             except:
