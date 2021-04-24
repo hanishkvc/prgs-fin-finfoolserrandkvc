@@ -315,7 +315,7 @@ class EntitiesDB:
                 for ca in self.more['corpActD'][theDate][entCode]:
                     newAdj = self.more['corpActD'][theDate][entCode][ca][0]
                     if ca == 'D':
-                        newAdj = newAdj/self.data['data'][entIndex,i]
+                        newAdj = 1-(newAdj/self.data['data'][entIndex,i])
                     cAdj = cAdj * newAdj
                 print("DBUG:Entities:HandleCA:{}:{}:{}".format(theDate, entCode, cAdj))
                 self.data['data'][entIndex, 0:i] *= cAdj
