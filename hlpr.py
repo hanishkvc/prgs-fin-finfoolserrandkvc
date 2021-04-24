@@ -212,6 +212,20 @@ def date2dateint(date):
     return dateint(date.year, date.month, date.day)
 
 
+def datestr2dateint(sDate):
+    """
+    Convert a date string of type DD-MM-YYYY or DD/MM/YYYY or DDMMYY to the date int
+    of format YYYYMMDD.
+    """
+    if '/' in sDate:
+        exDate = datetime.datetime.strptime(sDate, "%d/%m/%Y")
+    elif '-' in sDate:
+        exDate = datetime.datetime.strptime(sDate, "%d-%m-%Y")
+    else:
+        exDate = datetime.datetime.strptime(sDate, "%d%m%Y")
+    exDate = date2dateint(exDate)
+
+
 def not_beyond_today(date, bSkipTodayAlso=True):
     """
     If passed date is beyond today, then return today, else return passed date.

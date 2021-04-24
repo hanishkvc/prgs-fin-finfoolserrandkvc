@@ -300,8 +300,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                 exDate = la[6]
                 if exDate == '':
                     continue
-                exDate = datetime.datetime.strptime(exDate, "%d/%m/%Y")
-                exDate = hlpr.date2dateint(exDate)
+                exDate = hlpr.datestr2dateint(exDate)
                 purposes = la[9]
                 lPurposes = self._parse_purposes(purposes, code, exDate)
                 for purpose in lPurposes:
