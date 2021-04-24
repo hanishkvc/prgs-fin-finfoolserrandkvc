@@ -218,12 +218,13 @@ def datestr2dateint(sDate):
     of format YYYYMMDD.
     """
     if '/' in sDate:
-        exDate = datetime.datetime.strptime(sDate, "%d/%m/%Y")
+        dtDate = datetime.datetime.strptime(sDate, "%d/%m/%Y")
     elif '-' in sDate:
-        exDate = datetime.datetime.strptime(sDate, "%d-%m-%Y")
+        dtDate = datetime.datetime.strptime(sDate, "%d-%m-%Y")
     else:
-        exDate = datetime.datetime.strptime(sDate, "%d%m%Y")
-    exDate = date2dateint(exDate)
+        dtDate = datetime.datetime.strptime(sDate, "%d%m%Y")
+    iDate = date2dateint(dtDate)
+    return iDate
 
 
 def not_beyond_today(date, bSkipTodayAlso=True):
