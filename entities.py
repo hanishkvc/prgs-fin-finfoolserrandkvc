@@ -297,3 +297,19 @@ class EntitiesDB:
         self.dates = self.dates[:self.nxtDateIndex]
 
 
+    def handle_corpacts(self):
+        """
+        Handle the Corporate actions in the entities database, to adjust the
+        entities historical values.
+        """
+        for i in range(self.nxtDateIndex-1, -1, -1):
+            theDate = self.dates[i]
+            if theDate not in self.more['corpActD']:
+                continue
+            for entCode in self.more['corpActD'][theDate]:
+                cAdj = 1
+                for ca in self.more['corpActD'][theDate][entCode]:
+                    cAdj = cAdj * self.more['corpActD'][theDate][entCode][ca][0]
+                print("DBUG:{}:{}:{}".format(theDate, entCode, cAdj))
+
+
