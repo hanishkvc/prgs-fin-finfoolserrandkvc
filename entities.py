@@ -307,11 +307,14 @@ class EntitiesDB:
             if theDate not in self.more['corpActD']:
                 continue
             for entCode in self.more['corpActD'][theDate]:
+                entIndex = self.meta['codeD'][entCode]
                 cAdj = 1
                 for ca in self.more['corpActD'][theDate][entCode]:
-                    cAdj = cAdj * self.more['corpActD'][theDate][entCode][ca][0]
+                    newAdj = self.more['corpActD'][theDate][entCode][ca][0]
+                    if ca == 'D':
+                        newAdj = newAdj/self.data['data'][entIndex,i]
+                    cAdj = cAdj * newAdj
                 print("DBUG:{}:{}:{}".format(theDate, entCode, cAdj))
-                entIndex = self.meta['codeD'][entCode]
                 self.data['data'][entIndex, 0:i] *= cAdj
 
 

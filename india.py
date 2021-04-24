@@ -272,7 +272,13 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'S'
                     bAdd = True
                 elif purpose.startswith('DIV'):
-                    input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
+                    #input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
+                    parts = purpose.split(' ')
+                    if parts[1][0] == 'I':
+                        continue
+                    adj = float(parts[1])
+                    actType = 'D'
+                    bAdd = True
                 if bAdd:
                     lReturn.append([actType, adj, purpose])
             except:
