@@ -5,6 +5,7 @@ import sys
 import time
 import zipfile
 import traceback
+import datetime
 import hlpr
 import datasrc
 import todayfile
@@ -295,6 +296,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                 code = la[1]
                 name = la[2]
                 exDate = la[6]
+                exDate = datetime.datetime.strptime(exDate, "%d/%m/%Y")
+                exDate = hlpr.date2dateint(exDate)
                 purposes = la[9]
                 if series.lower() != 'eq':
                     continue

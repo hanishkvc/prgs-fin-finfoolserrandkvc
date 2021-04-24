@@ -205,6 +205,13 @@ def dateint(y, m, d):
     return y*10000+m*100+d
 
 
+def date2dateint(date):
+    """
+    Convert a datetime.date or datetime.datetime object to date int of YYYYMMDD format.
+    """
+    return dateint(date.year, date.month, date.day)
+
+
 def not_beyond_today(date, bSkipTodayAlso=True):
     """
     If passed date is beyond today, then return today, else return passed date.
