@@ -225,6 +225,8 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "ISSUE", "" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
+        [ "EQ SHARES", "" ],
+        [ "DVR", "" ],
         [ "RS", "" ],
         [ "RE", "" ],
         [ "FROM", "" ],
@@ -235,7 +237,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "TO", " TO " ],
         ]
     def _parse_purposes(self, purposes):
-        lPurposes = purposes.split('/')
+        lPurposes = purposes.upper().split('/')
         lReturn = []
         for purpose in lPurposes:
             bAdd = False
@@ -243,6 +245,8 @@ class IndiaSTKDS(datasrc.DataSrc):
             try:
                 if purpose.startswith('BONUS'):
                     tpurpose,datas = purpose.split(' ',1)
+                    if datas == '':
+                        continue
                     datas = datas.strip()
                     new,cur = datas.split(':')
                     new,cur = float(new), float(cur)
