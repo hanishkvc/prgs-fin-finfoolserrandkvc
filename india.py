@@ -229,8 +229,10 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "RE", "" ],
         [ "FROM", "" ],
         [ "FRM", "" ],
-        [ "  ", " " ],
-        [ "  ", " " ],
+        [ " ", "" ],
+        [ "BONUS", "BONUS " ],
+        [ "SPLIT", "SPLIT " ],
+        [ "TO", " TO " ],
         ]
     def _parse_purposes(self, purposes):
         lPurposes = purposes.split('/')
@@ -248,12 +250,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = cur/total
                     bAdd = True
                 elif purpose.startswith('SPLIT'):
-                    tparts = purpose.split(' ')
-                    parts = []
-                    for part in tparts:
-                        if part != '':
-                            parts.append(part)
-                    cur,new = float(parts[3]),float(parts[6])
+                    parts = purpose.split(' ')
+                    cur,new = float(parts[1]),float(parts[3])
                     adj = new/cur
                     bAdd = True
                 if bAdd:
