@@ -311,5 +311,7 @@ class EntitiesDB:
                 for ca in self.more['corpActD'][theDate][entCode]:
                     cAdj = cAdj * self.more['corpActD'][theDate][entCode][ca][0]
                 print("DBUG:{}:{}:{}".format(theDate, entCode, cAdj))
+                entIndex = self.meta['codeD'][entCode]
+                self.data['data'][entIndex, 0:i] *= cAdj
 
 
