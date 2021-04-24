@@ -220,13 +220,13 @@ class IndiaSTKDS(datasrc.DataSrc):
         tFile.close()
 
 
+    #[ "EQ SHARES", "" ],
+    #[ "DVR", "" ],
     purposeCM = [
         [ "BON ", "BONUS " ],
         [ "ISSUE", "" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
-        [ "EQ SHARES", "" ],
-        [ "DVR", "" ],
         [ "RS", "" ],
         [ "RE", "" ],
         [ "FROM", "" ],
@@ -244,6 +244,9 @@ class IndiaSTKDS(datasrc.DataSrc):
             purpose = hlpr.string_cleanup(purpose, self.purposeCM)
             try:
                 if purpose.startswith('BONUS'):
+                    if "DVR" in purpose:
+                        print("WARN:IndiaStks:parse_purposes:Ignoring DVR...")
+                        continue
                     tpurpose,datas = purpose.split(' ',1)
                     if datas == '':
                         continue
