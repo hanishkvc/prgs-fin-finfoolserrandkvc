@@ -175,7 +175,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         return True
 
 
-    def _parse_pdfile(self, csvPDFile, today):
+    def _parse_pdfile(self, z, csvPDFile, today):
         """
         Parse the Pd file containing stocks related data.
         """
@@ -220,7 +220,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         tFile.close()
 
 
-    def _parse_bcfile(self, csvBCFile, today):
+    def _parse_bcfile(self, z, csvBCFile, today):
         """
         Parse the Bc file containing corporate actions related to stocks.
         """
@@ -276,8 +276,8 @@ class IndiaSTKDS(datasrc.DataSrc):
         """
         z = zipfile.ZipFile(sFile)
         csvPDFile, csvBCFile, dateT = self._get_parts(sFile)
-        self._parse_pdfile(csvPDFile, today)
-        self._parse_bcfile(csvBCFile, today)
+        self._parse_pdfile(z, csvPDFile, today)
+        self._parse_bcfile(z, csvBCFile, today)
         z.close()
 
 
