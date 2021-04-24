@@ -21,6 +21,7 @@ def init(date, dataKeys):
         'dataKeys': dataKeys,
         'codeD': {},
         'data': []
+        'more': {}
         }
     return today
 
@@ -50,6 +51,30 @@ def add_ent(today, entCode, entName, entValues, entType, date):
     #if today['date'] > date:
     if today['date'] != date:
         today['bUpToDate'] = False
+
+
+def add_morecat(today, cat, catType=list):
+    """
+    Create a category in more dictionary to store any additional meta/related data
+    wrt entities or given date or so.
+    The category could either be a list or dictionary of items.
+    """
+    if catType == list:
+        today['more'][cat] = []
+    else:
+        today['more'][cat] = {}
+
+
+def add_morecat_data(today, cat, data, key=None):
+    """
+    Add data to the more-category.
+    If key is None: the underlying category is assumed to be a list.
+    """
+    theCat = today['more'][cat]
+    if key == None:
+        theCat.append(data)
+    else:
+        theCat[key] = data
 
 
 def valid_today(today):
@@ -90,6 +115,10 @@ def load2edb(today, entDB, loadFilters=None, nameCleanupMap=None, filterName=Non
             [ent2Code, ent2Name, [ent2Val1, ent2Val2, ...] ],
             ...
             ]
+        'more': {
+            cat1: [ data(s)1, data(s)2, ... ]
+            cat2: { key1: data1, key2: data2, ... }
+            }
     TOTHINK: Should I maintain entDate within today['data'] for each ent.
         Can give finer entity level info has to data is uptodate or not.
         But as currently I am not using it, so ignoring for now.
@@ -133,5 +162,10 @@ def load2edb(today, entDB, loadFilters=None, nameCleanupMap=None, filterName=Non
                 dataKey = today['dataKeys'][i]
                 datas[dataKey] = values[i]
             entDB.add_data(entCode, datas, name, curEntTypeId)
+    # Handle the more categories of data, which is blindly copied into entDB
+    for cat in today['more']:
+        entDB.add_morecat(cat)
+        for data in cat:
+            entDB.add_morecat_data(cat, data)
 
 
