@@ -236,7 +236,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "SPLIT", "SPLIT " ],
         [ "TO", " TO " ],
         ]
-    def _parse_purposes(self, purposes):
+    def _parse_purposes(self, purposes, code=None, exDate=None):
         lPurposes = purposes.upper().split('/')
         lReturn = []
         for purpose in lPurposes:
@@ -245,7 +245,7 @@ class IndiaSTKDS(datasrc.DataSrc):
             try:
                 if purpose.startswith('BONUS'):
                     if "DVR" in purpose:
-                        print("WARN:IndiaStks:parse_purposes:Ignoring DVR...")
+                        print("WARN:IndiaStks:parse_purposes:{}:{}:Ignoring DVR...".format(code, exDate))
                         continue
                     tpurpose,datas = purpose.split(' ',1)
                     if datas == '':
@@ -259,7 +259,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     bAdd = True
                 elif purpose.startswith('SPLIT'):
                     if "FV" not in purposes:
-                        input("DBUG:IndiaStks:parse_purposes:Split without FV?", purposes, purpose)
+                        input("DBUG:IndiaStks:parse_purposes:{}:{}:Split without FV?:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
                     cur,new = float(parts[1]),float(parts[3])
                     adj = new/cur
@@ -268,7 +268,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                 if bAdd:
                     lReturn.append([actType, adj, purpose])
             except:
-                input("DBUG:IndiaSTK:parse_purposes:{}:{}".format(purposes, purpose))
+                input("DBUG:IndiaSTK:parse_purposes:{}:{}:Exception:{}:{}".format(code, exDate, purposes, purpose))
         return lReturn
 
 
@@ -296,7 +296,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                 purposes = la[9]
                 if series.lower() != 'eq':
                     continue
-                lPurposes = self._parse_purposes(purposes)
+                lPurposes = self._parse_purposes(purposes, code, exDate)
                 for purpose in lPurposes:
                     todayfile.add_morecat_data(today, 'corpActD',[exDate, code, purpose[0], purpose[1], purpose[2]])
             except:
