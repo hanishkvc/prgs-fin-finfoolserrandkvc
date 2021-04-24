@@ -212,7 +212,7 @@ class EntitiesDB:
             if actType not in self.more['corpActD'][date][entCode]:
                 self.more['corpActD'][date][entCode][actType] = [adj, purpose]
             else:
-                print("DBUG:entities:AddCorpAct:{}:{}:{}: [{}] Exists, Skipping [{}]".format(date, entCode, actType, self.more['corpActD'][date][entCode], [adj, purpose]))
+                print("NOTE:entities:AddCorpAct:{}:{}:{}: [{}] Exists, Skipping [{}]".format(date, entCode, actType, self.more['corpActD'][date][entCode], [adj, purpose]))
 
 
     def add_ent(self, entCode, entName, entTypeId):

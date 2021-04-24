@@ -258,6 +258,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'B'
                     bAdd = True
                 elif purpose.startswith('SPLIT'):
+                    if "FV" not in purposes:
+                        input("DBUG:IndiaStks:parse_purposes:Split without FV?", purposes, purpose)
                     parts = purpose.split(' ')
                     cur,new = float(parts[1]),float(parts[3])
                     adj = new/cur
