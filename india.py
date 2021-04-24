@@ -293,14 +293,16 @@ class IndiaSTKDS(datasrc.DataSrc):
                 continue
             try:
                 series = la[0]
+                if series.lower() != 'eq':
+                    continue
                 code = la[1]
                 name = la[2]
                 exDate = la[6]
+                if exDate == '':
+                    continue
                 exDate = datetime.datetime.strptime(exDate, "%d/%m/%Y")
                 exDate = hlpr.date2dateint(exDate)
                 purposes = la[9]
-                if series.lower() != 'eq':
-                    continue
                 lPurposes = self._parse_purposes(purposes, code, exDate)
                 for purpose in lPurposes:
                     todayfile.add_morecat_data(today, 'corpActD',[exDate, code, purpose[0], purpose[1], purpose[2]])
