@@ -224,10 +224,25 @@ class IndiaSTKDS(datasrc.DataSrc):
     #[ "EQ SHARES", "" ],
     #[ "DVR", "" ],
     purposeCM = [
-        [ "BON ", "BONUS " ],
-        [ "ISSUE", "" ],
-        [ "DIVIDEND", "DIV" ],
+        [ "BON ", "BONUS" ],
         [ "-", "" ],
+        [ "ISSUE", "" ],
+        [ "PERSHARE", "" ],
+        [ "FVSPLIT", "SPLIT" ],
+        [ "FVSPLT", "SPLIT" ],
+        [ "RS.", "" ],
+        [ "RE.", "" ],
+        [ "RS", "" ],
+        [ "RE", "" ],
+        [ "FROM", "" ],
+        [ "FRM", "" ],
+        [ " ", "" ],
+        [ "BONUS", "BONUS " ],
+        [ "SPLIT", "SPLIT " ],
+        [ "TO", " TO " ],
+        ]
+    purposeDivCM = [
+        [ "DIVIDEND", "DIV" ],
         [ "PER", "" ],
         [ "PR", "" ],
         [ "PE", "" ],
@@ -244,26 +259,21 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "UNI", "" ],
         [ "UN", "" ],
         [ "SPDIV", "SPL" ],
-        [ "FVSPLIT", "SPLIT" ],
-        [ "FVSPLT", "SPLIT" ],
-        [ "RS.", "" ],
-        [ "RE.", "" ],
-        [ "RS", "" ],
-        [ "RE", "" ],
-        [ "FROM", "" ],
-        [ "FRM", "" ],
         [ ".@", " " ],
         [ "@", " " ],
-        [ " ", "" ],
-        [ "BONUS", "BONUS " ],
-        [ "SPLIT", "SPLIT " ],
-        [ "DIV", "DIV " ],
-        [ "TO", " TO " ],
-        [ "SPL", " SPL " ],
-        [ "INTRM", "INTRM " ],
-        [ "FINAL", "FINAL " ],
+        [ ":", " " ],
         [ "+", " " ],
         [ "&", " " ],
+        [ " ", "" ],
+        [ "DIV", "DIV " ],
+        [ "INTDIV", " INTDIV" ],
+        [ "SLDIV", " SLDIV" ],
+        [ "FVSPL", "SPL" ],
+        [ "SPL", " SPL " ],
+        [ "INTRM", " INTRM " ],
+        [ "FINAL", " FIN" ],
+        [ "FIN", " FIN " ],
+        [ "RIGHT", " RIGHT" ],
         [ "  ", " " ],
         ]
     def _parse_purposes(self, purposes, code=None, exDate=None):
@@ -296,8 +306,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'S'
                     bAdd = True
                 elif purpose.startswith('DIV'):
+                    purpose = hlpr.string_cleanup(purpose, self.purposeDivCM)
                     purpose = purpose.strip()
-                    purpose = purpose.replace(":","")
                     #input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
                     if len(parts) <= 1:
