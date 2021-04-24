@@ -227,13 +227,23 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "BON ", "BONUS " ],
         [ "ISSUE", "" ],
         [ "DIVIDEND", "DIV" ],
-        [ "DIV-", "DIV" ],
+        [ "-", "" ],
         [ "PER", "" ],
         [ "PR", "" ],
+        [ "PE", "" ],
         [ "SHARE", "" ],
+        [ "SHAR", "" ],
+        [ "SHAE", "" ],
+        [ "SAHRE", "" ],
+        [ "SHR", "" ],
+        [ "SHA", "" ],
         [ "SH", "" ],
         [ "PS", "" ],
+        [ "EQ", "" ],
         [ "UNIT", "" ],
+        [ "UNI", "" ],
+        [ "UN", "" ],
+        [ "SPDIV", "SPL" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
         [ "RS.", "" ],
@@ -242,15 +252,19 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "RE", "" ],
         [ "FROM", "" ],
         [ "FRM", "" ],
+        [ ".@", " " ],
+        [ "@", " " ],
         [ " ", "" ],
         [ "BONUS", "BONUS " ],
         [ "SPLIT", "SPLIT " ],
         [ "DIV", "DIV " ],
         [ "TO", " TO " ],
-        [ "SPL", "SPL " ],
+        [ "SPL", " SPL " ],
         [ "INTRM", "INTRM " ],
         [ "FINAL", "FINAL " ],
         [ "+", " " ],
+        [ "&", " " ],
+        [ "  ", " " ],
         ]
     def _parse_purposes(self, purposes, code=None, exDate=None):
         lPurposes = purposes.upper().split('/')
@@ -282,10 +296,17 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'S'
                     bAdd = True
                 elif purpose.startswith('DIV'):
+                    purpose = purpose.strip()
                     purpose = purpose.replace(":","")
-                    input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
+                    #input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
-                    adj = float(parts[1])
+                    if len(parts) <= 1:
+                        continue
+                    adj = 0
+                    for part in parts:
+                        if part[0].isalpha():
+                            continue
+                        adj += abs(float(part))
                     actType = 'D'
                     bAdd = True
                 if bAdd:
