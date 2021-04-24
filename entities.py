@@ -40,6 +40,7 @@ class EntitiesDB:
         A dictionary of any additional info/data wrt entities.
         """
         self.more = {}
+        self.more['corpActD'] = {}
 
 
     def _set_aliases(self, aliases=None):
@@ -193,6 +194,18 @@ class EntitiesDB:
             self.more[cat].append(data)
         else:
             self.more[cat][key] = data
+
+
+    def add_corpact(self, date, entCode, purpose, adj):
+        """
+        Add corporate actions data into entities db.
+        """
+        if date not in self.more['corpActD']:
+            self.more['corpActD'][date] = {}
+        if entCode not in self.more['corpActD'][date]:
+            self.more['corpActD'][date][entCode] = [adj, purpose]
+        else:
+            input("DBUG:entities:AddCorpAct:{} Exists, Skipping {}".format(self.more['corpActD'][date][entCode], [adj, purpose]))
 
 
     def add_ent(self, entCode, entName, entTypeId):
