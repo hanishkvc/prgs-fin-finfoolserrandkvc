@@ -220,6 +220,40 @@ class IndiaSTKDS(datasrc.DataSrc):
         tFile.close()
 
 
+    purposeCM = [
+        [ "FVSPLIT", "SPLIT" ],
+        [ "FVSPLT", "SPLIT" ],
+        [ "RS", "" ],
+        [ "FROM", "" ]
+        ]
+    def _parse_purposes(self, purposes):
+        lPurposes = purposes.split('/')
+        lReturn = []
+        for purpose in lPurposes:
+            bAdd = False
+            purpose = hlpr.string_cleanup(purpose, self.purposeCM)
+            if purpose.startswith('BONUS'):
+                tpurpose,datas = purpose.split(' ',1)
+                datas = datas.strip()
+                new,cur = datas.split(':')
+                new,cur = float(new), float(cur)
+                total = new+cur
+                adj = cur/total
+                bAdd = True
+            elif purpose.startswith('SPLIT'):
+                tparts = purpose.split(' ')
+                parts = []
+                for part in tparts:
+                    if part != '':
+                        parts.append(part)
+                cur,new = float(parts[3]),float(parts[6])
+                adj = new/cur
+                bAdd = True
+            if bAdd:
+                lReturn.append([purpose, adj])
+        return lReturn
+
+
     def _parse_bcfile(self, z, csvBCFile, today):
         """
         Parse the Bc file containing corporate actions related to stocks.
@@ -241,29 +275,12 @@ class IndiaSTKDS(datasrc.DataSrc):
                 code = la[1]
                 name = la[2]
                 exDate = la[6]
-                purpose = la[9]
+                purposes = la[9]
                 if series.lower() != 'eq':
                     continue
-                bAdd = False
-                if purpose.startswith('BONUS'):
-                    tpurpose,datas = purpose.split(' ',1)
-                    datas = datas.strip()
-                    new,cur = datas.split(':')
-                    new,cur = float(new), float(cur)
-                    total = new+cur
-                    adj = cur/total
-                    bAdd = True
-                elif purpose.startswith('FVSPLT'):
-                    tparts = purpose.split(' ')
-                    parts = []
-                    for part in tparts:
-                        if part != '':
-                            parts.append(part)
-                    cur,new = float(parts[3]),float(parts[6])
-                    adj = new/cur
-                    bAdd = True
-                if bAdd:
-                    todayfile.add_morecat_data(today, 'CorpAct',[code, exDate, purpose, adj])
+                lPurposes = self._parse_purposes(purposes)
+                for purpose in lPurposes:
+                    todayfile.add_morecat_data(today, 'CorpAct',[code, exDate, purpose[0], purpose[1]])
             except:
                 print("ERRR:IndiaSTKDS:parse_bc_csv:{}".format(l))
                 traceback.print_exc()
