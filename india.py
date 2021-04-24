@@ -249,7 +249,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     tpurpose,datas = purpose.split(' ',1)
                     datas = datas.strip()
                     new,cur = datas.split(':')
-                    new,cur = int(new), int(cur)
+                    new,cur = float(new), float(cur)
                     total = new+cur
                     adj = cur/total
                     bAdd = True
@@ -259,7 +259,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     for part in tparts:
                         if part != '':
                             parts.append(part)
-                    cur,new = parts[3],parts[6]
+                    cur,new = float(parts[3]),float(parts[6])
                     adj = new/cur
                     bAdd = True
                 if bAdd:
