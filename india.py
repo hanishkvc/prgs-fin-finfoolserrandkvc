@@ -226,8 +226,12 @@ class IndiaSTKDS(datasrc.DataSrc):
     purposeCM = [
         [ "BON ", "BONUS " ],
         [ "ISSUE", "" ],
+        [ "DIVIDEND", "DIV" ],
         [ "DIV-", "DIV" ],
-        [ "PER SHARE", "" ],
+        [ "PER", "" ],
+        [ "PR", "" ],
+        [ "SHARE", "" ],
+        [ "SH", "" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
         [ "RS.", "" ],
@@ -272,7 +276,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'S'
                     bAdd = True
                 elif purpose.startswith('DIV'):
-                    #input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
+                    input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
                     if parts[1][0] == 'I':
                         continue
