@@ -302,7 +302,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                 for purpose in lPurposes:
                     todayfile.add_morecat_data(today, 'corpActD',[exDate, code, purpose[0], purpose[1], purpose[2]])
             except:
-                print("ERRR:IndiaSTKDS:parse_bc_csv:{}".format(l))
+                input("ERRR:IndiaSTKDS:parse_bc_csv:{}:{}".format(csvBCFile, l))
                 traceback.print_exc()
         tFile.close()
 
