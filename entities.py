@@ -35,6 +35,13 @@ class EntitiesDB:
         self.datesD = {}
 
 
+    def _init_morecats(self):
+        """
+        A dictionary of any additional info/data wrt entities.
+        """
+        self.more = {}
+
+
     def _set_aliases(self, aliases=None):
         if aliases == None:
             aliases = self.aliases
@@ -88,6 +95,7 @@ class EntitiesDB:
         self.aliases = aliases
         self._init_types()
         self._init_dates(dateCnt)
+        self._init_morecats()
         self._init_ents(dataKeys, aliases, entCnt, dateCnt)
 
 
@@ -162,6 +170,27 @@ class EntitiesDB:
         else:
             endDateIndex = self.datesD[endDate]
         return startDateIndex, endDateIndex
+
+
+    def add_morecat(self, cat, catType=list):
+        """
+        Add a category (of info|data) to the more dictionary.
+        """
+        if catType == list:
+            self.more[cat] = []
+        else:
+            self.more[cat] = {}
+
+
+    def add_morecat_data(self, cat, data, key=None):
+        """
+        Add data belonging to the given more-category.
+        If key == None, assume cat is a list, else it is assumed to be a dictionary.
+        """
+        if key == None:
+            self.more[cat].append(data)
+        else:
+            self.more[cat][key] = data
 
 
     def add_ent(self, entCode, entName, entTypeId):

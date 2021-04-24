@@ -164,8 +164,13 @@ def load2edb(today, entDB, loadFilters=None, nameCleanupMap=None, filterName=Non
             entDB.add_data(entCode, datas, name, curEntTypeId)
     # Handle the more categories of data, which is blindly copied into entDB
     for cat in today['more']:
-        entDB.add_morecat(cat)
-        for data in cat:
-            entDB.add_morecat_data(cat, data)
+        theCat = today['more'][cat]
+        catType = type(today['more'][cat])
+        entDB.add_morecat(cat, catType)
+        for data in theCat:
+            if catType == list:
+                entDB.add_morecat_data(cat, data)
+            else:
+                entDB.add_morecat_data(cat, theCat[data], data)
 
 
