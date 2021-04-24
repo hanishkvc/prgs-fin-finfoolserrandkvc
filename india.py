@@ -221,10 +221,16 @@ class IndiaSTKDS(datasrc.DataSrc):
 
 
     purposeCM = [
+        [ "BON ", "BONUS " ],
+        [ "ISSUE", "" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
         [ "RS", "" ],
-        [ "FROM", "" ]
+        [ "RE", "" ],
+        [ "FROM", "" ],
+        [ "FRM", "" ],
+        [ "  ", " " ],
+        [ "  ", " " ],
         ]
     def _parse_purposes(self, purposes):
         lPurposes = purposes.split('/')
@@ -232,25 +238,28 @@ class IndiaSTKDS(datasrc.DataSrc):
         for purpose in lPurposes:
             bAdd = False
             purpose = hlpr.string_cleanup(purpose, self.purposeCM)
-            if purpose.startswith('BONUS'):
-                tpurpose,datas = purpose.split(' ',1)
-                datas = datas.strip()
-                new,cur = datas.split(':')
-                new,cur = float(new), float(cur)
-                total = new+cur
-                adj = cur/total
-                bAdd = True
-            elif purpose.startswith('SPLIT'):
-                tparts = purpose.split(' ')
-                parts = []
-                for part in tparts:
-                    if part != '':
-                        parts.append(part)
-                cur,new = float(parts[3]),float(parts[6])
-                adj = new/cur
-                bAdd = True
-            if bAdd:
-                lReturn.append([purpose, adj])
+            try:
+                if purpose.startswith('BONUS'):
+                    tpurpose,datas = purpose.split(' ',1)
+                    datas = datas.strip()
+                    new,cur = datas.split(':')
+                    new,cur = float(new), float(cur)
+                    total = new+cur
+                    adj = cur/total
+                    bAdd = True
+                elif purpose.startswith('SPLIT'):
+                    tparts = purpose.split(' ')
+                    parts = []
+                    for part in tparts:
+                        if part != '':
+                            parts.append(part)
+                    cur,new = float(parts[3]),float(parts[6])
+                    adj = new/cur
+                    bAdd = True
+                if bAdd:
+                    lReturn.append([purpose, adj])
+            except:
+                input("DBUG:IndiaSTK:parse_purposes:{}:{}".format(purposes, purpose))
         return lReturn
 
 
