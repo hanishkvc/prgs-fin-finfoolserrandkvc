@@ -262,7 +262,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = new/cur
                     bAdd = True
                 if bAdd:
-                    lReturn.append([purpose, adj])
+                    lReturn.append([adj, purpose])
             except:
                 input("DBUG:IndiaSTK:parse_purposes:{}:{}".format(purposes, purpose))
         return lReturn
@@ -272,7 +272,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         """
         Parse the Bc file containing corporate actions related to stocks.
         """
-        todayfile.add_morecat(today, 'CorpAct')
+        todayfile.add_morecat(today, 'corpActD')
         tFile = z.open(csvBCFile)
         tFile.readline()
         for l in tFile:
@@ -294,7 +294,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     continue
                 lPurposes = self._parse_purposes(purposes)
                 for purpose in lPurposes:
-                    todayfile.add_morecat_data(today, 'CorpAct',[code, exDate, purpose[0], purpose[1]])
+                    todayfile.add_morecat_data(today, 'corpActD',[exDate, code, purpose[0], purpose[1]])
             except:
                 print("ERRR:IndiaSTKDS:parse_bc_csv:{}".format(l))
                 traceback.print_exc()

@@ -196,7 +196,7 @@ class EntitiesDB:
             self.more[cat][key] = data
 
 
-    def add_corpact(self, date, entCode, purpose, adj):
+    def add_corpact(self, date, entCode, adj, purpose):
         """
         Add corporate actions data into entities db.
         """

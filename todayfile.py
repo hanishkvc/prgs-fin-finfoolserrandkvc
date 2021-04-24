@@ -168,11 +168,15 @@ def load2edb(today, entDB, loadFilters=None, nameCleanupMap=None, filterName=Non
     for cat in today['more']:
         theCat = today['more'][cat]
         catType = type(today['more'][cat])
-        entDB.add_morecat(cat, catType)
-        for data in theCat:
-            if catType == list:
-                entDB.add_morecat_data(cat, data)
-            else:
-                entDB.add_morecat_data(cat, theCat[data], data)
+        if cat == 'corpActD':
+            for data in theCat:
+                entDB.add_corpact(data[0], data[1], data[2], data[3])
+        else:
+            entDB.add_morecat(cat, catType)
+            for data in theCat:
+                if catType == list:
+                    entDB.add_morecat_data(cat, data)
+                else:
+                    entDB.add_morecat_data(cat, theCat[data], data)
 
 
