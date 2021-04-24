@@ -307,14 +307,17 @@ class EntitiesDB:
             if theDate not in self.more['corpActD']:
                 continue
             for entCode in self.more['corpActD'][theDate]:
-                entIndex = self.meta['codeD'][entCode]
+                entIndex = self.meta['codeD'].get(entCode, -1)
+                if entIndex == -1:
+                    input("DBUG:Entities:HandleCA:{}:{} is missing".format(theDate, entCode))
+                    continue
                 cAdj = 1
                 for ca in self.more['corpActD'][theDate][entCode]:
                     newAdj = self.more['corpActD'][theDate][entCode][ca][0]
                     if ca == 'D':
                         newAdj = newAdj/self.data['data'][entIndex,i]
                     cAdj = cAdj * newAdj
-                print("DBUG:{}:{}:{}".format(theDate, entCode, cAdj))
+                print("DBUG:Entities:HandleCA:{}:{}:{}".format(theDate, entCode, cAdj))
                 self.data['data'][entIndex, 0:i] *= cAdj
 
 
