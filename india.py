@@ -232,6 +232,8 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "PR", "" ],
         [ "SHARE", "" ],
         [ "SH", "" ],
+        [ "PS", "" ],
+        [ "UNIT", "" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
         [ "RS.", "" ],
@@ -245,6 +247,10 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "SPLIT", "SPLIT " ],
         [ "DIV", "DIV " ],
         [ "TO", " TO " ],
+        [ "SPL", "SPL " ],
+        [ "INTRM", "INTRM " ],
+        [ "FINAL", "FINAL " ],
+        [ "+", " " ],
         ]
     def _parse_purposes(self, purposes, code=None, exDate=None):
         lPurposes = purposes.upper().split('/')
@@ -276,10 +282,9 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'S'
                     bAdd = True
                 elif purpose.startswith('DIV'):
+                    purpose = purpose.replace(":","")
                     input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
-                    if parts[1][0] == 'I':
-                        continue
                     adj = float(parts[1])
                     actType = 'D'
                     bAdd = True
