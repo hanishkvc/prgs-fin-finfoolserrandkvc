@@ -224,7 +224,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         """
         Parse the Bc file containing corporate actions related to stocks.
         """
-        today.add_morecat('CorpAct')
+        todayfile.add_morecat(today, 'CorpAct')
         tFile = z.open(csvBCFile)
         tFile.readline()
         for l in tFile:
@@ -263,7 +263,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = new/cur
                     bAdd = True
                 if bAdd:
-                    today.add_morecat_data('CorpAct',[code, exDate, purpose, adj])
+                    todayfile.add_morecat_data(today, 'CorpAct',[code, exDate, purpose, adj])
             except:
                 print("ERRR:IndiaSTKDS:parse_bc_csv:{}".format(l))
                 traceback.print_exc()
