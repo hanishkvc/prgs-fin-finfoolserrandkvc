@@ -196,16 +196,23 @@ class EntitiesDB:
             self.more[cat][key] = data
 
 
-    def add_corpact(self, date, entCode, adj, purpose):
+    def add_corpact(self, date, entCode, actType, adj, purpose):
         """
         Add corporate actions data into entities db.
+        actType: Could be 'B'(onus), 'S'(plit).
+        adj: The amount to adjust historical entity value.
+        purpose: specify the action in words.
         """
         if date not in self.more['corpActD']:
             self.more['corpActD'][date] = {}
         if entCode not in self.more['corpActD'][date]:
-            self.more['corpActD'][date][entCode] = [adj, purpose]
+            self.more['corpActD'][date][entCode] = {}
+            self.more['corpActD'][date][entCode][actType] = [adj, purpose]
         else:
-            input("DBUG:entities:AddCorpAct:{} Exists, Skipping {}".format(self.more['corpActD'][date][entCode], [adj, purpose]))
+            if actType not in self.more['corpActD'][date][entCode]:
+                self.more['corpActD'][date][entCode][actType] = [adj, purpose]
+            else:
+                print("DBUG:entities:AddCorpAct:{}:{}:{}: [{}] Exists, Skipping [{}]".format(date, entCode, actType, self.more['corpActD'][date][entCode], [adj, purpose]))
 
 
     def add_ent(self, entCode, entName, entTypeId):

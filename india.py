@@ -255,14 +255,16 @@ class IndiaSTKDS(datasrc.DataSrc):
                     new,cur = float(new), float(cur)
                     total = new+cur
                     adj = cur/total
+                    actType = 'B'
                     bAdd = True
                 elif purpose.startswith('SPLIT'):
                     parts = purpose.split(' ')
                     cur,new = float(parts[1]),float(parts[3])
                     adj = new/cur
+                    actType = 'S'
                     bAdd = True
                 if bAdd:
-                    lReturn.append([adj, purpose])
+                    lReturn.append([actType, adj, purpose])
             except:
                 input("DBUG:IndiaSTK:parse_purposes:{}:{}".format(purposes, purpose))
         return lReturn
@@ -294,7 +296,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     continue
                 lPurposes = self._parse_purposes(purposes)
                 for purpose in lPurposes:
-                    todayfile.add_morecat_data(today, 'corpActD',[exDate, code, purpose[0], purpose[1]])
+                    todayfile.add_morecat_data(today, 'corpActD',[exDate, code, purpose[0], purpose[1], purpose[2]])
             except:
                 print("ERRR:IndiaSTKDS:parse_bc_csv:{}".format(l))
                 traceback.print_exc()

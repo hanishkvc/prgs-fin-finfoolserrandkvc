@@ -6,7 +6,7 @@ import hlpr
 import loadfilters
 
 
-TODAY_MARKER = "TODAYFILEKVC_V2"
+TODAY_MARKER = "TODAYFILEKVC_V94"
 
 
 def init(date, dataKeys):
@@ -170,7 +170,7 @@ def load2edb(today, entDB, loadFilters=None, nameCleanupMap=None, filterName=Non
         catType = type(today['more'][cat])
         if cat == 'corpActD':
             for data in theCat:
-                entDB.add_corpact(data[0], data[1], data[2], data[3])
+                entDB.add_corpact(data[0], data[1], data[2], data[3], data[4])
         else:
             entDB.add_morecat(cat, catType)
             for data in theCat:
