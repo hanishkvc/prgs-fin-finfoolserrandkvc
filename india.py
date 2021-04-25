@@ -238,17 +238,20 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "BONUS", "BONUS " ],
         ]
     purposeSCM = [
+        [ "-", "" ],
         [ "FV SPLIT", "SPLIT" ],
         [ "FV SPLT", "SPLIT" ],
         [ "FV SPL", "SPLIT" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
+        [ "FVSPL", "SPLIT" ],
         [ "RS.", "" ],
         [ "RE.", "" ],
         [ "RS", "" ],
         [ "RE", "" ],
         [ "FROM", "" ],
         [ "FRM", "" ],
+        [ "FR", "" ],
         [ " ", "" ],
         [ "SPLIT", "SPLIT " ],
         [ "TO", " TO " ],
@@ -277,6 +280,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "RS", "" ],
         [ "RE", "" ],
         [ "SPDIV", "SPL" ],
+        [ "SP DIV", "SPL" ],
         [ ".@", " " ],
         [ "@", " " ],
         [ ":", " " ],
@@ -318,7 +322,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = cur/total
                     actType = 'B'
                     bAdd = True
-                elif (purpose.startswith("FV") or purpose.startswith('SPL')):
+                elif (purpose.startswith("FV") or purpose.startswith('SPL')) and not purpose.startswith('SPL INT DIV'):
                     os.system("echo '{}' >> /tmp/t.S".format(purpose))
                     purpose = hlpr.string_cleanup(purpose, self.purposeSCM)
                     #if "FV" not in purposes:
