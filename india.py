@@ -252,6 +252,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "TO", " TO " ],
         ]
     purposeDCM = [
+        [ "-", "" ],
         [ "DIVIDEND", "DIV" ],
         [ "PER", "" ],
         [ "PR", "" ],
@@ -294,7 +295,7 @@ class IndiaSTKDS(datasrc.DataSrc):
             bAdd = False
             try:
                 if purpose.startswith('BON'):
-                    os.system("echo '{}' > /tmp/t.B".format(purpose))
+                    os.system("echo '{}' >> /tmp/t.B".format(purpose))
                     purpose = hlpr.string_cleanup(purpose, self.purposeBCM)
                     if "DVR" in purpose:
                         print("WARN:IndiaStks:parse_purposes:{}:{}:Ignoring DVR...".format(code, exDate))
@@ -310,7 +311,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'B'
                     bAdd = True
                 elif 'SPL' in purpose:
-                    os.system("echo '{}' > /tmp/t.S".format(purpose))
+                    os.system("echo '{}' >> /tmp/t.S".format(purpose))
                     purpose = hlpr.string_cleanup(purpose, self.purposeSCM)
                     #if "FV" not in purposes:
                     #    input("DBUG:IndiaStks:parse_purposes:{}:{}:Split without FV?:{}:{}".format(code, exDate, purposes, purpose))
@@ -320,7 +321,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'S'
                     bAdd = True
                 elif purpose.startswith('DIV'):
-                    os.system("echo '{}' > /tmp/t.D".format(purpose))
+                    os.system("echo '{}' >> /tmp/t.D".format(purpose))
                     purpose = hlpr.string_cleanup(purpose, self.purposeDCM)
                     purpose = purpose.strip()
                     #input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))

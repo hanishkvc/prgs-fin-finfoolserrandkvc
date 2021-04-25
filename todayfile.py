@@ -6,7 +6,7 @@ import hlpr
 import loadfilters
 
 
-TODAY_MARKER = "TODAYFILEKVC_V96"
+TODAY_MARKER = "TODAYFILEKVC_V97"
 
 
 def init(date, dataKeys):
