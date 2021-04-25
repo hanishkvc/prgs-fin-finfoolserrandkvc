@@ -225,8 +225,11 @@ class IndiaSTKDS(datasrc.DataSrc):
     #[ "EQ SHARES", "" ],
     #[ "DVR", "" ],
     purposesCM = [
-        [ "+FV SPL", "/FV SPL" ],
+        [ "SPLDIV", "DIVSPECIAL" ],
+        [ "SPL DIV", "DIVSPECIAL" ],
+        [ "+FV SPL", "/FV SPLIT" ],
         [ "/-", "" ],
+        [ "ISSUE", "" ],
         ]
     purposeBCM = [
         [ "BON ", "BONUS" ],
@@ -235,9 +238,8 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "BONUS", "BONUS " ],
         ]
     purposeSCM = [
-        [ "ISSUE", "" ],
-        [ "PERSHARE", "" ],
         [ "FV SPLIT", "SPLIT" ],
+        [ "FV SPLT", "SPLIT" ],
         [ "FV SPL", "SPLIT" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
@@ -253,6 +255,8 @@ class IndiaSTKDS(datasrc.DataSrc):
         ]
     purposeDCM = [
         [ "-", "" ],
+        [ "PERSHARE", "" ],
+        [ "DIV.", "DIV" ],
         [ "DIVIDEND", "DIV" ],
         [ "PER", "" ],
         [ "PR", "" ],
@@ -279,7 +283,6 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "DIV", "DIV " ],
         [ "INTDIV", " INTDIV" ],
         [ "SLDIV", " SLDIV" ],
-        [ "FVSPL", "SPL" ],
         [ "SPL", " SPL " ],
         [ "INTRM", " INTRM " ],
         [ "FINAL", " FIN" ],
@@ -310,7 +313,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = cur/total
                     actType = 'B'
                     bAdd = True
-                elif 'SPL' in purpose:
+                elif (purpose.startswith("FV") or purpose.startswith('SPL')):
                     os.system("echo '{}' >> /tmp/t.S".format(purpose))
                     purpose = hlpr.string_cleanup(purpose, self.purposeSCM)
                     #if "FV" not in purposes:
