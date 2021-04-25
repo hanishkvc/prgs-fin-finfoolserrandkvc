@@ -290,6 +290,7 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "PS", "" ],
         [ "DIVXYZ", "SPL" ],
         [ "DIV", "DIV " ],
+        [ "INT ", "INTDIV" ],
         [ "INTDIV", " INTDIV" ],
         [ "SLDIV", " SLDIV" ],
         [ "SPL", " SPL " ],
@@ -322,7 +323,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = cur/total
                     actType = 'B'
                     bAdd = True
-                elif (purpose.startswith("FV") or purpose.startswith('SPL')) and not purpose.startswith('SPL INT DIV'):
+                elif (purpose.startswith("FV") or purpose.startswith('SPL')) and not (purpose.startswith('SPL INT DIV') or purpose.startswith("SPL-R")):
                     os.system("echo '{}' >> /tmp/t.S".format(purpose))
                     purpose = hlpr.string_cleanup(purpose, self.purposeSCM)
                     #if "FV" not in purposes:
