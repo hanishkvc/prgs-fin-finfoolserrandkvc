@@ -225,8 +225,8 @@ class IndiaSTKDS(datasrc.DataSrc):
     #[ "EQ SHARES", "" ],
     #[ "DVR", "" ],
     purposesCM = [
-        [ "SPLDIV", "DIVSPECIAL" ],
-        [ "SPL DIV", "DIVSPECIAL" ],
+        [ "SPLDIV", "DIVXYZ" ],
+        [ "SPL DIV", "DIVXYZ" ],
         [ "+FV SPL", "/FV SPLIT" ],
         [ "/-", "" ],
         [ "ISSUE", "" ],
@@ -283,6 +283,8 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "+", " " ],
         [ "&", " " ],
         [ " ", "" ],
+        [ "PS", "" ],
+        [ "DIVXYZ", "SPL" ],
         [ "DIV", "DIV " ],
         [ "INTDIV", " INTDIV" ],
         [ "SLDIV", " SLDIV" ],
@@ -336,6 +338,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                         continue
                     adj = 0
                     for part in parts:
+                        if part == "":
+                            continue
                         if part[0].isalpha():
                             continue
                         adj += abs(float(part))
