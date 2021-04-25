@@ -6,6 +6,7 @@ import time
 import zipfile
 import traceback
 import datetime
+import os
 import hlpr
 import datasrc
 import todayfile
@@ -223,11 +224,21 @@ class IndiaSTKDS(datasrc.DataSrc):
 
     #[ "EQ SHARES", "" ],
     #[ "DVR", "" ],
-    purposeCM = [
+    purposesCM = [
+        [ "+FV SPL", "/FV SPL" ],
+        [ "/-", "" ],
+        ]
+    purposeBCM = [
         [ "BON ", "BONUS" ],
-        [ "-", "" ],
+        [ "BON-", "BONUS" ],
+        [ " ", "" ],
+        [ "BONUS", "BONUS " ],
+        ]
+    purposeSCM = [
         [ "ISSUE", "" ],
         [ "PERSHARE", "" ],
+        [ "FV SPLIT", "SPLIT" ],
+        [ "FV SPL", "SPLIT" ],
         [ "FVSPLIT", "SPLIT" ],
         [ "FVSPLT", "SPLIT" ],
         [ "RS.", "" ],
@@ -237,11 +248,10 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "FROM", "" ],
         [ "FRM", "" ],
         [ " ", "" ],
-        [ "BONUS", "BONUS " ],
         [ "SPLIT", "SPLIT " ],
         [ "TO", " TO " ],
         ]
-    purposeDivCM = [
+    purposeDCM = [
         [ "DIVIDEND", "DIV" ],
         [ "PER", "" ],
         [ "PR", "" ],
@@ -277,13 +287,15 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "  ", " " ],
         ]
     def _parse_purposes(self, purposes, code=None, exDate=None):
-        lPurposes = purposes.upper().split('/')
+        purposesC1 = hlpr.string_cleanup(purposes, self.purposesCM)
+        lPurposes = purposesC1.upper().split('/')
         lReturn = []
         for purpose in lPurposes:
             bAdd = False
-            purpose = hlpr.string_cleanup(purpose, self.purposeCM)
             try:
-                if purpose.startswith('BONUS'):
+                if purpose.startswith('BON'):
+                    os.system("echo '{}' > /tmp/t.B".format(purpose))
+                    purpose = hlpr.string_cleanup(purpose, self.purposeBCM)
                     if "DVR" in purpose:
                         print("WARN:IndiaStks:parse_purposes:{}:{}:Ignoring DVR...".format(code, exDate))
                         continue
@@ -297,7 +309,9 @@ class IndiaSTKDS(datasrc.DataSrc):
                     adj = cur/total
                     actType = 'B'
                     bAdd = True
-                elif purpose.startswith('SPLIT'):
+                elif 'SPL' in purpose:
+                    os.system("echo '{}' > /tmp/t.S".format(purpose))
+                    purpose = hlpr.string_cleanup(purpose, self.purposeSCM)
                     #if "FV" not in purposes:
                     #    input("DBUG:IndiaStks:parse_purposes:{}:{}:Split without FV?:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
@@ -306,7 +320,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                     actType = 'S'
                     bAdd = True
                 elif purpose.startswith('DIV'):
-                    purpose = hlpr.string_cleanup(purpose, self.purposeDivCM)
+                    os.system("echo '{}' > /tmp/t.D".format(purpose))
+                    purpose = hlpr.string_cleanup(purpose, self.purposeDCM)
                     purpose = purpose.strip()
                     #input("DBUG:IndiaSTK:parse_purposes:{}:{}:{}:{}".format(code, exDate, purposes, purpose))
                     parts = purpose.split(' ')
@@ -322,6 +337,7 @@ class IndiaSTKDS(datasrc.DataSrc):
                 if bAdd:
                     lReturn.append([actType, adj, purpose])
             except:
+                traceback.print_exc()
                 input("DBUG:IndiaSTK:parse_purposes:{}:{}:Exception:{}:{}".format(code, exDate, purposes, purpose))
         return lReturn
 
