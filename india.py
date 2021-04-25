@@ -354,7 +354,8 @@ class IndiaSTKDS(datasrc.DataSrc):
                     lReturn.append([actType, adj, purpose])
             except:
                 traceback.print_exc()
-                input("DBUG:IndiaSTK:parse_purposes:{}:{}:Exception:{}:{}".format(code, exDate, purposes, purpose))
+                os.system("echo '{}' >> /tmp/t.E".format(purposes))
+                #input("DBUG:IndiaSTK:parse_purposes:{}:{}:Exception:{}:{}".format(code, exDate, purposes, purpose))
         return lReturn
 
 
