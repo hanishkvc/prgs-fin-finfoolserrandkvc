@@ -255,7 +255,6 @@ class IndiaSTKDS(datasrc.DataSrc):
         ]
     purposeDCM = [
         [ "-", "" ],
-        [ "PERSHARE", "" ],
         [ "DIV.", "DIV" ],
         [ "DIVIDEND", "DIV" ],
         [ "PER", "" ],
@@ -273,6 +272,10 @@ class IndiaSTKDS(datasrc.DataSrc):
         [ "UNIT", "" ],
         [ "UNI", "" ],
         [ "UN", "" ],
+        [ "RS.", "" ],
+        [ "RE.", "" ],
+        [ "RS", "" ],
+        [ "RE", "" ],
         [ "SPDIV", "SPL" ],
         [ ".@", " " ],
         [ "@", " " ],
